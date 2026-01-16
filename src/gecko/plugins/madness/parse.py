@@ -1,61 +1,117 @@
+# src/gecko/plugins/madness/parse.py
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
+import numpy as np
 
 from gecko.core.model import Calculation
 
 
+
+_IJK = ["x", "y", "z"]
+
+def _beta_df_to_tensor(beta_df) -> dict[str, Any]:
+    """
+    Convert MADQC beta_pivot (a pandas DataFrame pivot_table) into a tensor-first
+    representation.
+
+    Expects:
+      beta_df.index = MultiIndex [omegaA, omegaB, omegaC]
+      beta_df.columns = strings like "xyz", "xxy", etc.
+      beta_df.values = scalar (float or complex)
+
+    Returns:
+      {
+        "omega": np.ndarray shape (n_freq, 3) [omegaA, omegaB, omegaC],
+        "components": list[str] length n_comp,
+        "values": np.ndarray shape (n_freq, n_comp),
+        "shape": ("freq", "component"),
+      }
+    """
+    # Lazy import: parse.py can be imported without pandas installed
+    import pandas as pd  # type: ignore
+
+    if beta_df is None:
+        return {}
+
+    if not isinstance(beta_df, pd.DataFrame):
+        raise TypeError(f"Expected pandas DataFrame, got {type(beta_df)}")
+
+    # Ensure stable ordering for reproducibility
+    beta_df = beta_df.sort_index()
+    beta_df = beta_df.reindex(sorted(beta_df.columns), axis=1)
+
+    # Extract omega tuples from MultiIndex
+    omega = np.asarray(beta_df.index.to_list(), dtype=float)  # (n_freq, 3)
+
+    components = [str(c) for c in beta_df.columns.to_list()]
+    values = beta_df.to_numpy()  # (n_freq, n_comp)
+
+    return {
+        "omega": omega,
+        "components": components,
+        "values": values,
+        "shape": ("freq", "component"),
+    }
+
+
+
 def parse_run(calc: Calculation) -> None:
-    """
-    Populate calc.data/meta from MADQC-style MADNESS artifacts.
-    Migration-first: keep dicts as dicts; normalize later.
-    """
-    root = calc.root
-
-    # 1) calc_info is the anchor for MADQC-style runs
     ci_path = calc.artifacts.get("calc_info_json")
-    if ci_path and ci_path.exists():
-        calc_info = _read_json(ci_path)
-        calc.data["calc_info"] = calc_info
-        calc.meta["style"] = "madqc"
+    if not ci_path:
+        return
 
-        # light metadata extraction (best-effort)
-        _populate_meta_from_calc_info(calc, calc_info)
+    calc.meta["style"] = "madqc"
 
-    # 2) optional: mad_output_json (older/newer auxiliary)
-    mo_path = calc.artifacts.get("mad_output_json")
-    if mo_path and mo_path.exists():
-        calc.data["mad_output"] = _read_json(mo_path)
+    from gecko.plugins.madness.legacy.madness_data import madqc_parser
+    obj = madqc_parser(ci_path)
 
-    # 3) optional: responses metadata (if present)
-    rm_path = calc.artifacts.get("responses_metadata_json")
-    if rm_path and rm_path.exists():
-        calc.data["responses_metadata"] = _read_json(rm_path)
+    # Keep raw JSON as a source of truth during migration
+    calc.data["calc_info"] = _read_json(ci_path)
+
+    # Tensor-first hyperpolarizability
+    calc.data["beta"] = _beta_df_to_tensor(obj.beta_pivot)
+
+    # (Optional) do the same for alpha later:
+    # calc.data["alpha"] = _alpha_df_to_tensor(obj.alpha_pivot)
+
+    # Keep other useful arrays
+    calc.data["orbital_energies"] = obj.orbital_energies
+    calc.data["hessian"] = obj.hessian
+    calc.data["normal_modes"] = obj.normal_modes
+    calc.data["vibrational_frequencies"] = obj.vibrational_frequencies
+    calc.data["polarization_frequencies"] = getattr(obj, "polarization_frequencies", None)
+
+    # Optional
+    calc.data["molecule"] = obj.molecule
+    calc.meta["ground_state_energy"] = obj.ground_state_energy
+
+
+def _parse_madqc_calc_info(path: Path) -> dict[str, Any]:
+    # Import inside function so gecko can still import even if optional deps missing
+    from gecko.plugins.madness.legacy.madness_data import madqc_parser
+
+    obj = madqc_parser(path)
+
+    # NOTE: obj currently stores a bunch of pandas DataFrames and numpy arrays.
+    # That's fine for migration. We'll normalize later.
+    return {
+        "raw": _read_json(path),  # keep the raw JSON dict as source of truth
+        "ground_state_energy": obj.ground_state_energy,
+        "molecule": obj.molecule,
+        "orbital_energies": obj.orbital_energies,
+        "alpha_df": obj.alpha_pivot,
+        "beta_df": obj.beta_pivot,
+        "raman_df": obj.raman_pivot,
+        "hessian": obj.hessian,
+        "normal_modes": obj.normal_modes,
+        "polarization_frequencies": getattr(obj, "polarization_frequencies", None),
+        "vibrational_frequencies": obj.vibrational_frequencies,
+    }
 
 
 def _read_json(path: Path) -> dict[str, Any]:
+    import json
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
-
-
-def _populate_meta_from_calc_info(calc: Calculation, ci: dict[str, Any]) -> None:
-    """
-    Best-effort extraction. Don't overfit yet—just grab what’s commonly useful.
-    """
-    # You can adjust these keys once we look at a real calc_info schema
-    # Typical candidates: molecule name, basis, method, protocol, frequencies, etc.
-
-    # Example patterns (safe lookups):
-    for key in ("molecule", "mol", "name"):
-        if key in ci and "molecule" not in calc.meta:
-            calc.meta["molecule"] = ci[key]
-
-    for key in ("basis", "basis_set"):
-        if key in ci and "basis" not in calc.meta:
-            calc.meta["basis"] = ci[key]
-
-    for key in ("protocol", "threshold", "dconv", "econv"):
-        if key in ci and key not in calc.meta:
-            calc.meta[key] = ci[key]

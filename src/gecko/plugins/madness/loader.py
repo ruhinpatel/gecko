@@ -42,4 +42,15 @@ def _discover_artifacts(root: Path) -> dict[str, Path]:
     if resp_meta.exists():
         artifacts["responses_metadata_json"] = resp_meta
 
+    # If you have precomputed SHG data saved somewhere (common in older workflows)
+    for name in ("shg_ijk.csv", "beta.csv", "hyperpolarizability.csv"):
+        p = root / name
+        if p.exists():
+            artifacts["beta_csv"] = p
+            break
+    # Keep old json marker too
+    mad_out = next(iter(root.glob("output.json")), None)
+    if mad_out:
+        artifacts["mad_output_json"] = mad_out
+
     return artifacts

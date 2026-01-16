@@ -35,6 +35,46 @@ def tensor_to_numpy(tensor: dict) -> np.ndarray:
     """
     return np.array(tensor["vals"]).reshape(tensor["dims"])
 
+def normalize_ijk_component(comp) -> str:
+    """
+    Normalize hyperpolarizability component labels to 'xyz' style.
+
+    Supports:
+      - ['Dipole_X','Dipole_Y','Dipole_Z']  -> 'xyz'
+      - ['X','Y','Z'] or ['x','y','z']      -> 'xyz'
+      - 'xyz'                               -> 'xyz'
+      - ('Dipole_X','Dipole_X','Dipole_Y')  -> 'xxy'
+    """
+    if comp is None:
+        raise ValueError("component is None")
+
+    # Already a compact string like "xxy"
+    if isinstance(comp, str):
+        s = comp.strip()
+        # handle "Dipole_X,Dipole_Y,..." as a string (just in case)
+        if "Dipole_" in s or "_" in s:
+            parts = [p.strip() for p in s.replace(",", " ").split()]
+            comp = parts
+        else:
+            # assume already xyz-like
+            return s.lower()
+
+    # Now treat as iterable of tokens
+    tokens = list(comp)
+
+    def tok_to_axis(t) -> str:
+        t = str(t).strip()
+        # e.g., "Dipole_X" -> "X"
+        if "_" in t:
+            t = t.split("_")[-1]
+        t = t.lower()
+        # allow x/y/z only
+        if t not in ("x", "y", "z"):
+            raise ValueError(f"Unrecognized component token: {t!r}")
+        return t
+
+    return "".join(tok_to_axis(t) for t in tokens)
+
 
 class madqc_parser:
     """
@@ -101,9 +141,8 @@ class madqc_parser:
 
             # Hyperpolarizability β(ωA; ωB, ωC)
             beta = rprops.query("property == 'hyperpolarizability'").copy()
-            beta["ijk"] = beta.component.apply(
-                lambda x: "".join([v.split("_")[1] for v in x])
-            )
+            beta["ijk"] = beta.component.apply(normalize_ijk_component)
+
             beta["omegaB"] = beta.freqB
             beta["omegaC"] = beta.freqC
             beta["omegaA"] = -(beta.freqB + beta.freqC)
@@ -141,7 +180,7 @@ class madqc_parser:
 
             self.polarizability_derivatives = []
             self.polarizability_derivatives_normal_modes = []
-        
+
             raman_related_properties= raman_spectra["raman_spectra"]
             self.raman_by_freq = {}
             for freq_, item in raman_related_properties.items():
@@ -160,6 +199,3 @@ class madqc_parser:
 
         except Exception as e:
             print("No response data found:", e)
-
-
-
