@@ -5,21 +5,25 @@ from pathlib import Path
 
 def can_load(path: Path) -> bool:
     """
-    Heuristic detection for MADNESS outputs (migration fixtures first).
+    Detect MADNESS run directories.
 
-    We will make this more robust once we inspect real production run layouts.
+    Supports:
+      - MADQC style: *.calc_info.json
+      - Legacy molresponse style: output.json
+      - Optional: responses/metadata.json
     """
     if not path.exists() or not path.is_dir():
         return False
 
-    # Fixture markers you currently have:
-    # - n12_mad_output.json
-    # - ... or any *_mad_output.json
+    # MADQC marker
     if any(path.glob("*.calc_info.json")):
         return True
 
-    # Common future marker candidates you might have in real runs:
-    # - responses/metadata.json
+    # Legacy molresponse marker
+    if (path / "output.json").exists():
+        return True
+
+    # Optional common marker
     if (path / "responses" / "metadata.json").exists():
         return True
 

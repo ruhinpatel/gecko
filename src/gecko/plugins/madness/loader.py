@@ -51,6 +51,6 @@ def _discover_artifacts(root: Path) -> dict[str, Path]:
     # Keep old json marker too
     mad_out = next(iter(root.glob("output.json")), None)
     if mad_out:
-        artifacts["mad_output_json"] = mad_out
+        artifacts["output_json"] = mad_out
 
     return artifacts
