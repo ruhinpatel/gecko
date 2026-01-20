@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from gecko.core.model import Calculation
+from gecko.molecule_id import compute_molecule_id
 
 
 def _beta_df_to_tensor(beta_df) -> dict[str, Any]:
@@ -78,7 +79,20 @@ def parse_run(calc: Calculation) -> None:
     calc.data["polarization_frequencies"] = getattr(obj, "polarization_frequencies", None)
 
     calc.data["molecule"] = obj.molecule
+    calc.molecule = obj.molecule
     calc.meta["ground_state_energy"] = obj.ground_state_energy
+
+    if calc.molecule is None:
+        calc.molecule = _load_molecule_from_input(calc.artifacts.get("input_json"))
+        if calc.molecule is not None:
+            calc.meta.setdefault("molecule_source", "input.json")
+        else:
+            calc.meta.setdefault("warnings", []).append(
+                "MADNESS output missing molecule; input.json not found or invalid."
+            )
+
+    if calc.molecule is not None:
+        calc.meta["molecule_id"] = compute_molecule_id(calc.molecule)
 
 
 def _select_input_json(calc: Calculation) -> tuple[Path | None, str | None]:
@@ -104,3 +118,30 @@ def _read_json(path: Path) -> dict[str, Any]:
     import json
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _load_molecule_from_input(path: Path | None):
+    if path is None or not path.exists():
+        return None
+    data = _read_json(path)
+    mol = data.get("molecule")
+    if not isinstance(mol, dict):
+        return None
+    symbols = mol.get("symbols")
+    geometry = mol.get("geometry")
+    if symbols is None or geometry is None:
+        return None
+
+    import numpy as np
+    import qcelemental as qcel
+
+    units = mol.get("units") or mol.get("parameters", {}).get("units")
+    coords = np.asarray(geometry, dtype=float)
+    if isinstance(units, str) and units.lower() in ("bohr", "atomic", "au"):
+        coords = coords * qcel.constants.bohr2angstroms
+    return qcel.models.Molecule(
+        symbols=list(symbols),
+        geometry=coords,
+        charge=mol.get("charge"),
+        multiplicity=mol.get("multiplicity"),
+    )

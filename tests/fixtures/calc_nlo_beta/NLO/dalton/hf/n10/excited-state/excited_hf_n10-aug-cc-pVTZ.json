@@ -1,0 +1,89 @@
+{
+    "simulation": {
+        "calculations": [
+            {
+                "calculationType": "Dipole",
+                "calculationResults": {
+                    "x": "-0.00003395",
+                    "y": "0.00001145",
+                    "z": "0.00000000"
+                }
+            },
+            {
+                "calculationType": "energyCalculation",
+                "calculationTime": {
+                    "cpuTime": 1812.139,
+                    "wallTime": 1821.187,
+                    "units": "second"
+                },
+                "calculationResults": {
+                    "totalEnergy": {
+                        "value": -1028.884624256315,
+                        "units": "Hartree"
+                    },
+                    "nuclearRepulsionEnergy": {
+                        "value": 1425.837764718247,
+                        "units": "Hartree"
+                    },
+                    "electronEnergy": {
+                        "value": -2454.722388974562,
+                        "units": "Hartree"
+                    }
+                },
+                "calculationSetup": {
+                    "numberOfElectrons": 172,
+                    "molecularSpinMultiplicity": 1,
+                    "waveFunctionType": "HF",
+                    "waveFunctionTheory": "Hartree-Fock",
+                    "charge": 0
+                }
+            },
+            {
+                "calculationType": "SingletExcitationEnergy",
+                "calculationTime": {
+                    "cpuTime": 1.0,
+                    "wallTime": 1.0,
+                    "units": "second"
+                },
+                "calculationResults": {
+                    "frequencies": [
+                        [
+                            0.101392,
+                            0.158135,
+                            0.16154,
+                            0.164573
+                        ]
+                    ],
+                    "Sym": [
+                        [
+                            1,
+                            1,
+                            1,
+                            1
+                        ]
+                    ],
+                    "Mode": [
+                        [
+                            1,
+                            2,
+                            3,
+                            4
+                        ]
+                    ]
+                }
+            }
+        ],
+        "simulationTime": {
+            "cpuTime": 1.0,
+            "wallTime": 1.0,
+            "units": "second"
+        },
+        "symmetry": {
+            "point_group": "C1",
+            "representation": "C1",
+            "irreps": [
+                "A"
+            ]
+        }
+    }
+}

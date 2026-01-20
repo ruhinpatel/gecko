@@ -53,4 +53,8 @@ def _discover_artifacts(root: Path) -> dict[str, Path]:
     if mad_out:
         artifacts["output_json"] = mad_out
 
+    input_json = root / "input.json"
+    if input_json.exists():
+        artifacts["input_json"] = input_json
+
     return artifacts

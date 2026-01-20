@@ -36,3 +36,19 @@ src/gecko/
       madness/
     legacy/                   # quarantine: db/ and cli/ initially
 ```
+
+## External geometry for legacy outputs
+
+Some legacy MADNESS outputs (e.g., `output.json`) do not embed molecular geometry.
+You can provide external `.mol` files and gecko will resolve them in the following
+priority order:
+
+1) `--mol-map` (explicit label -> file mapping)
+2) `--mol-dir` (label-based lookup, `LABEL.mol`)
+3) `--mol-file` (single fallback)
+
+Examples:
+
+gecko-viz --calc-root /path/to/calcs --mol-dir /path/to/mols
+gecko-viz --calc-root /path/to/calcs --mol-map /path/to/mol_map.json
+gecko-viz --calc-root /path/to/calcs --mol-file /path/to/H2O.mol

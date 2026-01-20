@@ -1,0 +1,25 @@
+{
+    "simulation": {
+        "calculations": [],
+        "simulationTime": {
+            "cpuTime": 0.02,
+            "wallTime": 0.02,
+            "units": "second"
+        },
+        "symmetry": {
+            "point_group": "C1",
+            "representation": "C1",
+            "irreps": [
+                "A"
+            ]
+        }
+    },
+    "alpha": {
+        "molecule": {},
+        "basis": {}
+    },
+    "Quad": {
+        "molecule": {},
+        "basis": {}
+    }
+}

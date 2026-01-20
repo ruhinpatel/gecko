@@ -1,0 +1,1 @@
+This directory has an example of madness hyperpolarizability data using the "molresponse" style format.  The difference is simply that the response properties components are printed using "xxx", "xxy", etc. notation instead of the "Dipole_X", "Dipole_Y", etc. notation.

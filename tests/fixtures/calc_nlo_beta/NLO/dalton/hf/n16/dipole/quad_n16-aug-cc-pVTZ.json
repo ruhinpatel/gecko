@@ -1,0 +1,63 @@
+{
+    "simulation": {
+        "calculations": [
+            {
+                "calculationType": "Dipole",
+                "calculationResults": {
+                    "x": "0.00000573",
+                    "y": "-0.00003204",
+                    "z": "0.00000000"
+                }
+            },
+            {
+                "calculationType": "energyCalculation",
+                "calculationTime": {
+                    "cpuTime": 3656.6,
+                    "wallTime": 3675.732,
+                    "units": "second"
+                },
+                "calculationResults": {
+                    "totalEnergy": {
+                        "value": -1490.359866401002,
+                        "units": "Hartree"
+                    },
+                    "nuclearRepulsionEnergy": {
+                        "value": 2402.763166227178,
+                        "units": "Hartree"
+                    },
+                    "electronEnergy": {
+                        "value": -3893.12303262818,
+                        "units": "Hartree"
+                    }
+                },
+                "calculationSetup": {
+                    "numberOfElectrons": 256,
+                    "molecularSpinMultiplicity": 1,
+                    "waveFunctionType": "HF",
+                    "waveFunctionTheory": "Hartree-Fock",
+                    "charge": 0
+                }
+            }
+        ],
+        "simulationTime": {
+            "cpuTime": 1.0,
+            "wallTime": 1.0,
+            "units": "second"
+        },
+        "symmetry": {
+            "point_group": "C1",
+            "representation": "C1",
+            "irreps": [
+                "A"
+            ]
+        }
+    },
+    "alpha": {
+        "molecule": {},
+        "basis": {}
+    },
+    "Quad": {
+        "molecule": {},
+        "basis": {}
+    }
+}

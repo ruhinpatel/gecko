@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
+
+import qcelemental as qcel
 
 
 @dataclass
@@ -20,6 +22,7 @@ class Calculation:
     artifacts: dict[str, Path] = field(default_factory=dict)
     data: dict[str, Any] = field(default_factory=dict)
     meta: dict[str, Any] = field(default_factory=dict)
+    molecule: Optional[qcel.models.Molecule] = None
 
     def __repr__(self) -> str:
         keys = ", ".join(sorted(self.data.keys())) if self.data else "-"

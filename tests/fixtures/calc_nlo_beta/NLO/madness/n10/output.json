@@ -1,0 +1,334 @@
+{
+  "tasks": [
+    {
+      "dipole": {
+        "dims": [
+          3
+        ],
+        "size": 3,
+        "vals": [
+          -0.948045803975343,
+          3.1878797239392735,
+          -1.199214564370968e-06
+        ]
+      },
+      "energy": -1028.959336533129,
+      "type": "scf"
+    },
+    {
+      "metadata": {
+        "states": {
+          "Dipole_x": {
+            "final_converged": false,
+            "protocols": {
+              "1.000000e-04": {
+                "converged": {
+                  "0.000000e+00": true
+                },
+                "saved": {
+                  "0.000000e+00": true
+                }
+              },
+              "1.000000e-06": {
+                "converged": {
+                  "0.000000e+00": true
+                },
+                "saved": {
+                  "0.000000e+00": true
+                }
+              }
+            }
+          },
+          "Dipole_y": {
+            "final_converged": false,
+            "protocols": {
+              "1.000000e-04": {
+                "converged": {
+                  "0.000000e+00": true
+                },
+                "saved": {
+                  "0.000000e+00": true
+                }
+              },
+              "1.000000e-06": {
+                "converged": {
+                  "0.000000e+00": true
+                },
+                "saved": {
+                  "0.000000e+00": true
+                }
+              }
+            }
+          },
+          "Dipole_z": {
+            "final_converged": false,
+            "protocols": {
+              "1.000000e-04": {
+                "converged": {
+                  "0.000000e+00": true
+                },
+                "saved": {
+                  "0.000000e+00": true
+                }
+              },
+              "1.000000e-06": {
+                "converged": {
+                  "0.000000e+00": true
+                },
+                "saved": {
+                  "0.000000e+00": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "properties": [
+        {
+          "component": "xxx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -1254.0207126216083
+        },
+        {
+          "component": "xxy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 5205.300442343615
+        },
+        {
+          "component": "xxz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 0.000427644655549666
+        },
+        {
+          "component": "xyx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 5205.300442343814
+        },
+        {
+          "component": "xyy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -19447.94046880037
+        },
+        {
+          "component": "xyz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -0.0013187522935426154
+        },
+        {
+          "component": "xzx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 0.0004276446736959571
+        },
+        {
+          "component": "xzy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -0.0013187522922077427
+        },
+        {
+          "component": "xzz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 10.793276622804402
+        },
+        {
+          "component": "yxx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 5205.297223095797
+        },
+        {
+          "component": "yxy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -19447.919777496958
+        },
+        {
+          "component": "yxz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -0.0013212137734531677
+        },
+        {
+          "component": "yyx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -19447.919777499104
+        },
+        {
+          "component": "yyy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 62170.13346541686
+        },
+        {
+          "component": "yyz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 0.005147206984826864
+        },
+        {
+          "component": "yzx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -0.0013212141082333054
+        },
+        {
+          "component": "yzy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 0.005147206976692875
+        },
+        {
+          "component": "yzz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -36.891228706724405
+        },
+        {
+          "component": "zxx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 0.00042831521675128865
+        },
+        {
+          "component": "zxy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -0.0013228566277316066
+        },
+        {
+          "component": "zxz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 10.793847326266395
+        },
+        {
+          "component": "zyx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -0.0013228566265279383
+        },
+        {
+          "component": "zyy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 0.005154310989081618
+        },
+        {
+          "component": "zyz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -36.8907953278593
+        },
+        {
+          "component": "zzx",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": 10.793847326268965
+        },
+        {
+          "component": "zzy",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -36.890795327893336
+        },
+        {
+          "component": "zzz",
+          "freqB": 0.0,
+          "freqC": 0.0,
+          "property": "hyperpolarizability",
+          "value": -0.00026110989055634366
+        },
+        {
+          "component": "xx",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": 257.48006292873106
+        },
+        {
+          "component": "xy",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": -230.4974360724893
+        },
+        {
+          "component": "xz",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": 1.2911071476901382e-05
+        },
+        {
+          "component": "yx",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": -230.8376320441742
+        },
+        {
+          "component": "yy",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": 1695.5808721198
+        },
+        {
+          "component": "yz",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": 1.5839757967869346e-05
+        },
+        {
+          "component": "zx",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": 3.505106119433922e-06
+        },
+        {
+          "component": "zy",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": 1.7162407444695194e-05
+        },
+        {
+          "component": "zz",
+          "freqB": 0.0,
+          "property": "polarizability",
+          "value": 160.54923779727747
+        }
+      ],
+      "type": "response"
+    }
+  ]
+}

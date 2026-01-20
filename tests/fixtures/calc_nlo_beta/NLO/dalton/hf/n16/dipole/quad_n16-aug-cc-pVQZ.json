@@ -1,0 +1,34 @@
+{
+    "simulation": {
+        "calculations": [
+            {
+                "calculationType": "Dipole",
+                "calculationResults": {
+                    "x": "0.00000573",
+                    "y": "-0.00003204",
+                    "z": "0.00000000"
+                }
+            }
+        ],
+        "simulationTime": {
+            "cpuTime": 2.0,
+            "wallTime": 2.0,
+            "units": "second"
+        },
+        "symmetry": {
+            "point_group": "C1",
+            "representation": "C1",
+            "irreps": [
+                "A"
+            ]
+        }
+    },
+    "alpha": {
+        "molecule": {},
+        "basis": {}
+    },
+    "Quad": {
+        "molecule": {},
+        "basis": {}
+    }
+}

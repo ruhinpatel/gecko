@@ -1,0 +1,45 @@
+{
+    "simulation": {
+        "calculations": [
+            {
+                "calculationType": "Dipole",
+                "calculationResults": {
+                    "x": "-0.00000204",
+                    "y": "0.00000730",
+                    "z": "0.00000000"
+                }
+            },
+            {
+                "calculationType": "energyCalculation",
+                "calculationResults": {},
+                "calculationSetup": {
+                    "numberOfElectrons": 214,
+                    "molecularSpinMultiplicity": 1,
+                    "waveFunctionType": "HF",
+                    "waveFunctionTheory": "Hartree-Fock",
+                    "charge": 0
+                }
+            }
+        ],
+        "simulationTime": {
+            "cpuTime": 0.0,
+            "wallTime": 0.0,
+            "units": "second"
+        },
+        "symmetry": {
+            "point_group": "C1",
+            "representation": "C1",
+            "irreps": [
+                "A"
+            ]
+        }
+    },
+    "alpha": {
+        "molecule": {},
+        "basis": {}
+    },
+    "Quad": {
+        "molecule": {},
+        "basis": {}
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "molecule": {
+    "symbols": ["H", "H"],
+    "geometry": [[0.0, 0.0, 0.0], [0.0, 0.0, 0.74]],
+    "charge": 0,
+    "multiplicity": 1,
+    "units": "angstrom"
+  }
+}

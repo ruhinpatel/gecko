@@ -2,7 +2,9 @@ from pathlib import Path
 from typing import Iterable
 
 import pandas as pd
-import gecko
+
+from gecko.index import CalcIndex
+from gecko.tables import TableBuilder
 
 
 def build_beta_table(
@@ -10,6 +12,13 @@ def build_beta_table(
     *,
     verbose: bool = True,
     fail_fast: bool = False,
+    require_geometry: bool = False,
+    inline_geometry: bool = False,
+    include_geometry: bool = False,
+    mol_file: str | Path | None = None,
+    mol_dir: str | Path | None = None,
+    mol_root: str | Path | None = None,
+    mol_map: str | Path | None = None,
 ) -> pd.DataFrame:
     """
     Build a long-form table for hyperpolarizability data.
@@ -17,59 +26,77 @@ def build_beta_table(
     If a calculation fails to load or parse, the offending directory
     is reported and skipped (unless fail_fast=True).
 
-    Output columns:
-      - root
-      - molecule (if available)
-      - basis (if available)
-      - omegaA, omegaB, omegaC
-      - ijk
-      - value
+        Output columns:
+            - calc_id
+            - geom_id
+            - mol_id
+            - molecule_id
+            - label
+            - code
+            - root
+            - basis
+            - method
+            - omegaA, omegaB, omegaC
+            - ijk
+            - value
+            - geometry (optional JSON string)
     """
-    rows: list[dict] = []
+    if inline_geometry and not include_geometry:
+        include_geometry = True
 
-    for d in calc_dirs:
-        try:
-            calc = gecko.load_calc(d)
+    index = CalcIndex.from_dirs(
+        calc_dirs,
+        mol_root=mol_root,
+        mol_map=mol_map,
+        mol_file=mol_file,
+        mol_dir=mol_dir,
+        strict=fail_fast,
+    )
 
-            beta = calc.data.get("beta") or {}
-            if not beta:
+    if verbose:
+        for failure in index.failures:
+            print("\n[gecko] FAILED to process calculation:")
+            print(f"  path: {failure.path}")
+            print(f"  error: {failure.error}")
+
+    if require_geometry:
+        filtered = []
+        for calc in index.calcs:
+            if calc.meta.get("geom_id") is None:
+                msg = f"[gecko] missing geometry, skipping: {calc.root}"
                 if verbose:
-                    print(f"[gecko] no beta data found, skipping: {d}")
+                    print(msg)
+                if fail_fast:
+                    raise ValueError(msg)
                 continue
+            filtered.append(calc)
+        index.calcs = filtered
 
-            omega = beta["omega"]          # shape (N, 3)
-            comps = beta["components"]     # len n_comp
-            vals = beta["values"]          # shape (N, n_comp)
+    builder = TableBuilder(index.calcs)
+    beta_df = builder.build_beta()
 
-            mol = (
-                calc.meta.get("molecule")
-                or calc.data.get("calc_info", {}).get("molecule")
-                or calc.data.get("raw_json", {}).get("molecule")
+    if include_geometry:
+        import json
+
+        geom_df = builder.build_geometries()
+        if not geom_df.empty:
+            beta_df = beta_df.merge(
+                geom_df[["geom_id", "symbols", "geometry_angstrom"]],
+                on="geom_id",
+                how="left",
             )
-            basis = calc.meta.get("basis")
-
-            for i in range(vals.shape[0]):
-                omegaA, omegaB, omegaC = omega[i, :]
-                for j, ijk in enumerate(comps):
-                    rows.append(
-                        {
-                            "root": str(calc.root),
-                            "molecule": mol,
-                            "basis": basis,
-                            "omegaA": float(omegaA),
-                            "omegaB": float(omegaB),
-                            "omegaC": float(omegaC),
-                            "ijk": ijk,
-                            "value": vals[i, j],
-                        }
+            if not beta_df.empty:
+                def _format_geometry(row):
+                    symbols = row.get("symbols")
+                    geometry = row.get("geometry_angstrom")
+                    if pd.isna(symbols) or pd.isna(geometry):
+                        return None
+                    return json.dumps(
+                        {"symbols": symbols, "geometry": geometry},
+                        separators=(",", ":"),
                     )
 
-        except Exception as e:
-            if verbose:
-                print("\n[gecko] FAILED to process calculation:")
-                print(f"  path: {d}")
-                print(f"  error: {type(e).__name__}: {e}")
-            if fail_fast:
-                raise
+                beta_df["geometry"] = beta_df.apply(_format_geometry, axis=1)
+                beta_df = beta_df.drop(columns=["symbols", "geometry_angstrom"])
 
-    return pd.DataFrame(rows)
+    return beta_df

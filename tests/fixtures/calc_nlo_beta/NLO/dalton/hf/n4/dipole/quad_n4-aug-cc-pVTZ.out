@@ -1,0 +1,2628 @@
+
+
+     ************************************************************************
+     *************** Dalton - An Electronic Structure Program ***************
+     ************************************************************************
+
+    This is output from DALTON release Dalton2020.0 (2020)
+         ( Web site: http://daltonprogram.org )
+
+   ----------------------------------------------------------------------------
+
+    NOTE:
+     
+    Dalton is an experimental code for the evaluation of molecular
+    properties using (MC)SCF, DFT, CI, and CC wave functions.
+    The authors accept no responsibility for the performance of
+    the code or for the correctness of the results.
+     
+    The code (in whole or part) is provided under a licence and
+    is not to be reproduced for further distribution without
+    the written permission of the authors or their representatives.
+     
+    See the home page "http://daltonprogram.org" for further information.
+     
+    If results obtained with this code are published,
+    the appropriate citations would be both of:
+     
+       K. Aidas, C. Angeli, K. L. Bak, V. Bakken, R. Bast,
+       L. Boman, O. Christiansen, R. Cimiraglia, S. Coriani,
+       P. Dahle, E. K. Dalskov, U. Ekstroem,
+       T. Enevoldsen, J. J. Eriksen, P. Ettenhuber, B. Fernandez,
+       L. Ferrighi, H. Fliegl, L. Frediani, K. Hald, A. Halkier,
+       C. Haettig, H. Heiberg, T. Helgaker, A. C. Hennum,
+       H. Hettema, E. Hjertenaes, S. Hoest, I.-M. Hoeyvik,
+       M. F. Iozzi, B. Jansik, H. J. Aa. Jensen, D. Jonsson,
+       P. Joergensen, J. Kauczor, S. Kirpekar,
+       T. Kjaergaard, W. Klopper, S. Knecht, R. Kobayashi, H. Koch,
+       J. Kongsted, A. Krapp, K. Kristensen, A. Ligabue,
+       O. B. Lutnaes, J. I. Melo, K. V. Mikkelsen, R. H. Myhre,
+       C. Neiss, C. B. Nielsen, P. Norman, J. Olsen,
+       J. M. H. Olsen, A. Osted, M. J. Packer, F. Pawlowski,
+       T. B. Pedersen, P. F. Provasi, S. Reine, Z. Rinkevicius,
+       T. A. Ruden, K. Ruud, V. Rybkin, P. Salek, C. C. M. Samson,
+       A. Sanchez de Meras, T. Saue, S. P. A. Sauer,
+       B. Schimmelpfennig, K. Sneskov, A. H. Steindal,
+       K. O. Sylvester-Hvid, P. R. Taylor, A. M. Teale,
+       E. I. Tellgren, D. P. Tew, A. J. Thorvaldsen, L. Thoegersen,
+       O. Vahtras, M. A. Watson, D. J. D. Wilson, M. Ziolkowski
+       and H. Agren,
+       "The Dalton quantum chemistry program system",
+       WIREs Comput. Mol. Sci. 2014, 4:269–284 (doi: 10.1002/wcms.1172)
+     
+    and
+     
+       Dalton, a molecular electronic structure program,
+       Release Dalton2020.0 (2020), see http://daltonprogram.org
+   ----------------------------------------------------------------------------
+
+    Authors in alphabetical order (Major contribution(s) in parenthesis):
+
+  Kestutis Aidas,           Vilnius University,           Lithuania   (QM/MM)
+  Celestino Angeli,         University of Ferrara,        Italy       (NEVPT2)
+  Keld L. Bak,              UNI-C,                        Denmark     (AOSOPPA, non-adiabatic coupling, magnetic properties)
+  Vebjoern Bakken,          University of Oslo,           Norway      (DALTON; geometry optimizer, symmetry detection)
+  Radovan Bast,             UiT The Arctic U. of Norway,  Norway      (DALTON installation and execution frameworks)
+  Pablo Baudin,             University of Valencia,       Spain       (Cholesky excitation energies)
+  Linus Boman,              NTNU,                         Norway      (Cholesky decomposition and subsystems)
+  Bruno N. Cabral Tenorio,  Technical Univ. of Denmark,   Denmark     (Lanczos-based CC methods)
+  Ove Christiansen,         Aarhus University,            Denmark     (CC module)
+  Renzo Cimiraglia,         University of Ferrara,        Italy       (NEVPT2)
+  Sonia Coriani,            Technical Univ. of Denmark,   Denmark     (CC and RESPONS modules)
+  Janusz Cukras,            University of Warsaw,         Poland      (MChD in RESPONS)
+  Paal Dahle,               University of Oslo,           Norway      (Parallelization)
+  Erik K. Dalskov,          UNI-C,                        Denmark     (SOPPA)
+  Thomas Enevoldsen,        Univ. of Southern Denmark,    Denmark     (SOPPA)
+  Janus J. Eriksen,         Aarhus University,            Denmark     (Polarizable embedding, TDA)
+  Rasmus Faber,             Technical Univ. of Denmark,   Denmark     (Vib.avg. NMR w. SOPPA, parallel AO-SOPPA, CVS-CC and EOMCC)
+  Tobias Fahleson,          KTH Stockholm,                Sweden      (Damped cubic response)
+  Berta Fernandez,          U. of Santiago de Compostela, Spain       (Doublet spin, ESR in RESPONS)
+  Lara Ferrighi,            Aarhus University,            Denmark     (PCM Cubic response)
+  Heike Fliegl,             University of Oslo,           Norway      (CCSD(R12))
+  Luca Frediani,            UiT The Arctic U. of Norway,  Norway      (PCM)
+  Emmanuel Fromager,        Univ. Strasbourg,             France      (MC-srDFT)
+  Bin Gao,                  UiT The Arctic U. of Norway,  Norway      (Gen1Int library)
+  Andre S. P. Gomes,        CNRS/Universite de Lille,     France      (Frozen density embedding)
+  Christof Haettig,         Ruhr-University Bochum,       Germany     (CC module)
+  Kasper Hald,              Aarhus University,            Denmark     (CC module)
+  Asger Halkier,            Aarhus University,            Denmark     (CC module)
+  Frederik Beyer Hansen,    University of Copenhagen,     Denmark     (Parallel AO-SOPPA)
+  Erik D. Hedegaard,        Univ. of Southern Denmark,    Denmark     (Polarizable embedding, QM/MM, and MC-srDFT)
+  Hanne Heiberg,            University of Oslo,           Norway      (Geometry analysis, selected one-electron integrals)
+  Trygve Helgaker,          University of Oslo,           Norway      (DALTON; ABACUS, ERI, DFT modules, London, and much more)
+  Alf Christian Hennum,     University of Oslo,           Norway      (Parity violation)
+  Hinne Hettema,            University of Auckland,       New Zealand (Quadratic response in RESPONS; SIRIUS supersymmetry)
+  Eirik Hjertenaes,         NTNU,                         Norway      (Cholesky decomposition)
+  Pi A. B. Haase,           University of Copenhagen,     Denmark     (Triplet AO-SOPPA)
+  Maria Francesca Iozzi,    University of Oslo,           Norway      (RPA)
+  Christoph Jacob           TU Braunschweig               Germany     (Frozen density embedding)
+  Brano Jansik              Technical Univ. of Ostrava    Czech Rep.  (DFT cubic response)
+  Hans Joergen Aa. Jensen,  Univ. of Southern Denmark,    Denmark     (DALTON; SIRIUS, RESPONS, ABACUS, MC-srDFT, and much more)
+  Dan Jonsson,              UiT The Arctic U. of Norway,  Norway      (Cubic response in RESPONS module)
+  Poul Joergensen,          Aarhus University,            Denmark     (RESPONS, ABACUS, and CC modules)
+  Maciej Kaminski,          University of Warsaw,         Poland      (CPPh in RESPONS)
+  Joanna Kauczor,           Linkoeping University,        Sweden      (Complex polarization propagator (CPP) module)
+  Sheela Kirpekar,          Univ. of Southern Denmark,    Denmark     (Mass-velocity & Darwin integrals)
+  Erik Kjellgren,           Univ. of Southern Denmark,    Denmark     (MC-srDFT)
+  Wim Klopper,              KIT Karlsruhe,                Germany     (R12 code in CC, SIRIUS, and ABACUS modules)
+  Stefan Knecht,            ETH Zurich,                   Switzerland (Parallel CI and MCSCF, MC-srDFT)
+  Rika Kobayashi,           Australian National Univ.,    Australia   (DIIS in CC, London in MCSCF)
+  Henrik Koch,              NTNU,                         Norway      (CC module, Cholesky decomposition)
+  Jacob Kongsted,           Univ. of Southern Denmark,    Denmark     (Polarizable embedding, polarizable density embedding, QM/MM)
+  Andrea Ligabue,           University of Modena,         Italy       (CTOCD, AOSOPPA)
+  Nanna H. List             Univ. of Southern Denmark,    Denmark     (Polarizable embedding)
+  Ola B. Lutnaes,           University of Oslo,           Norway      (DFT Hessian)
+  Juan I. Melo,             University of Buenos Aires,   Argentina   (LRESC, Relativistic Effects on NMR Shieldings)
+  Kurt V. Mikkelsen,        University of Copenhagen,     Denmark     (MC-SCRF and QM/MM)
+  Rolf H. Myhre,            NTNU,                         Norway      (Subsystems and CC3)
+  Christian Neiss,          Univ. Erlangen-Nuernberg,     Germany     (CCSD(R12))
+  Christian B. Nielsen,     University of Copenhagen,     Denmark     (QM/MM)
+  Patrick Norman,           KTH Stockholm,                Sweden      (Cubic response and complex frequency response in RESPONS)
+  Jeppe Olsen,              Aarhus University,            Denmark     (SIRIUS CI/density modules)
+  Jogvan Magnus H. Olsen,   Aarhus University,            Denmark     (Polarizable embedding and polarizable density embedding)
+  Anders Osted,             Copenhagen University,        Denmark     (QM/MM)
+  Martin J. Packer,         University of Sheffield,      UK          (SOPPA)
+  Filip Pawlowski,          Kazimierz Wielki University,  Poland      (CC3)
+  Morten N. Pedersen,       Univ. of Southern Denmark,    Denmark     (Polarizable embedding)
+  Thomas B. Pedersen,       University of Oslo,           Norway      (Cholesky decomposition)
+  Patricio F. Provasi,      University of Northeastern,   Argentina   (Analysis of coupling constants in localized orbitals)
+  Peter Reinholdt,          Univ. of Southern Denmark,    Denmark     (Polarizable embedding and polarizable density embedding)
+  Zilvinas Rinkevicius,     KTH Stockholm,                Sweden      (open-shell DFT, ESR)
+  Elias Rudberg,            KTH Stockholm,                Sweden      (DFT grid and basis info)
+  Torgeir A. Ruden,         University of Oslo,           Norway      (Numerical derivatives in ABACUS)
+  Kenneth Ruud,             UiT The Arctic U. of Norway,  Norway      (DALTON; ABACUS magnetic properties and much more)
+  Pawel Salek,              KTH Stockholm,                Sweden      (DALTON; DFT code)
+  Claire C. M. Samson       University of Karlsruhe       Germany     (Boys localization, r12 integrals in ERI)
+  Alfredo Sanchez de Meras, University of Valencia,       Spain       (CC module, Cholesky decomposition)
+  Trond Saue,               Paul Sabatier University,     France      (direct Fock matrix construction)
+  Stephan P. A. Sauer,      University of Copenhagen,     Denmark     (SOPPA(CCSD), SOPPA prop., AOSOPPA, vibrational g-factors)
+  Bernd Schimmelpfennig,    Forschungszentrum Karlsruhe,  Germany     (AMFI module)
+  Anna K. Schnack-Petersen, University of Copenhagen,     Denmark     (RPA(D) and HRPA(D) properties in AOSOPPA)
+  Kristian Sneskov,         Aarhus University,            Denmark     (Polarizable embedding, QM/MM)
+  Arnfinn H. Steindal,      UiT The Arctic U. of Norway,  Norway      (parallel QM/MM, polarizable embedding)
+  Casper Steinmann,         Aalborg University,           Denmark     (QFIT, polarizable embedding)
+  K. O. Sylvester-Hvid,     University of Copenhagen,     Denmark     (MC-SCRF)
+  Peter R. Taylor,          VLSCI/Univ. of Melbourne,     Australia   (Symmetry handling ABACUS, integral transformation)
+  Andrew M. Teale,          University of Nottingham,     England     (DFT-AC, DFT-D)
+  David P. Tew,             University of Bristol,        England     (CCSD(R12))
+  Julien Toulouse,          Sorbonne Univ.,               France      (MC-srDFT)
+  Olav Vahtras,             KTH Stockholm,                Sweden      (Triplet response, spin-orbit, ESR, TDDFT, open-shell DFT)
+  Lucas Visscher,           Vrije Universiteit Amsterdam, Netherlands (Frozen density embedding)
+  David J. Wilson,          La Trobe University,          Australia   (DFT Hessian and DFT magnetizabilities)
+  Hans Agren,               KTH Stockholm,                Sweden      (SIRIUS module, RESPONS, MC-SCRF solvation)
+ --------------------------------------------------------------------------------
+
+     Date and time (Linux)  : Thu May  8 15:02:59 2025
+     Host name              : xm046                                   
+
+ * Work memory size             :  1310720000 =  9.766 gigabytes.
+
+ * Directories for basis set searches:
+   1) /gpfs/projects/rjh/adrian/summer2025/beta_projects/raw_data/NLO/dalton/hf/n4/dipole
+   2) /gpfs/projects/rjh/adrian/dalton/build/basis
+
+
+Compilation information
+-----------------------
+
+ Who compiled             | ahurtado
+ Host                     | milan2
+ System                   | Linux-5.14.0-427.42.1.el9_4.x86_64
+ CMake generator          | Unix Makefiles
+ Processor                | x86_64
+ 64-bit integers          | OFF
+ MPI                      | ON
+ Fortran compiler         | /gpfs/software/openmpi/milan/gcc13.2/4.1.6/bin/mpi
+                          | f90
+ Fortran compiler version | GNU Fortran (GCC) 13.2.0
+ C compiler               | /gpfs/software/openmpi/milan/gcc13.2/4.1.6/bin/mpi
+                          | cc
+ C compiler version       | gcc (GCC) 13.2.0
+ C++ compiler             | /gpfs/software/openmpi/milan/gcc13.2/4.1.6/bin/mpi
+                          | cxx
+ C++ compiler version     | unknown
+ BLAS                     | /gpfs/software/intel/oneAPI/2024_2/mkl/2024.2/lib/
+                          | intel64/libmkl_gf_lp64.so;/gpfs/software/intel/one
+                          | API/2024_2/mkl/2024.2/lib/intel64/libmkl_sequentia
+                          | l.so;/gpfs/software/intel/oneAPI/2024_2/mkl/2024.2
+                          | /lib/intel64/libmkl_core.so;/usr/lib64/libpthread.
+                          | a;/usr/lib64/libm.so
+ LAPACK                   | /gpfs/software/intel/oneAPI/2024_2/mkl/2024.2/lib/
+                          | intel64/libmkl_lapack95_lp64.a;/gpfs/software/inte
+                          | l/oneAPI/2024_2/mkl/2024.2/lib/intel64/libmkl_gf_l
+                          | p64.so
+ Static linking           | OFF
+ Last Git revision        | 66052b3af5ea7225e31178bf9a8b031913c72190
+ Git branch               | (HEAD detached at Dalton2020.0)
+ Configuration time       | 2025-04-10 16:02:31.569498
+
+ * MPI parallel run using 96 processes.
+
+
+   Content of the .dal input file
+ ----------------------------------
+
+**DALTON INPUT
+.RUN RESPONSE
+.DIRECT
+**WAVE FUNCTIONS
+.HF
+**PROPERTIES
+**RESPONSE
+*QUADRA
+.DIPLEN
+.FREQUENCIES
+2
+0.0 0.0233
+**END OF DALTON INPUT
+
+
+   Content of the .mol file
+ ----------------------------
+
+BASIS
+aug-cc-pVTZ
+blah
+blah
+Atomtype=4 Angstrom Charge=0 Nosymmetry
+Charge=6 Atoms=8
+C_a -1.1882749990853696 5.117256998104514 0.0
+C_b -1.5969329996265353 3.809735999842726 0.0
+C_c -0.6564090019655506 2.7190129991747667 0.0
+C_d -0.9857789998795103 1.387195998766701 0.0
+C_e 0.0 0.33539000253089535 0.0
+C_f -0.2866469975212757 -1.0046079981775466 0.0
+C_g 0.7451960001128884 -2.0162560006291397 0.0
+C_h 0.49348400143119636 -3.346346999604479 0.0
+Charge=7 Atoms=2
+N_a -1.9995219990328295 6.216471001666405 0.0
+N_b 1.57848899891635 -4.318030999345519 0.0
+Charge=8 Atoms=2
+O_a 2.744088997946027 -3.913927002627481 0.0
+O_b 1.2323250012939346 -5.50623099814482 0.0
+Charge=1 Atoms=10
+H_a -0.11499899751206023 5.345406000328604 0.0
+H_b -2.670389000828054 3.577750002457105 0.0
+H_c -3.0058400016160234 6.118605000075728 0.0
+H_d -1.6131520006696491 7.147926002625104 0.0
+H_e 0.4128139996006046 2.9826160013713494 0.0
+H_f -2.0460389989386774 1.0977839974019534 0.0
+H_g 1.0580160019302323 0.6387760023731218 0.0
+H_h -1.3358889978770827 -1.3294699989350738 0.0
+H_i 1.795708999460371 -1.7003540019438161 0.0
+H_j -0.492141997441393 -3.815153001736331 0.0
+
+
+       *******************************************************************
+       *********** Output from DALTON general input processing ***********
+       *******************************************************************
+
+ --------------------------------------------------------------------------------
+   Overall default print level:    0
+   Print level for DALTON.STAT:    1
+
+    Parallel calculation using MPI
+    AO-direct calculation (in sections where implemented)
+    HERMIT 1- and 2-electron integral sections will be executed
+    "Old" integral transformation used (limited to max 255 basis functions)
+    Wave function sections will be executed (SIRIUS module)
+    Dynamic molecular response properties section will be executed (RESPONSE module)
+ --------------------------------------------------------------------------------
+
+
+   ****************************************************************************
+   *************** Output of molecule and basis set information ***************
+   ****************************************************************************
+
+
+    The two title cards from your ".mol" input:
+    ------------------------------------------------------------------------
+ 1: blah                                                                    
+ 2: blah                                                                    
+    ------------------------------------------------------------------------
+
+  Coordinates are entered in Angstrom and converted to atomic units.
+          - Conversion factor : 1 bohr = 0.52917721 A
+
+  Atomic type no.    1
+  --------------------
+  Nuclear charge:   6.00000
+  Number of symmetry independent centers:    8
+  Number of basis sets to read;    2
+  Basis set file used for this atomic type with Z =   6 :
+     "/gpfs/projects/rjh/adrian/dalton/build/basis/aug-cc-pVTZ"
+
+  Atomic type no.    2
+  --------------------
+  Nuclear charge:   7.00000
+  Number of symmetry independent centers:    2
+  Number of basis sets to read;    2
+  Basis set file used for this atomic type with Z =   7 :
+     "/gpfs/projects/rjh/adrian/dalton/build/basis/aug-cc-pVTZ"
+
+  Atomic type no.    3
+  --------------------
+  Nuclear charge:   8.00000
+  Number of symmetry independent centers:    2
+  Number of basis sets to read;    2
+  Basis set file used for this atomic type with Z =   8 :
+     "/gpfs/projects/rjh/adrian/dalton/build/basis/aug-cc-pVTZ"
+
+  Atomic type no.    4
+  --------------------
+  Nuclear charge:   1.00000
+  Number of symmetry independent centers:   10
+  Number of basis sets to read;    2
+  Basis set file used for this atomic type with Z =   1 :
+     "/gpfs/projects/rjh/adrian/dalton/build/basis/aug-cc-pVTZ"
+
+
+                         SYMGRP: Point group information
+                         -------------------------------
+
+@    Point group: C1 
+
+
+                                 Isotopic Masses
+                                 ---------------
+
+                           C_a        12.000000
+                           C_b        12.000000
+                           C_c        12.000000
+                           C_d        12.000000
+                           C_e        12.000000
+                           C_f        12.000000
+                           C_g        12.000000
+                           C_h        12.000000
+                           N_a        14.003074
+                           N_b        14.003074
+                           O_a        15.994915
+                           O_b        15.994915
+                           H_a         1.007825
+                           H_b         1.007825
+                           H_c         1.007825
+                           H_d         1.007825
+                           H_e         1.007825
+                           H_f         1.007825
+                           H_g         1.007825
+                           H_h         1.007825
+                           H_i         1.007825
+                           H_j         1.007825
+
+                       Total mass:   166.074228 amu
+                       Natural abundance:  90.284 %
+
+ Center-of-mass coordinates (a.u.):    0.090208   -0.225905    0.000000
+ Center-of-mass coordinates (Angs):    0.047736   -0.119544    0.000000
+
+
+  Atoms and basis sets
+  --------------------
+
+  Number of atom types :    4
+  Total number of atoms:   22
+
+  Basis set used is "aug-cc-pVTZ" from the basis set library.
+
+  label    atoms   charge   prim   cont     basis
+  ----------------------------------------------------------------------
+  C_          8    6.0000    58    46      [11s6p3d2f|5s4p3d2f]                               
+  N_          2    7.0000    58    46      [11s6p3d2f|5s4p3d2f]                               
+  O_          2    8.0000    58    46      [11s6p3d2f|5s4p3d2f]                               
+  H_         10    1.0000    25    23      [6s3p2d|4s3p2d]                                    
+  ----------------------------------------------------------------------
+  total:     22   88.0000   946   782
+  ----------------------------------------------------------------------
+  Spherical harmonic basis used.
+
+  Threshold for neglecting AO integrals:  1.00D-12
+
+  Max    interatomic separation is   12.9701 Angstrom (   24.5100 Bohr)
+  between atoms   16 and   12, "H_d   " and "O_b   ".
+
+  Min HX interatomic separation is    1.0084 Angstrom (    1.9056 Bohr)
+
+  Min YX interatomic separation is    1.2337 Angstrom (    2.3313 Bohr)
+
+
+  Bond distances (Angstrom):
+  --------------------------
+
+                  atom 1     atom 2       distance
+                  ------     ------       --------
+  bond distance:  C_b        C_a          1.369895
+  bond distance:  C_c        C_b          1.440230
+  bond distance:  C_d        C_c          1.371941
+  bond distance:  C_e        C_d          1.441546
+  bond distance:  C_f        C_e          1.370314
+  bond distance:  C_g        C_f          1.445037
+  bond distance:  C_h        C_g          1.353699
+  bond distance:  N_a        C_a          1.366160
+  bond distance:  N_b        C_h          1.456505
+  bond distance:  O_a        N_b          1.233663
+  bond distance:  O_b        N_b          1.237598
+  bond distance:  H_a        C_a          1.097257
+  bond distance:  H_b        C_b          1.098237
+  bond distance:  H_c        N_a          1.011066
+  bond distance:  H_d        N_a          1.008410
+  bond distance:  H_e        C_c          1.101238
+  bond distance:  H_f        C_d          1.099050
+  bond distance:  H_g        C_e          1.100655
+  bond distance:  H_h        C_f          1.098382
+  bond distance:  H_i        C_g          1.096983
+  bond distance:  H_j        C_h          1.091438
+
+
+  Bond angles (degrees):
+  ----------------------
+
+                  atom 1     atom 2     atom 3         angle
+                  ------     ------     ------         -----
+  bond angle:     C_b        C_a        N_a          126.215
+  bond angle:     C_b        C_a        H_a          119.357
+  bond angle:     N_a        C_a        H_a          114.427
+  bond angle:     C_a        C_b        C_c          121.873
+  bond angle:     C_a        C_b        H_b          119.551
+  bond angle:     C_c        C_b        H_b          118.576
+  bond angle:     C_b        C_c        C_d          125.338
+  bond angle:     C_b        C_c        H_e          116.922
+  bond angle:     C_d        C_c        H_e          117.740
+  bond angle:     C_c        C_d        C_e          122.965
+  bond angle:     C_c        C_d        H_f          119.159
+  bond angle:     C_e        C_d        H_f          117.876
+  bond angle:     C_d        C_e        C_f          124.781
+  bond angle:     C_d        C_e        H_g          117.144
+  bond angle:     C_f        C_e        H_g          118.075
+  bond angle:     C_e        C_f        C_g          122.359
+  bond angle:     C_e        C_f        H_h          119.278
+  bond angle:     C_g        C_f        H_h          118.363
+  bond angle:     C_f        C_g        C_h          123.718
+  bond angle:     C_f        C_g        H_i          118.830
+  bond angle:     C_h        C_g        H_i          117.453
+  bond angle:     C_g        C_h        N_b          121.130
+  bond angle:     C_g        C_h        H_j          126.154
+  bond angle:     N_b        C_h        H_j          112.716
+  bond angle:     C_a        N_a        H_c          120.874
+  bond angle:     C_a        N_a        H_d          121.043
+  bond angle:     H_c        N_a        H_d          118.083
+  bond angle:     C_h        N_b        O_a          119.033
+  bond angle:     C_h        N_b        O_b          115.604
+  bond angle:     O_a        N_b        O_b          125.364
+
+
+
+
+ Principal moments of inertia (u*A**2) and principal axes
+ --------------------------------------------------------
+
+   IA      70.354815         -0.316751    0.948509    0.000000
+   IB    2757.102656          0.948509    0.316751    0.000000
+   IC    2827.457470          0.000000    0.000000    1.000000
+
+
+ Rotational constants
+ --------------------
+
+@    The molecule is planar.
+
+               A                   B                   C
+
+           7183.2896            183.3008            178.7397 MHz
+            0.239609            0.006114            0.005962 cm-1
+
+
+@  Nuclear repulsion energy :  574.625117125708 Hartree
+
+
+                     .---------------------------------------.
+                     | Starting in Integral Section (HERMIT) |
+                     `---------------------------------------'
+
+
+
+ ***************************************************************************************
+ ****************** Output from **INTEGRALS input processing (HERMIT) ******************
+ ***************************************************************************************
+
+
+ - Using defaults, no **INTEGRALS input found
+
+ Default print level:        1
+
+ Calculation of one-electron Hamiltonian integrals.
+
+ Center of mass  (bohr):      0.090207604024     -0.225905365811      0.000000000000
+ Operator center (bohr):      0.000000000000      0.000000000000      0.000000000000
+ Gauge origin    (bohr):      0.000000000000      0.000000000000      0.000000000000
+ Dipole origin   (bohr):      0.000000000000      0.000000000000      0.000000000000
+
+
+     ************************************************************************
+     ************************** Output from HERINT **************************
+     ************************************************************************
+
+
+
+                      Nuclear contribution to dipole moments
+                      --------------------------------------
+
+                 au               Debye          C m (/(10**-30)
+
+      x     -0.00001508        -0.00003833        -0.00012785
+      y     -0.00002265        -0.00005757        -0.00019203
+      z      0.00000000         0.00000000         0.00000000
+
+
+  Time used in ONEDRV     is       0.93 seconds
+  Time used in HUCKEL     is       0.26 seconds
+  Time used in OVERLAP    is       0.14 seconds
+  Time used in POPOVLP    is       0.27 seconds
+  Time used in R2         is       0.18 seconds
+  Time used in R4         is       0.22 seconds
+  Time used in DIPLEN     is       0.23 seconds
+  Time used in QUADRUP    is       0.47 seconds
+  Time used in KINENE     is       0.26 seconds
+  Time used in GABGEN     is       1.49 seconds
+  Total CPU  time used in HERMIT:   4.45 seconds
+  Total wall time used in HERMIT:   4.54 seconds
+
+
+                        .----------------------------------.
+                        | End of Integral Section (HERMIT) |
+                        `----------------------------------'
+
+
+
+                   .--------------------------------------------.
+                   | Starting in Wave Function Section (SIRIUS) |
+                   `--------------------------------------------'
+
+
+
+@ Primary orbitals are deleted during canonical orthonormalization
+@   because of detected numerical linear dependence or too large coefficients.
+@ Eigenvalue threshold for num. lin. dep. =  1.00D-06
+
+@   1 MO components are deleted in symmetry    1
+ Overlap eigenvalues of the deleted orbitals:
+  8.68D-07
+
+ Max MO coeff. of last deleted MO & limit:  4.92D+02  1.00D+03
+
+WARNING: Orbitals have been deleted because of numerical
+   linear dependence although not requested in input.
+
+ *** Output from Huckel module :
+
+     Using EWMO model:          T
+     Using EHT  model:          F
+     Number of Huckel orbitals each symmetry:   70
+
+ EWMO - Energy Weighted Maximum Overlap - is a Huckel type method,
+        which normally is better than Extended Huckel Theory.
+ Reference: Linderberg and Ohrn, Propagators in Quantum Chemistry (Wiley, 1973)
+
+ Huckel EWMO eigenvalues for symmetry :  1
+          -20.684751     -20.683481     -15.677073     -15.674988     -11.359146
+          -11.358653     -11.356154     -11.352584     -11.347974     -11.346240
+          -11.345424     -11.345374      -1.964162      -1.788082      -1.734786
+           -1.596046      -1.447484      -1.387161      -1.184566      -1.157865
+           -1.049213      -0.965971      -0.906339      -0.851949      -0.832685
+           -0.754031      -0.750101      -0.745427      -0.670108      -0.663157
+           -0.633145      -0.596679      -0.585930      -0.560104      -0.541106
+           -0.538394      -0.508141      -0.496618      -0.484080      -0.482371
+           -0.461805      -0.453057      -0.387938      -0.383238      -0.333745
+           -0.273894      -0.234058      -0.229197      -0.209688      -0.201310
+           -0.197331      -0.190415      -0.166296      -0.142751      -0.138050
+           -0.131383      -0.129230      -0.128854      -0.126770      -0.126476
+           -0.124464      -0.123265      -0.109230      -0.103580      -0.097345
+           -0.092683      -0.088052      -0.086885      -0.083314      -0.079948
+
+ **********************************************************************
+ *SIRIUS* a direct, restricted step, second order MCSCF program       *
+ **********************************************************************
+
+ 
+     Date and time (Linux)  : Thu May  8 15:03:28 2025
+     Host name              : xm046                                   
+
+ Title lines from ".mol" input file:
+     blah                                                                    
+     blah                                                                    
+
+ Print level on unit LUPRI =   2 is   0
+ Print level on unit LUW4  =   2 is   5
+
+@    Restricted, closed shell Hartree-Fock calculation.
+
+@    Time-dependent Hartree-Fock calculation (random phase approximation).
+ Fock matrices are calculated directly and in parallel without use of integrals on disk.
+
+ Initial molecular orbitals are obtained according to
+ ".MOSTART EWMO  " input option
+
+     Wave function specification
+     ============================
+@    Wave function type        --- HF ---
+@    Number of closed shell electrons          88
+@    Number of electrons in active shells       0
+@    Total charge of the molecule               0
+
+@    Spin multiplicity and 2 M_S                1         0
+@    Total number of symmetries                 1 (point group: C1 )
+@    Reference state symmetry                   1 (irrep name : A  )
+
+     Orbital specifications
+     ======================
+@    Abelian symmetry species          All |    1
+@                                          |  A  
+                                       --- |  ---
+@    Occupied SCF orbitals              44 |   44
+@    Secondary orbitals                737 |  737
+@    Total number of orbitals          781 |  781
+@    Number of basis functions         782 |  782
+
+     Optimization information
+     ========================
+@    Number of configurations                 1
+@    Number of orbital rotations          32428
+     ------------------------------------------
+@    Total number of variables            32429
+
+     Maximum number of Fock   iterations      0
+     Maximum number of DIIS   iterations     60
+     Maximum number of QC-SCF iterations     60
+     Threshold for SCF convergence     1.00D-05
+
+    INFORMATION: Switched to "new" integral transformation (from 1988 ;-) )
+    because more than 255 basis functions.
+
+
+ ***********************************************
+ ***** DIIS acceleration of SCF iterations *****
+ ***********************************************
+
+ C1-DIIS algorithm; max error vectors =    8
+
+ Iter      Total energy        Error norm    Delta(E)  DIIS dim.
+ -----------------------------------------------------------------------------
+   1  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)   -9    1    T  2.02D+01  2.03D+01
+@  1    -565.058586011        6.16932D+00   -5.65D+02    1
+      Virial theorem: -V/T =      2.006401
+@    MULPOP   C_a     0.37; C_b    -0.05; C_c    -0.04; C_d    -0.12; C_e    -0.01; C_f    -0.06; C_g     0.02; C_h     0.14; N_a    -0.65; N_b     0.78; 
+@             O_a    -0.94; O_b    -0.89; H_a     0.23; H_b     0.15; H_c     0.30; H_d     0.32; H_e    -0.01; H_f     0.04; H_g    -0.01; H_h     0.06; 
+@             H_i     0.06; H_j     0.31; 
+   1  Level shift: doubly occupied orbital energies shifted by -2.00D-01
+ -----------------------------------------------------------------------------
+   2  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)   -9    2    T  1.59D+01  1.60D+01
+@  2    -566.991631578        2.86874D+00   -1.93D+00    2
+      Virial theorem: -V/T =      2.001982
+@    MULPOP   C_a    -0.58; C_b     0.08; C_c    -0.04; C_d    -0.06; C_e     0.16; C_f    -0.19; C_g     0.24; C_h    -0.95; N_a    -0.55; N_b     0.18; 
+@             O_a    -0.31; O_b    -0.21; H_a     0.58; H_b     0.24; H_c     0.20; H_d     0.20; H_e     0.08; H_f     0.04; H_g     0.06; H_h     0.06; 
+@             H_i     0.20; H_j     0.57; 
+   2  Level shift: doubly occupied orbital energies shifted by -1.00D-01
+ -----------------------------------------------------------------------------
+   3  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)   -9    3    T  1.55D+01  1.56D+01
+@  3    -567.367798537        7.18099D-01   -3.76D-01    3
+      Virial theorem: -V/T =      2.001382
+@    MULPOP   C_a    -0.48; C_b    -0.02; C_c    -0.01; C_d    -0.12; C_e     0.12; C_f    -0.17; C_g     0.21; C_h    -0.71; N_a    -0.54; N_b     0.88; 
+@             O_a    -0.69; O_b    -0.71; H_a     0.57; H_b     0.25; H_c     0.14; H_d     0.14; H_e     0.12; H_f     0.07; H_g     0.11; H_h     0.09; 
+@             H_i     0.23; H_j     0.53; 
+   3  Level shift: doubly occupied orbital energies shifted by -5.00D-02
+ -----------------------------------------------------------------------------
+   4  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)   -9    4    T  1.52D+01  1.53D+01
+@  4    -567.402017884        2.30507D-01   -3.42D-02    4
+      Virial theorem: -V/T =      2.003301
+@    MULPOP   C_a    -0.41; C_b    -0.06; C_c     0.05; C_d    -0.12; C_e     0.15; C_f    -0.17; C_g     0.21; C_h    -0.73; N_a    -0.55; N_b     0.73; 
+@             O_a    -0.67; O_b    -0.64; H_a     0.57; H_b     0.24; H_c     0.11; H_d     0.11; H_e     0.12; H_f     0.07; H_g     0.10; H_h     0.09; 
+@             H_i     0.27; H_j     0.53; 
+   4  Level shift: doubly occupied orbital energies shifted by -2.50D-02
+ -----------------------------------------------------------------------------
+   5  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13    5    F  1.74D+01  1.75D+01
+@  5    -567.408526039        8.85881D-02   -6.51D-03    5
+      Virial theorem: -V/T =      2.002688
+@    MULPOP   C_a    -0.43; C_b    -0.08; C_c     0.03; C_d    -0.14; C_e     0.13; C_f    -0.18; C_g     0.19; C_h    -0.72; N_a    -0.56; N_b     0.78; 
+@             O_a    -0.67; O_b    -0.67; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.13; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.29; H_j     0.53; 
+   5  Level shift: doubly occupied orbital energies shifted by -1.25D-02
+ -----------------------------------------------------------------------------
+   6  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13    6    T  1.68D+01  1.70D+01
+@  6    -567.410040113        4.12483D-02   -1.51D-03    6
+      Virial theorem: -V/T =      2.002529
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.20; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.67; O_b    -0.65; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.13; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.29; H_j     0.53; 
+ -----------------------------------------------------------------------------
+   7  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13    7    T  1.67D+01  1.68D+01
+@  7    -567.410422492        1.97539D-02   -3.82D-04    7
+      Virial theorem: -V/T =      2.002579
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.20; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.13; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+   8  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13    8    T  1.66D+01  1.67D+01
+@  8    -567.410500440        7.89995D-03   -7.79D-05    8
+      Virial theorem: -V/T =      2.002575
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.67; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.13; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+   9  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13    9    T  1.64D+01  1.66D+01
+@  9    -567.410511851        2.67663D-03   -1.14D-05    8
+      Virial theorem: -V/T =      2.002564
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.13; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+  10  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13   10    T  1.62D+01  1.64D+01
+@ 10    -567.410513753        1.31274D-03   -1.90D-06    8
+      Virial theorem: -V/T =      2.002565
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.13; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+  11  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13   11    T  1.61D+01  1.62D+01
+@ 11    -567.410514271        7.15808D-04   -5.18D-07    8
+      Virial theorem: -V/T =      2.002566
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.12; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+  12  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13   12    T  1.60D+01  1.61D+01
+@ 12    -567.410514431        2.01288D-04   -1.61D-07    8
+      Virial theorem: -V/T =      2.002565
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.12; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+  13  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13   13    T  1.57D+01  1.58D+01
+@ 13    -567.410514445        8.94436D-05   -1.35D-08    8
+      Virial theorem: -V/T =      2.002565
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.12; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+  14  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13   14    T  1.54D+01  1.54D+01
+@ 14    -567.410514446        2.72215D-05   -1.21D-09    8
+      Virial theorem: -V/T =      2.002565
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.12; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+  15  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13   15    T  1.51D+01  1.52D+01
+@ 15    -567.410514446        1.12549D-05   -1.28D-10    8
+      Virial theorem: -V/T =      2.002565
+@    MULPOP   C_a    -0.44; C_b    -0.07; C_c     0.03; C_d    -0.14; C_e     0.14; C_f    -0.18; C_g     0.19; C_h    -0.73; N_a    -0.57; N_b     0.77; 
+@             O_a    -0.66; O_b    -0.66; H_a     0.58; H_b     0.25; H_c     0.11; H_d     0.11; H_e     0.12; H_f     0.08; H_g     0.12; H_h     0.10; 
+@             H_i     0.30; H_j     0.53; 
+ -----------------------------------------------------------------------------
+  16  Screening settings (-IFTHRS, JTDIIS, DIFDEN, times)  -13   16    T  1.52D+01  1.52D+01
+@ 16    -567.410514446        5.35324D-06   -1.84D-11    8
+
+@ *** DIIS converged in  16 iterations !
+@     Converged SCF energy, gradient:   -567.410514446290    5.35D-06
+    - total time used in SIRFCK :              0.00 seconds
+
+
+ *** SCF orbital energy analysis ***
+
+ Only the 20 lowest virtual orbital energies printed in each symmetry.
+
+ Number of electrons :   88
+ Orbital occupations :   44
+
+ Sym       Hartree-Fock orbital energies
+
+1 A     -20.58090945   -20.57815114   -15.83164630   -15.60601215   -11.31898020
+        -11.28313700   -11.27947932   -11.27397088   -11.27286685   -11.24846021
+        -11.24155455   -11.23901435    -1.57122129    -1.36880594    -1.25154303
+         -1.13535994    -1.10795006    -1.06346289    -1.00284898    -0.93597232
+         -0.85459854    -0.80580990    -0.78130693    -0.77658676    -0.73380981
+         -0.72915903    -0.70637729    -0.68943263    -0.68842707    -0.64298806
+         -0.63665294    -0.59468476    -0.56951391    -0.55969434    -0.53820254
+         -0.53453909    -0.51763801    -0.48440028    -0.47457505    -0.47159149
+         -0.43443742    -0.43278552    -0.35891349    -0.27011837     0.01140385
+          0.02072251     0.03052346     0.03062125     0.03647155     0.04338852
+          0.05454234     0.06505711     0.07293444     0.07480503     0.08284656
+          0.08647485     0.08868979     0.08915617     0.09361877     0.09652092
+          0.10069414     0.10366339     0.10459847     0.10524370
+
+    E(LUMO) :     0.01140385 au (symmetry 1)
+  - E(HOMO) :    -0.27011837 au (symmetry 1)
+  ------------------------------------------
+    gap     :     0.28152222 au
+
+ --- Writing SIRIFC interface file
+
+ CPU and wall time for SCF :     317.199     319.639
+
+
+                       .-----------------------------------.
+                       | --- Final results from SIRIUS --- |
+                       `-----------------------------------'
+
+
+@    Spin multiplicity:           1
+@    Spatial symmetry:            1 ( irrep  A   in C1  )
+@    Total charge of molecule:    0
+
+@    Final HF energy:            -567.410514446290                 
+@    Nuclear repulsion:           574.625117125708
+@    Electronic energy:         -1142.035631571998
+
+@    Final gradient norm:           0.000005353244
+
+ 
+     Date and time (Linux)  : Thu May  8 15:08:49 2025
+     Host name              : xm046                                   
+
+File label for MO orbitals:   8May25   FOCKDIIS
+
+ (Only coefficients > 0.0100 are printed.)
+
+ Molecular orbitals for symmetry species 1  (A  )
+ ------------------------------------------------
+
+    Orbital        35       36       37       38       39       40       41
+   2 C_a :1s     0.0000  -0.0390   0.0119   0.0000  -0.0069   0.0010   0.0000
+   4 C_a :1s     0.0000   0.0534  -0.0147  -0.0000  -0.0247   0.0184   0.0000
+   5 C_a :1s     0.0000   0.0082   0.0008   0.0000   0.0303  -0.0704   0.0000
+   6 C_a :2px    0.0000   0.1512  -0.0498  -0.0000   0.0012  -0.0007   0.0000
+   7 C_a :2py    0.0000   0.1051  -0.0185   0.0000   0.0113  -0.0019   0.0000
+   8 C_a :2pz    0.4226   0.0000   0.0000  -0.0489   0.0000  -0.0000  -0.0245
+  12 C_a :2px   -0.0000   0.0468  -0.0189   0.0000   0.0164  -0.0146  -0.0000
+  13 C_a :2py    0.0000  -0.0092   0.0464   0.0000   0.0167  -0.0161  -0.0000
+  14 C_a :2pz   -0.0628  -0.0000  -0.0000  -0.0031  -0.0000  -0.0000  -0.0064
+  15 C_a :2px    0.0000   0.0041  -0.0073  -0.0000  -0.0028   0.0211  -0.0000
+  24 C_a :3d1-   0.0061   0.0000   0.0000  -0.0089  -0.0000  -0.0000   0.0176
+  26 C_a :3d1+  -0.0166   0.0000  -0.0000   0.0046   0.0000   0.0000  -0.0028
+  27 C_a :3d2+  -0.0000   0.0132  -0.0059   0.0000   0.0015   0.0003   0.0000
+  28 C_a :3d2-   0.0000  -0.0116   0.0308  -0.0000   0.0077  -0.0043   0.0000
+  29 C_a :3d1-  -0.0114  -0.0000   0.0000   0.0071  -0.0000  -0.0000   0.0058
+  31 C_a :3d1+   0.0270   0.0000   0.0000   0.0088   0.0000   0.0000  -0.0004
+  32 C_a :3d2+  -0.0000   0.0162   0.0100  -0.0000  -0.0008  -0.0029   0.0000
+  48 C_b :1s     0.0000  -0.0344   0.0633  -0.0000   0.0102  -0.0014  -0.0000
+  50 C_b :1s     0.0000   0.1217  -0.0471  -0.0000   0.0302  -0.0067   0.0000
+  51 C_b :1s     0.0000   0.0119  -0.0376  -0.0000  -0.0623   0.0153  -0.0000
+  52 C_b :2px    0.0000  -0.3248   0.2301  -0.0000   0.0139  -0.0004   0.0000
+  53 C_b :2py   -0.0000  -0.0280  -0.0790   0.0000  -0.0216   0.0030  -0.0000
+  54 C_b :2pz    0.2765   0.0000   0.0000   0.0784   0.0000   0.0000  -0.1960
+  58 C_b :2px   -0.0000  -0.0495   0.0279   0.0000   0.0057  -0.0010   0.0000
+  59 C_b :2py    0.0000   0.0148   0.0348   0.0000   0.0259   0.0014  -0.0000
+  61 C_b :2px    0.0000   0.0015   0.0019  -0.0000  -0.0164   0.0035   0.0000
+  62 C_b :2py    0.0000   0.0115  -0.0093   0.0000  -0.0089   0.0668  -0.0000
+  68 C_b :3d2+   0.0000   0.0120  -0.0073  -0.0000   0.0003  -0.0001  -0.0000
+  70 C_b :3d1-   0.0107  -0.0000  -0.0000  -0.0042  -0.0000   0.0000   0.0056
+  73 C_b :3d2+  -0.0000   0.0093  -0.0112   0.0000  -0.0006  -0.0007   0.0000
+  74 C_b :3d2-   0.0000   0.0037   0.0169  -0.0000   0.0135  -0.0130   0.0000
+  75 C_b :3d1-   0.0122   0.0000   0.0000   0.0140   0.0000  -0.0000   0.0058
+  77 C_b :3d1+  -0.0029  -0.0000  -0.0000  -0.0158  -0.0000  -0.0000  -0.0032
+  78 C_b :3d2+   0.0000  -0.0014   0.0022  -0.0000  -0.0152   0.0240   0.0000
+  94 C_c :1s    -0.0000  -0.0403   0.0631  -0.0000  -0.0116  -0.0002   0.0000
+  96 C_c :1s     0.0000   0.0653  -0.1628   0.0000   0.0670  -0.0346  -0.0000
+  97 C_c :1s    -0.0000   0.0303   0.0023  -0.0000   0.0678   0.0858   0.0000
+  98 C_c :2px   -0.0000   0.3080  -0.3166  -0.0000  -0.0100  -0.0000  -0.0000
+  99 C_c :2py    0.0000   0.0086  -0.0367  -0.0000   0.0332  -0.0030   0.0000
+ 100 C_c :2pz    0.1473   0.0000  -0.0000   0.2288  -0.0000   0.0000  -0.2794
+ 104 C_c :2px   -0.0000   0.0442  -0.0703  -0.0000  -0.0292   0.0062   0.0000
+ 105 C_c :2py   -0.0000   0.0932   0.0206  -0.0000  -0.0086   0.0484  -0.0000
+ 106 C_c :2pz    0.0055   0.0000   0.0000  -0.0105   0.0000  -0.0000   0.0034
+ 107 C_c :2px    0.0000  -0.0033  -0.0045  -0.0000  -0.0382  -0.0094  -0.0000
+ 108 C_c :2py   -0.0000  -0.0233   0.0167  -0.0000   0.0328  -0.0639   0.0000
+ 110 C_c :3d2-   0.0000   0.0058  -0.0105   0.0000  -0.0015   0.0002  -0.0000
+ 114 C_c :3d2+  -0.0000   0.0107  -0.0125  -0.0000  -0.0000   0.0000  -0.0000
+ 115 C_c :3d2-  -0.0000   0.0102  -0.0138  -0.0000  -0.0008  -0.0009  -0.0000
+ 116 C_c :3d1-   0.0020  -0.0000  -0.0000  -0.0106  -0.0000  -0.0000   0.0079
+ 119 C_c :3d2+  -0.0000   0.0122  -0.0195  -0.0000   0.0001  -0.0001   0.0000
+ 120 C_c :3d2-   0.0000   0.0034   0.0313   0.0000   0.0545   0.0018   0.0000
+ 121 C_c :3d1-  -0.0285   0.0000   0.0000   0.0196   0.0000  -0.0000   0.0176
+ 124 C_c :3d2+  -0.0000   0.0114  -0.0324   0.0000  -0.0031   0.0469  -0.0000
+ 140 C_d :1s     0.0000   0.0108   0.0612   0.0000   0.0185  -0.0070   0.0000
+ 142 C_d :1s    -0.0000   0.0446  -0.1946   0.0000  -0.1176   0.0510  -0.0000
+ 143 C_d :1s    -0.0000  -0.0094   0.0101   0.0000   0.1657  -0.1273  -0.0000
+ 144 C_d :2px    0.0000  -0.0460   0.4070   0.0000   0.0320  -0.0112  -0.0000
+ 145 C_d :2py   -0.0000  -0.1307   0.0087   0.0000  -0.0471   0.0100   0.0000
+ 146 C_d :2pz    0.0930  -0.0000  -0.0000   0.3164  -0.0000   0.0000  -0.2381
+ 147 C_d :2px    0.0000   0.0022  -0.0112   0.0000   0.0001   0.0002  -0.0000
+ 150 C_d :2px   -0.0000  -0.0326   0.0668  -0.0000  -0.0489   0.0252   0.0000
+ 151 C_d :2py   -0.0000   0.1110   0.0276  -0.0000  -0.0377   0.0518  -0.0000
+ 152 C_d :2pz   -0.0231   0.0000   0.0000  -0.0026   0.0000  -0.0000  -0.0012
+ 153 C_d :2px   -0.0000  -0.0017  -0.0010   0.0000   0.0515  -0.0403  -0.0000
+ 154 C_d :2py    0.0000  -0.0050   0.0019  -0.0000  -0.1021   0.0510   0.0000
+ 156 C_d :3d2-  -0.0000   0.0022  -0.0122  -0.0000  -0.0019   0.0005   0.0000
+ 160 C_d :3d2+   0.0000   0.0030  -0.0137   0.0000   0.0008   0.0002   0.0000
+ 161 C_d :3d2-  -0.0000   0.0007  -0.0171  -0.0000  -0.0023   0.0011   0.0000
+ 164 C_d :3d1+   0.0033   0.0000  -0.0000   0.0117  -0.0000  -0.0000  -0.0063
+ 165 C_d :3d2+   0.0000   0.0043  -0.0193  -0.0000   0.0001   0.0030  -0.0000
+ 166 C_d :3d2-  -0.0000  -0.0063   0.0165   0.0000   0.0428   0.0118  -0.0000
+ 167 C_d :3d1-  -0.0143   0.0000   0.0000   0.0183   0.0000   0.0000   0.0189
+ 169 C_d :3d1+  -0.0054   0.0000   0.0000  -0.0097   0.0000  -0.0000  -0.0102
+ 170 C_d :3d2+  -0.0000  -0.0032  -0.0448   0.0000  -0.0055   0.0042  -0.0000
+ 186 C_e :1s     0.0000   0.0131   0.0924   0.0000  -0.0252  -0.0076   0.0000
+ 188 C_e :1s    -0.0000  -0.1019  -0.1601  -0.0000  -0.1271  -0.1757  -0.0000
+ 189 C_e :1s    -0.0000  -0.0005   0.0138  -0.0000  -0.2800   0.0034  -0.0000
+ 190 C_e :2px    0.0000  -0.1658  -0.3731   0.0000  -0.0185   0.0229   0.0000
+ 191 C_e :2py    0.0000  -0.1531   0.0287   0.0000   0.0815   0.0093  -0.0000
+ 192 C_e :2pz    0.0494  -0.0000   0.0000   0.3736  -0.0000   0.0000  -0.0158
+ 196 C_e :2px    0.0000  -0.0599  -0.0653   0.0000  -0.0410   0.0347  -0.0000
+ 197 C_e :2py    0.0000   0.0883  -0.0396   0.0000   0.1019   0.0461  -0.0000
+ 198 C_e :2pz    0.0079   0.0000  -0.0000  -0.0156   0.0000   0.0000  -0.0011
+ 199 C_e :2px    0.0000   0.0106   0.0038   0.0000   0.0660   0.0303   0.0000
+ 200 C_e :2py    0.0000  -0.0178   0.0021   0.0000   0.0273  -0.0226  -0.0000
+ 202 C_e :3d2-  -0.0000  -0.0055  -0.0113  -0.0000  -0.0031   0.0012  -0.0000
+ 206 C_e :3d2+   0.0000  -0.0073  -0.0123   0.0000   0.0008   0.0011   0.0000
+ 207 C_e :3d2-   0.0000  -0.0056  -0.0185   0.0000  -0.0058  -0.0047  -0.0000
+ 208 C_e :3d1-  -0.0002   0.0000   0.0000  -0.0087   0.0000  -0.0000  -0.0112
+ 210 C_e :3d1+  -0.0016  -0.0000  -0.0000  -0.0116   0.0000   0.0000   0.0044
+ 211 C_e :3d2+   0.0000  -0.0100  -0.0199   0.0000  -0.0004  -0.0015  -0.0000
+ 212 C_e :3d2-  -0.0000  -0.0017   0.0068  -0.0000  -0.0284  -0.0454   0.0000
+ 213 C_e :3d1-  -0.0168  -0.0000   0.0000   0.0054  -0.0000   0.0000   0.0261
+ 216 C_e :3d2+  -0.0000  -0.0136  -0.0501   0.0000  -0.0406  -0.0109  -0.0000
+ 232 C_f :1s    -0.0000   0.0291   0.0270  -0.0000   0.0356  -0.0079   0.0000
+ 234 C_f :1s     0.0000  -0.1301  -0.1579   0.0000   0.1504  -0.1146  -0.0000
+ 235 C_f :1s     0.0000   0.0044  -0.0082   0.0000   0.1898   0.2429   0.0000
+ 236 C_f :2px    0.0000   0.3628   0.2301   0.0000   0.0490  -0.0597   0.0000
+ 237 C_f :2py   -0.0000   0.0784   0.0507  -0.0000  -0.1046   0.0026   0.0000
+ 238 C_f :2pz    0.0323  -0.0000   0.0000   0.3835   0.0000  -0.0000   0.1382
+ 242 C_f :2px    0.0000   0.0417   0.0481   0.0000   0.0591  -0.0677  -0.0000
+ 243 C_f :2py    0.0000   0.0726  -0.0228   0.0000   0.0378   0.1832  -0.0000
+ 244 C_f :2pz   -0.0098   0.0000  -0.0000  -0.0031  -0.0000   0.0000   0.0102
+ 245 C_f :2px    0.0000  -0.0007  -0.0024   0.0000   0.0387   0.0072   0.0000
+ 246 C_f :2py   -0.0000  -0.0037   0.0043  -0.0000   0.0306   0.0998   0.0000
+ 252 C_f :3d2+  -0.0000  -0.0121  -0.0085  -0.0000   0.0027   0.0018   0.0000
+ 253 C_f :3d2-   0.0000  -0.0123  -0.0115   0.0000  -0.0061  -0.0028  -0.0000
+ 256 C_f :3d1+   0.0006  -0.0000   0.0000   0.0129   0.0000   0.0000   0.0068
+ 257 C_f :3d2+  -0.0000  -0.0142  -0.0137  -0.0000   0.0025  -0.0002   0.0000
+ 258 C_f :3d2-  -0.0000  -0.0011   0.0250  -0.0000  -0.0012   0.0085   0.0000
+ 259 C_f :3d1-  -0.0154  -0.0000   0.0000   0.0054  -0.0000   0.0000   0.0260
+ 260 C_f :3d0    0.0000  -0.0051  -0.0047   0.0000  -0.0070  -0.0143  -0.0000
+ 262 C_f :3d2+  -0.0000  -0.0174  -0.0280  -0.0000  -0.0552  -0.0663   0.0000
+ 278 C_g :1s     0.0000   0.0570   0.0681   0.0000  -0.0286   0.0495  -0.0000
+ 280 C_g :1s     0.0000  -0.0897  -0.0112   0.0000  -0.1567   0.2554   0.0000
+ 281 C_g :1s     0.0000  -0.0345  -0.0034   0.0000   0.2688  -0.1531  -0.0000
+ 282 C_g :2px   -0.0000  -0.3265  -0.1606  -0.0000  -0.0226   0.0733   0.0000
+ 283 C_g :2py   -0.0000  -0.0327   0.0531  -0.0000   0.1563  -0.0394  -0.0000
+ 284 C_g :2pz    0.0160   0.0000   0.0000   0.2959   0.0000  -0.0000   0.2623
+ 288 C_g :2px    0.0000  -0.0586  -0.0146   0.0000   0.0595  -0.1451  -0.0000
+ 289 C_g :2py   -0.0000  -0.0204  -0.0379  -0.0000   0.0528   0.0431  -0.0000
+ 290 C_g :2pz    0.0006  -0.0000  -0.0000  -0.0069   0.0000   0.0000  -0.0257
+ 291 C_g :2px   -0.0000   0.0059  -0.0045  -0.0000  -0.0022   0.0778   0.0000
+ 292 C_g :2py   -0.0000  -0.0110   0.0008  -0.0000  -0.1467  -0.1483  -0.0000
+ 298 C_g :3d2+  -0.0000  -0.0108  -0.0038   0.0000   0.0018  -0.0007  -0.0000
+ 299 C_g :3d2-   0.0000  -0.0104  -0.0081  -0.0000  -0.0014   0.0134   0.0000
+ 302 C_g :3d1+  -0.0001  -0.0000   0.0000  -0.0117   0.0000   0.0000  -0.0070
+ 303 C_g :3d2+   0.0000  -0.0123  -0.0075   0.0000   0.0057   0.0156  -0.0000
+ 304 C_g :3d2-   0.0000  -0.0094   0.0061   0.0000   0.0699  -0.0282   0.0000
+ 305 C_g :3d1-  -0.0078  -0.0000   0.0000  -0.0079   0.0000   0.0000   0.0162
+ 307 C_g :3d1+   0.0089   0.0000  -0.0000   0.0158   0.0000  -0.0000  -0.0021
+ 308 C_g :3d2+   0.0000  -0.0025  -0.0055  -0.0000   0.0006   0.0163   0.0000
+ 322 C_g :4f3+   0.0000  -0.0017   0.0008   0.0000   0.0051   0.0129  -0.0000
+ 324 C_h :1s     0.0000   0.0108  -0.0151   0.0000   0.1035   0.0112   0.0000
+ 326 C_h :1s    -0.0000  -0.0685  -0.0272  -0.0000   0.0412  -0.0313   0.0000
+ 327 C_h :1s    -0.0000  -0.0059   0.0048  -0.0000  -0.5079  -0.0464  -0.0000
+ 328 C_h :2px   -0.0000   0.1041   0.0146  -0.0000   0.2125   0.1499   0.0000
+ 329 C_h :2py   -0.0000   0.1245   0.0257   0.0000  -0.2376   0.0049  -0.0000
+ 330 C_h :2pz    0.0089   0.0000  -0.0000   0.2191  -0.0000  -0.0000   0.2520
+ 331 C_h :2px   -0.0000  -0.0038  -0.0036  -0.0000  -0.0197   0.0013   0.0000
+ 332 C_h :2py   -0.0000  -0.0038  -0.0010  -0.0000   0.0234   0.0072  -0.0000
+ 334 C_h :2px   -0.0000   0.0208   0.0075  -0.0000   0.0212  -0.1064   0.0000
+ 335 C_h :2py   -0.0000  -0.0338  -0.0445  -0.0000   0.1701  -0.1569  -0.0000
+ 336 C_h :2pz   -0.0075  -0.0000   0.0000  -0.0179   0.0000   0.0000   0.0124
+ 337 C_h :2px   -0.0000   0.0004   0.0048  -0.0000  -0.0794  -0.0464   0.0000
+ 338 C_h :2py   -0.0000   0.0083   0.0057  -0.0000  -0.0372   0.1153  -0.0000
+ 339 C_h :2pz    0.0025   0.0000  -0.0000   0.0062  -0.0000   0.0000   0.0157
+ 340 C_h :3d2-   0.0000  -0.0060  -0.0027   0.0000  -0.0106  -0.0031  -0.0000
+ 346 C_h :3d1-   0.0000   0.0000  -0.0000   0.0121  -0.0000   0.0000   0.0159
+ 350 C_h :3d2-   0.0000   0.0141   0.0227   0.0000   0.0877   0.0203   0.0000
+ 351 C_h :3d1-  -0.0056  -0.0000   0.0000  -0.0035   0.0000  -0.0000   0.0311
+ 352 C_h :3d0   -0.0000   0.0023   0.0031  -0.0000   0.0017   0.0158   0.0000
+ 353 C_h :3d1+  -0.0050  -0.0000   0.0000  -0.0164  -0.0000   0.0000   0.0090
+ 354 C_h :3d2+   0.0000  -0.0083  -0.0031  -0.0000  -0.0162  -0.0104   0.0000
+ 370 N_a :1s    -0.0000  -0.0294   0.0217   0.0000   0.0033  -0.0004   0.0000
+ 373 N_a :1s    -0.0000  -0.0130   0.0102  -0.0000  -0.0044   0.0115   0.0000
+ 374 N_a :2px   -0.0000  -0.0598   0.0206   0.0000   0.0018  -0.0001  -0.0000
+ 375 N_a :2py   -0.0000   0.0223  -0.0338  -0.0000  -0.0070   0.0008  -0.0000
+ 376 N_a :2pz    0.6343  -0.0000  -0.0000  -0.2014  -0.0000  -0.0000   0.2260
+ 381 N_a :2py    0.0000  -0.0077   0.0109   0.0000  -0.0020   0.0003   0.0000
+ 382 N_a :2pz    0.0129   0.0000   0.0000  -0.0027   0.0000   0.0000   0.0089
+ 385 N_a :2pz    0.0153  -0.0000  -0.0000  -0.0077  -0.0000  -0.0000   0.0111
+ 392 N_a :3d1-  -0.0122   0.0000   0.0000   0.0027   0.0000  -0.0000  -0.0011
+ 416 N_b :1s    -0.0000   0.0205   0.0120  -0.0000   0.0269   0.0065  -0.0000
+ 418 N_b :1s    -0.0000   0.0184   0.0103  -0.0000   0.1743   0.0280  -0.0000
+ 419 N_b :1s     0.0000   0.0071  -0.0006   0.0000   0.3115   0.0664  -0.0000
+ 420 N_b :2px    0.0000  -0.0530  -0.0097   0.0000  -0.2191   0.0040  -0.0000
+ 421 N_b :2py   -0.0000   0.0313   0.0193  -0.0000   0.1723   0.1195   0.0000
+ 422 N_b :2pz   -0.0029  -0.0000  -0.0000  -0.0400  -0.0000   0.0000  -0.0304
+ 426 N_b :2px   -0.0000   0.0085   0.0097  -0.0000  -0.0411  -0.0203   0.0000
+ 427 N_b :2py    0.0000  -0.0096  -0.0069   0.0000   0.0251   0.0230  -0.0000
+ 428 N_b :2pz    0.0021  -0.0000   0.0000   0.0141   0.0000  -0.0000   0.0076
+ 429 N_b :2px   -0.0000  -0.0016  -0.0003  -0.0000  -0.0491  -0.0398  -0.0000
+ 430 N_b :2py    0.0000  -0.0069  -0.0051   0.0000   0.0490  -0.0813   0.0000
+ 432 N_b :3d2-   0.0000   0.0001   0.0010   0.0000  -0.0227  -0.0059  -0.0000
+ 433 N_b :3d1-   0.0001   0.0000  -0.0000   0.0024  -0.0000  -0.0000   0.0119
+ 436 N_b :3d2+   0.0000  -0.0006   0.0010   0.0000  -0.0029   0.0155  -0.0000
+ 437 N_b :3d2-  -0.0000  -0.0020   0.0013  -0.0000  -0.0619  -0.0169   0.0000
+ 438 N_b :3d1-   0.0002  -0.0000   0.0000   0.0073   0.0000   0.0000   0.0352
+ 440 N_b :3d1+  -0.0002   0.0000  -0.0000  -0.0058  -0.0000   0.0000   0.0175
+ 441 N_b :3d2+  -0.0000  -0.0011   0.0018  -0.0000  -0.0046   0.0334   0.0000
+ 442 N_b :3d2-  -0.0000  -0.0072  -0.0049  -0.0000   0.0146  -0.0147   0.0000
+ 446 N_b :3d2+  -0.0000  -0.0081  -0.0083  -0.0000   0.0310  -0.1213   0.0000
+ 454 N_b :4f3-   0.0000   0.0022   0.0009  -0.0000   0.0127   0.0007   0.0000
+ 462 O_a :1s    -0.0000   0.0228   0.0070  -0.0000   0.0093   0.0026  -0.0000
+ 464 O_a :1s     0.0000   0.0111   0.0042   0.0000  -0.0016   0.0562  -0.0000
+ 465 O_a :1s     0.0000   0.0066   0.0053   0.0000  -0.0446   0.0767   0.0000
+ 466 O_a :2px    0.0000   0.0348  -0.0057   0.0000   0.3472   0.1788   0.0000
+ 467 O_a :2py   -0.0000   0.0046  -0.0105  -0.0000  -0.2583  -0.7793  -0.0000
+ 468 O_a :2pz   -0.0035  -0.0000   0.0000  -0.0673   0.0000   0.0000   0.3324
+ 472 O_a :2px   -0.0000   0.0008   0.0013  -0.0000   0.0137   0.0256  -0.0000
+ 473 O_a :2py    0.0000  -0.0006  -0.0004   0.0000  -0.0260  -0.0956   0.0000
+ 474 O_a :2pz   -0.0009  -0.0000  -0.0000  -0.0066  -0.0000  -0.0000   0.0339
+ 475 O_a :2px    0.0000   0.0005  -0.0009  -0.0000   0.0249   0.0002   0.0000
+ 476 O_a :2py   -0.0000   0.0011   0.0001  -0.0000  -0.0247  -0.0517  -0.0000
+ 477 O_a :2pz    0.0013  -0.0000   0.0000   0.0004   0.0000   0.0000   0.0263
+ 483 O_a :3d2-   0.0000  -0.0012   0.0003   0.0000  -0.0032   0.0149   0.0000
+ 488 O_a :3d2-  -0.0000  -0.0005  -0.0000  -0.0000   0.0047   0.0301   0.0000
+ 490 O_a :3d0   -0.0000   0.0011   0.0006   0.0000   0.0017   0.0101  -0.0000
+ 491 O_a :3d1+   0.0003   0.0000   0.0000   0.0029   0.0000   0.0000  -0.0106
+ 492 O_a :3d2+   0.0000  -0.0003   0.0002   0.0000  -0.0077  -0.0130   0.0000
+ 510 O_b :1s     0.0000  -0.0063  -0.0026   0.0000   0.0118  -0.0283  -0.0000
+ 511 O_b :1s     0.0000  -0.0085  -0.0036  -0.0000  -0.0304  -0.0938   0.0000
+ 512 O_b :2px    0.0000  -0.0584  -0.0782   0.0000   0.6535  -0.5205  -0.0000
+ 513 O_b :2py   -0.0000   0.0127   0.0123   0.0000  -0.3638  -0.0639  -0.0000
+ 514 O_b :2pz   -0.0039  -0.0000   0.0000  -0.0857   0.0000  -0.0000  -0.4962
+ 518 O_b :2px   -0.0000  -0.0078  -0.0090  -0.0000   0.0632  -0.0656   0.0000
+ 519 O_b :2py    0.0000  -0.0010   0.0005  -0.0000  -0.0274   0.0185   0.0000
+ 520 O_b :2pz   -0.0012   0.0000  -0.0000  -0.0064  -0.0000   0.0000  -0.0438
+ 521 O_b :2px    0.0000  -0.0039  -0.0053   0.0000   0.0433  -0.0496  -0.0000
+ 522 O_b :2py   -0.0000  -0.0002   0.0008   0.0000  -0.0261  -0.0077  -0.0000
+ 523 O_b :2pz    0.0005  -0.0000   0.0000  -0.0015   0.0000  -0.0000  -0.0321
+ 529 O_b :3d2-  -0.0000  -0.0015  -0.0019   0.0000   0.0051  -0.0140  -0.0000
+ 530 O_b :3d1-  -0.0003  -0.0000   0.0000  -0.0029   0.0000  -0.0000  -0.0128
+ 534 O_b :3d2-  -0.0000  -0.0024  -0.0030  -0.0000   0.0168  -0.0220   0.0000
+ 535 O_b :3d1-  -0.0006   0.0000  -0.0000  -0.0030  -0.0000   0.0000  -0.0141
+ 538 O_b :3d2+  -0.0000  -0.0017  -0.0012  -0.0000   0.0149  -0.0094  -0.0000
+ 553 H_a :1s    -0.0000   0.1985  -0.0790   0.0000  -0.0014  -0.0005  -0.0000
+ 554 H_a :1s     0.0000  -0.0416   0.0159  -0.0000  -0.0013   0.0005   0.0000
+ 555 H_a :1s     0.0000  -0.1095  -0.0315  -0.0000  -0.0287   0.0379   0.0000
+ 556 H_a :1s    -0.0000  -0.0030   0.0031   0.0000   0.0027  -0.0140  -0.0000
+ 563 H_a :2px    0.0000   0.0130   0.0124  -0.0000   0.0095  -0.0069   0.0000
+ 564 H_a :2py   -0.0000   0.0131  -0.0078   0.0000  -0.0033  -0.0018  -0.0000
+ 565 H_a :2pz   -0.0126  -0.0000   0.0000  -0.0072  -0.0000  -0.0000  -0.0020
+ 576 H_b :1s     0.0000   0.3679  -0.2271   0.0000  -0.0044  -0.0011  -0.0000
+ 577 H_b :1s    -0.0000  -0.0680   0.0449   0.0000   0.0010   0.0021   0.0000
+ 578 H_b :1s    -0.0000  -0.1675   0.0856   0.0000   0.0310  -0.0342  -0.0000
+ 579 H_b :1s     0.0000   0.0034   0.0000  -0.0000  -0.0150   0.0055   0.0000
+ 586 H_b :2px   -0.0000  -0.0259   0.0115   0.0000   0.0034  -0.0064  -0.0000
+ 587 H_b :2py    0.0000  -0.0024   0.0092  -0.0000   0.0083  -0.0104  -0.0000
+ 599 H_c :1s    -0.0000   0.0646  -0.0155   0.0000   0.0006  -0.0002  -0.0000
+ 601 H_c :1s     0.0000  -0.0142   0.0066  -0.0000   0.0130   0.0000   0.0000
+ 608 H_c :2pz    0.0216   0.0000   0.0000  -0.0079  -0.0000  -0.0000   0.0086
+ 611 H_c :2pz    0.0185  -0.0000  -0.0000  -0.0060  -0.0000  -0.0000   0.0061
+ 622 H_d :1s     0.0000  -0.0237  -0.0149  -0.0000  -0.0056   0.0008   0.0000
+ 624 H_d :1s    -0.0000   0.0179   0.0011   0.0000  -0.0048   0.0013  -0.0000
+ 631 H_d :2pz    0.0226   0.0000   0.0000  -0.0088   0.0000  -0.0000   0.0094
+ 634 H_d :2pz    0.0179  -0.0000  -0.0000  -0.0071  -0.0000  -0.0000   0.0071
+ 645 H_e :1s    -0.0000   0.3311  -0.3691   0.0000  -0.0117   0.0008  -0.0000
+ 646 H_e :1s     0.0000  -0.0668   0.0763   0.0000   0.0001   0.0005   0.0000
+ 647 H_e :1s     0.0000  -0.1865   0.1780  -0.0000  -0.0366  -0.0891   0.0000
+ 648 H_e :1s     0.0000   0.0102  -0.0026   0.0000   0.0162   0.0248  -0.0000
+ 655 H_e :2px    0.0000   0.0285  -0.0218  -0.0000   0.0117   0.0113   0.0000
+ 656 H_e :2py    0.0000   0.0131  -0.0253   0.0000  -0.0194   0.0112  -0.0000
+ 668 H_f :1s     0.0000   0.0998  -0.4551   0.0000  -0.0106   0.0084   0.0000
+ 669 H_f :1s    -0.0000  -0.0197   0.0931  -0.0000   0.0008  -0.0046  -0.0000
+ 670 H_f :1s    -0.0000  -0.0293   0.2573  -0.0000  -0.0878   0.0134   0.0000
+ 671 H_f :1s     0.0000   0.0010  -0.0050   0.0000   0.0297  -0.0118  -0.0000
+ 678 H_f :2px   -0.0000  -0.0023   0.0364  -0.0000  -0.0180   0.0062   0.0000
+ 679 H_f :2py    0.0000  -0.0046   0.0257  -0.0000   0.0149  -0.0035   0.0000
+ 691 H_g :1s     0.0000  -0.2337  -0.3887   0.0000  -0.0137   0.0296  -0.0000
+ 692 H_g :1s    -0.0000   0.0481   0.0833  -0.0000   0.0114   0.0077  -0.0000
+ 693 H_g :1s     0.0000   0.1305   0.2433   0.0000   0.1198   0.0087   0.0000
+ 694 H_g :1s    -0.0000  -0.0058  -0.0026  -0.0000  -0.0354  -0.0219   0.0000
+ 701 H_g :2px   -0.0000  -0.0204  -0.0347  -0.0000  -0.0134  -0.0061  -0.0000
+ 702 H_g :2py    0.0000  -0.0045  -0.0267   0.0000  -0.0187   0.0151  -0.0000
+ 714 H_h :1s    -0.0000  -0.4187  -0.2868  -0.0000   0.0014   0.0621  -0.0000
+ 715 H_h :1s     0.0000   0.0848   0.0605   0.0000  -0.0045  -0.0039  -0.0000
+ 716 H_h :1s     0.0000   0.2237   0.1322   0.0000   0.1146   0.0567  -0.0000
+ 717 H_h :1s     0.0000  -0.0051   0.0008  -0.0000   0.0007   0.0134   0.0000
+ 723 H_h :2pz    0.0016  -0.0000   0.0000   0.0101   0.0000   0.0000   0.0026
+ 724 H_h :2px    0.0000   0.0331   0.0138   0.0000   0.0157   0.0131  -0.0000
+ 725 H_h :2py    0.0000   0.0111   0.0186   0.0000   0.0269   0.0036  -0.0000
+ 737 H_i :1s    -0.0000  -0.3423  -0.1328  -0.0000  -0.0171   0.0521  -0.0000
+ 738 H_i :1s    -0.0000   0.0698   0.0263  -0.0000  -0.0080  -0.0448   0.0000
+ 739 H_i :1s    -0.0000   0.1924   0.0621  -0.0000  -0.1642   0.1018   0.0000
+ 740 H_i :1s     0.0000  -0.0032   0.0012   0.0000   0.0327   0.0005  -0.0000
+ 747 H_i :2px    0.0000  -0.0283  -0.0080   0.0000   0.0419  -0.0337   0.0000
+ 748 H_i :2py    0.0000  -0.0050  -0.0089   0.0000  -0.0224   0.0192  -0.0000
+ 749 H_i :2pz   -0.0051   0.0000  -0.0000  -0.0102  -0.0000  -0.0000   0.0009
+ 760 H_j :1s     0.0000  -0.1772  -0.0482   0.0000  -0.0816  -0.1427  -0.0000
+ 761 H_j :1s    -0.0000   0.0359   0.0100  -0.0000   0.0033   0.0237   0.0000
+ 762 H_j :1s    -0.0000   0.0607  -0.0295  -0.0000   0.0036  -0.0914  -0.0000
+ 763 H_j :1s    -0.0000   0.0024   0.0023  -0.0000  -0.0280   0.0077  -0.0000
+ 770 H_j :2px   -0.0000   0.0029  -0.0117  -0.0000  -0.0104  -0.0298  -0.0000
+ 771 H_j :2py   -0.0000   0.0067   0.0016   0.0000   0.0291  -0.0109  -0.0000
+ 772 H_j :2pz   -0.0050  -0.0000  -0.0000  -0.0110  -0.0000  -0.0000   0.0141
+
+    Orbital        42       43       44       45       46       47       48
+   2 C_a :1s     0.0000  -0.0000   0.0000   0.0224   0.0300  -0.0000  -0.0154
+   4 C_a :1s     0.0000  -0.0000  -0.0000  -1.8027  -0.3353   0.0000  -0.6064
+   5 C_a :1s     0.0000   0.0000  -0.0000   1.7183 -19.0404   0.0000  -7.4353
+   6 C_a :2px    0.0000   0.0000  -0.0000   0.0625   0.0421   0.0000  -0.0161
+   7 C_a :2py    0.0000   0.0000  -0.0000  -0.0145   0.0153   0.0000  -0.0229
+   8 C_a :2pz    0.0227  -0.1787   0.2798  -0.0000   0.0000   0.2527  -0.0000
+   9 C_a :2px    0.0000  -0.0000  -0.0000  -0.0237  -0.0024   0.0000   0.0060
+  10 C_a :2py   -0.0000   0.0000  -0.0000   0.0282   0.0367  -0.0000   0.0131
+  12 C_a :2px   -0.0000   0.0000   0.0000   1.1876  -0.3563  -0.0000  -1.4467
+  13 C_a :2py    0.0000   0.0000   0.0000   0.3589  -0.3825  -0.0000  -0.5921
+  14 C_a :2pz    0.0080   0.0032   0.0036   0.0000  -0.0000   0.0691   0.0000
+  15 C_a :2px    0.0000   0.0000  -0.0000  -0.6137   3.4712  -0.0000  -0.8459
+  16 C_a :2py    0.0000   0.0000  -0.0000   4.3119   3.0785  -0.0000   2.6591
+  17 C_a :2pz    0.0023  -0.0084   0.0260  -0.0000   0.0000   0.2347  -0.0000
+  19 C_a :3d1-  -0.0059   0.0126  -0.0121  -0.0000   0.0000  -0.0023  -0.0000
+  23 C_a :3d2-   0.0000  -0.0000  -0.0000  -0.0734   0.0080   0.0000  -0.0293
+  24 C_a :3d1-  -0.0149   0.0326  -0.0305   0.0000  -0.0000   0.0008   0.0000
+  25 C_a :3d0   -0.0000   0.0000  -0.0000   0.0214  -0.0009   0.0000   0.0419
+  27 C_a :3d2+   0.0000  -0.0000  -0.0000  -0.0727  -0.0146   0.0000  -0.0522
+  28 C_a :3d2-   0.0000   0.0000  -0.0000  -0.8084   0.2748   0.0000  -0.2637
+  29 C_a :3d1-  -0.0058   0.0147  -0.0176  -0.0000   0.0000   0.0300  -0.0000
+  30 C_a :3d0   -0.0000  -0.0000  -0.0000   0.1208   0.0225   0.0000   0.3919
+  31 C_a :3d1+  -0.0013  -0.0027   0.0041  -0.0000   0.0000  -0.0250  -0.0000
+  32 C_a :3d2+   0.0000   0.0000   0.0000  -0.7700  -0.3371  -0.0000  -0.2991
+  40 C_a :4f3-   0.0000   0.0000   0.0000   0.0155  -0.0082  -0.0000  -0.0099
+  42 C_a :4f1-  -0.0000   0.0000  -0.0000  -0.0156   0.0246   0.0000   0.0077
+  44 C_a :4f1+  -0.0000   0.0000   0.0000  -0.0055  -0.0038  -0.0000   0.0366
+  46 C_a :4f3+   0.0000  -0.0000   0.0000  -0.0267  -0.0163  -0.0000  -0.0690
+  48 C_b :1s    -0.0000   0.0000  -0.0000   0.0193  -0.0355   0.0000  -0.0101
+  50 C_b :1s    -0.0000   0.0000   0.0000   0.1683   0.9129  -0.0000   0.6210
+  51 C_b :1s    -0.0000  -0.0000   0.0000   1.6426  24.2831  -0.0000   5.0350
+  52 C_b :2px    0.0000  -0.0000  -0.0000  -0.0276   0.0404   0.0000   0.0314
+  54 C_b :2pz    0.1661  -0.3793   0.3408   0.0000  -0.0000  -0.0076   0.0000
+  55 C_b :2px    0.0000   0.0000  -0.0000   0.0281  -0.0130   0.0000  -0.0021
+  56 C_b :2py   -0.0000  -0.0000  -0.0000   0.0127  -0.0500  -0.0000   0.0204
+  58 C_b :2px   -0.0000   0.0000   0.0000  -0.3700  -0.7499  -0.0000   1.0748
+  59 C_b :2py    0.0000   0.0000   0.0000   0.7971  -0.2945  -0.0000  -0.2599
+  60 C_b :2pz    0.0001  -0.0222   0.0322  -0.0000   0.0000  -0.0121  -0.0000
+  61 C_b :2px    0.0000  -0.0000  -0.0000  -0.6831   4.1765   0.0000   1.6897
+  62 C_b :2py    0.0000  -0.0000   0.0000   1.3782   3.4342  -0.0000   0.8042
+  63 C_b :2pz    0.0061  -0.0208   0.0464   0.0000  -0.0000  -0.0402   0.0000
+  65 C_b :3d1-  -0.0015  -0.0032   0.0097  -0.0000   0.0000   0.0100  -0.0000
+  69 C_b :3d2-   0.0000  -0.0000   0.0000  -0.0418  -0.0118  -0.0000  -0.0370
+  70 C_b :3d1-  -0.0044  -0.0050   0.0219   0.0000  -0.0000   0.0268   0.0000
+  71 C_b :3d0    0.0000  -0.0000   0.0000  -0.0182  -0.0335   0.0000  -0.0020
+  73 C_b :3d2+   0.0000  -0.0000   0.0000  -0.0631   0.0463  -0.0000  -0.0491
+  74 C_b :3d2-   0.0000   0.0000   0.0000  -1.0164   0.3600  -0.0000  -0.5873
+  75 C_b :3d1-  -0.0079   0.0022   0.0099  -0.0000   0.0000   0.0344  -0.0000
+  76 C_b :3d0    0.0000  -0.0000   0.0000  -0.1504  -0.3303  -0.0000   0.0018
+  77 C_b :3d1+   0.0029  -0.0096   0.0043  -0.0000   0.0000   0.0118  -0.0000
+  78 C_b :3d2+   0.0000  -0.0000   0.0000  -1.3454   0.2519   0.0000   0.8867
+  86 C_b :4f3-   0.0000  -0.0000   0.0000  -0.0585  -0.0340   0.0000  -0.0356
+  90 C_b :4f1+   0.0000  -0.0000  -0.0000   0.0099   0.0179  -0.0000  -0.0226
+  92 C_b :4f3+   0.0000  -0.0000   0.0000   0.0363  -0.0669  -0.0000  -0.0076
+  94 C_c :1s     0.0000  -0.0000   0.0000  -0.0024   0.0284  -0.0000  -0.0299
+  96 C_c :1s     0.0000  -0.0000   0.0000  -0.4548  -0.1254  -0.0000  -0.5190
+  97 C_c :1s     0.0000   0.0000  -0.0000  -1.6942 -19.9908   0.0000  -3.2419
+  98 C_c :2px   -0.0000   0.0000   0.0000   0.0252   0.0335  -0.0000  -0.0419
+  99 C_c :2py   -0.0000   0.0000  -0.0000  -0.0064   0.0109   0.0000  -0.0136
+ 100 C_c :2pz    0.2315  -0.1222  -0.2613  -0.0000   0.0000  -0.3203  -0.0000
+ 101 C_c :2px   -0.0000   0.0000  -0.0000  -0.0035   0.0102  -0.0000   0.0301
+ 102 C_c :2py    0.0000  -0.0000   0.0000  -0.0243   0.0005  -0.0000  -0.0366
+ 104 C_c :2px   -0.0000   0.0000   0.0000   0.3560  -0.8224  -0.0000  -0.5904
+ 105 C_c :2py   -0.0000   0.0000   0.0000   0.3182  -0.4177   0.0000  -0.3560
+ 106 C_c :2pz   -0.0056   0.0121  -0.0106   0.0000  -0.0000  -0.0300   0.0000
+ 107 C_c :2px   -0.0000   0.0000  -0.0000   0.0872   1.9365   0.0000  -1.1942
+ 108 C_c :2py   -0.0000  -0.0000  -0.0000   3.4063   1.0496   0.0000   2.5673
+ 109 C_c :2pz    0.0004  -0.0037  -0.0300  -0.0000   0.0000  -0.1900  -0.0000
+ 111 C_c :3d1-  -0.0021  -0.0071   0.0133   0.0000  -0.0000  -0.0018   0.0000
+ 115 C_c :3d2-  -0.0000   0.0000  -0.0000   0.0310   0.0291   0.0000   0.0136
+ 116 C_c :3d1-  -0.0057  -0.0184   0.0326   0.0000   0.0000  -0.0079  -0.0000
+ 117 C_c :3d0   -0.0000   0.0000  -0.0000   0.0008   0.0282   0.0000   0.0221
+ 119 C_c :3d2+  -0.0000   0.0000  -0.0000   0.0521   0.0031   0.0000  -0.0051
+ 120 C_c :3d2-  -0.0000   0.0000  -0.0000   0.3707   0.1601   0.0000   0.4648
+ 121 C_c :3d1-  -0.0128   0.0101   0.0063   0.0000  -0.0000  -0.0014   0.0000
+ 122 C_c :3d0    0.0000  -0.0000   0.0000  -0.0966   0.3898   0.0000   0.2070
+ 123 C_c :3d1+   0.0020  -0.0073  -0.0012  -0.0000   0.0000  -0.0321  -0.0000
+ 124 C_c :3d2+   0.0000  -0.0000   0.0000  -0.2445  -0.1654   0.0000   1.4039
+ 132 C_c :4f3-   0.0000  -0.0000   0.0000  -0.0245  -0.0472  -0.0000  -0.0239
+ 134 C_c :4f1-   0.0000  -0.0000   0.0000  -0.0105   0.0091  -0.0000  -0.0049
+ 136 C_c :4f1+   0.0000  -0.0000  -0.0000  -0.0123   0.0144   0.0000   0.0226
+ 138 C_c :4f3+  -0.0000   0.0000  -0.0000   0.0187  -0.0642  -0.0000  -0.0090
+ 140 C_d :1s     0.0000  -0.0000  -0.0000   0.0030  -0.0147   0.0000  -0.0193
+ 142 C_d :1s    -0.0000  -0.0000  -0.0000   0.3426   1.0254   0.0000   1.3877
+ 143 C_d :1s     0.0000  -0.0000   0.0000   2.6917  12.3497   0.0000   3.0892
+ 144 C_d :2px   -0.0000  -0.0000  -0.0000  -0.0057   0.0272   0.0000   0.0416
+ 145 C_d :2py    0.0000  -0.0000   0.0000  -0.0005   0.0047  -0.0000   0.0130
+ 146 C_d :2pz    0.1934   0.1392  -0.3898   0.0000   0.0000   0.1051  -0.0000
+ 147 C_d :2px    0.0000   0.0000   0.0000   0.0059  -0.0097  -0.0000  -0.0262
+ 148 C_d :2py   -0.0000   0.0000  -0.0000   0.0138   0.0277   0.0000   0.0074
+ 150 C_d :2px   -0.0000  -0.0000  -0.0000  -0.6686  -0.1052   0.0000   1.1145
+ 151 C_d :2py   -0.0000   0.0000  -0.0000  -0.0627  -0.9225  -0.0000   0.2496
+ 152 C_d :2pz    0.0095   0.0027  -0.0376  -0.0000   0.0000   0.0116  -0.0000
+ 153 C_d :2px   -0.0000  -0.0000  -0.0000  -0.2428   0.9508   0.0000   1.8977
+ 154 C_d :2py    0.0000   0.0000  -0.0000   2.6337   0.1811   0.0000  -2.0356
+ 155 C_d :2pz    0.0028   0.0079  -0.0529   0.0000   0.0000   0.0466  -0.0000
+ 157 C_d :3d1-   0.0044  -0.0054  -0.0082  -0.0000   0.0000  -0.0118  -0.0000
+ 161 C_d :3d2-  -0.0000   0.0000  -0.0000   0.0345   0.0248   0.0000   0.0056
+ 162 C_d :3d1-   0.0089  -0.0139  -0.0196   0.0000  -0.0000  -0.0321   0.0000
+ 163 C_d :3d0   -0.0000   0.0000   0.0000  -0.0161  -0.0097  -0.0000   0.0031
+ 165 C_d :3d2+  -0.0000   0.0000  -0.0000   0.0247  -0.0127   0.0000   0.0242
+ 166 C_d :3d2-  -0.0000   0.0000  -0.0000   0.4915   0.0425   0.0000   0.5400
+ 167 C_d :3d1-  -0.0179   0.0059  -0.0113  -0.0000   0.0000  -0.0502  -0.0000
+ 168 C_d :3d0   -0.0000   0.0000   0.0000  -0.1060  -0.1377   0.0000   0.1861
+ 169 C_d :3d1+   0.0123   0.0060  -0.0070  -0.0000  -0.0000   0.0184   0.0000
+ 170 C_d :3d2+  -0.0000  -0.0000  -0.0000   0.6355   0.3263   0.0000   0.8000
+ 180 C_d :4f1-  -0.0000  -0.0000  -0.0000   0.0011   0.0183   0.0000   0.0006
+ 182 C_d :4f1+   0.0000   0.0000  -0.0000   0.0150   0.0026  -0.0000  -0.0171
+ 184 C_d :4f3+  -0.0000  -0.0000   0.0000  -0.0197  -0.0573  -0.0000   0.0057
+ 186 C_e :1s    -0.0000  -0.0000  -0.0000  -0.0007   0.0054   0.0000  -0.0170
+ 188 C_e :1s    -0.0000  -0.0000   0.0000   0.4644  -0.5250  -0.0000   0.9250
+ 189 C_e :1s    -0.0000   0.0000  -0.0000   1.4904  -8.0480  -0.0000  -1.2842
+ 190 C_e :2px    0.0000  -0.0000   0.0000   0.0085   0.0224  -0.0000  -0.0393
+ 192 C_e :2pz    0.0039   0.3365   0.1657  -0.0000   0.0000   0.3549  -0.0000
+ 193 C_e :2px    0.0000  -0.0000  -0.0000  -0.0037   0.0031   0.0000   0.0221
+ 194 C_e :2py   -0.0000   0.0000   0.0000  -0.0084  -0.0168  -0.0000  -0.0008
+ 196 C_e :2px   -0.0000   0.0000  -0.0000   0.2046   0.0461   0.0000  -1.1847
+ 197 C_e :2py    0.0000   0.0000  -0.0000   0.2037  -0.3894   0.0000  -0.3745
+ 198 C_e :2pz   -0.0073   0.0025   0.0164   0.0000  -0.0000   0.0132   0.0000
+ 199 C_e :2px    0.0000  -0.0000   0.0000  -0.9289  -0.5898   0.0000  -0.7592
+ 200 C_e :2py   -0.0000  -0.0000   0.0000   1.6432   5.3990  -0.0000   0.5459
+ 201 C_e :2pz    0.0085   0.0151   0.0267  -0.0000  -0.0000   0.1935  -0.0000
+ 203 C_e :3d1-   0.0045  -0.0038  -0.0130  -0.0000   0.0000   0.0049  -0.0000
+ 207 C_e :3d2-  -0.0000  -0.0000  -0.0000   0.0194   0.0054  -0.0000  -0.0089
+ 208 C_e :3d1-   0.0105  -0.0083  -0.0342   0.0000  -0.0000   0.0172   0.0000
+ 209 C_e :3d0    0.0000   0.0000  -0.0000  -0.0158  -0.0016  -0.0000   0.0136
+ 211 C_e :3d2+  -0.0000   0.0000  -0.0000  -0.0105  -0.0384  -0.0000   0.0063
+ 212 C_e :3d2-  -0.0000   0.0000  -0.0000  -0.2759   0.3693   0.0000   0.1846
+ 213 C_e :3d1-  -0.0236  -0.0054  -0.0091   0.0000   0.0000   0.0289  -0.0000
+ 214 C_e :3d0   -0.0000  -0.0000   0.0000  -0.0556   0.0819  -0.0000   0.2780
+ 215 C_e :3d1+   0.0114  -0.0068   0.0001  -0.0000   0.0000   0.0064  -0.0000
+ 216 C_e :3d2+  -0.0000  -0.0000   0.0000   0.1750  -0.2345   0.0000   0.5226
+ 224 C_e :4f3-  -0.0000  -0.0000   0.0000   0.0102  -0.0340   0.0000   0.0053
+ 228 C_e :4f1+   0.0000   0.0000  -0.0000  -0.0069   0.0023   0.0000   0.0224
+ 230 C_e :4f3+  -0.0000   0.0000  -0.0000   0.0195   0.0056   0.0000  -0.0173
+ 232 C_f :1s     0.0000  -0.0000   0.0000   0.0061  -0.0089  -0.0000  -0.0238
+ 234 C_f :1s    -0.0000   0.0000   0.0000   0.2284   0.1492  -0.0000   0.1267
+ 235 C_f :1s     0.0000  -0.0000   0.0000  -1.7404  10.0537   0.0000  -0.4265
+ 236 C_f :2px    0.0000   0.0000  -0.0000  -0.0008   0.0186   0.0000   0.0319
+ 237 C_f :2py   -0.0000  -0.0000   0.0000   0.0013   0.0061  -0.0000   0.0139
+ 238 C_f :2pz   -0.1267   0.2346   0.3672   0.0000  -0.0000  -0.1824   0.0000
+ 239 C_f :2px   -0.0000  -0.0000   0.0000  -0.0003  -0.0106  -0.0000  -0.0292
+ 240 C_f :2py    0.0000   0.0000  -0.0000  -0.0301  -0.0210  -0.0000   0.0190
+ 242 C_f :2px   -0.0000  -0.0000   0.0000   0.1430  -0.1902  -0.0000   0.7112
+ 243 C_f :2py    0.0000   0.0000  -0.0000  -0.0321  -0.5238   0.0000   0.3307
+ 244 C_f :2pz    0.0093   0.0159   0.0265  -0.0000   0.0000   0.0328  -0.0000
+ 245 C_f :2px    0.0000  -0.0000   0.0000  -1.0489   2.9079  -0.0000   2.0266
+ 246 C_f :2py    0.0000  -0.0000   0.0000   1.2192  -3.3518  -0.0000  -2.1655
+ 247 C_f :2pz   -0.0020   0.0103   0.0415   0.0000  -0.0000  -0.0201   0.0000
+ 249 C_f :3d1-   0.0020   0.0093   0.0050  -0.0000  -0.0000   0.0120  -0.0000
+ 253 C_f :3d2-  -0.0000   0.0000  -0.0000   0.0030   0.0121  -0.0000  -0.0033
+ 254 C_f :3d1-   0.0041   0.0226   0.0099   0.0000   0.0000   0.0328   0.0000
+ 255 C_f :3d0   -0.0000  -0.0000  -0.0000   0.0018  -0.0045  -0.0000   0.0101
+ 257 C_f :3d2+  -0.0000   0.0000  -0.0000   0.0281   0.0383   0.0000  -0.0214
+ 258 C_f :3d2-   0.0000   0.0000  -0.0000  -0.3673   0.1232   0.0000   0.1232
+ 259 C_f :3d1-  -0.0221  -0.0058   0.0030  -0.0000   0.0000   0.0249  -0.0000
+ 260 C_f :3d0   -0.0000   0.0000  -0.0000   0.0207  -0.1572  -0.0000   0.1809
+ 261 C_f :3d1+   0.0021   0.0121   0.0068  -0.0000  -0.0000   0.0333  -0.0000
+ 262 C_f :3d2+  -0.0000   0.0000   0.0000  -0.6604  -0.0205  -0.0000   1.0592
+ 270 C_f :4f3-  -0.0000  -0.0000  -0.0000   0.0120  -0.0169   0.0000   0.0156
+ 274 C_f :4f1+   0.0000  -0.0000   0.0000   0.0018   0.0044  -0.0000  -0.0242
+ 276 C_f :4f3+   0.0000   0.0000  -0.0000   0.0001  -0.0275   0.0000   0.0084
+ 280 C_g :1s     0.0000   0.0000  -0.0000  -0.1668  -0.2713   0.0000  -0.1917
+ 281 C_g :1s     0.0000  -0.0000   0.0000  -1.1841  -9.5625  -0.0000   1.4241
+ 282 C_g :2px   -0.0000  -0.0000   0.0000   0.0023   0.0096  -0.0000  -0.0205
+ 284 C_g :2pz   -0.2255  -0.2317  -0.0473  -0.0000  -0.0000  -0.3402   0.0000
+ 286 C_g :2py   -0.0000  -0.0000   0.0000   0.0284  -0.0103  -0.0000  -0.0198
+ 288 C_g :2px   -0.0000   0.0000  -0.0000   0.2631  -0.3292  -0.0000  -0.5800
+ 289 C_g :2py    0.0000   0.0000  -0.0000  -0.5200  -0.4698   0.0000   0.6448
+ 290 C_g :2pz   -0.0166  -0.0001  -0.0031   0.0000   0.0000  -0.1026  -0.0000
+ 291 C_g :2px   -0.0000  -0.0000   0.0000  -0.9579   0.6548  -0.0000   0.0315
+ 292 C_g :2py   -0.0000   0.0000  -0.0000   3.9263   4.6442   0.0000  -2.3596
+ 293 C_g :2pz   -0.0213  -0.0100  -0.0118  -0.0000   0.0000  -0.3035  -0.0000
+ 295 C_g :3d1-   0.0034   0.0114   0.0107   0.0000  -0.0000  -0.0075   0.0000
+ 299 C_g :3d2-   0.0000   0.0000  -0.0000   0.0051   0.0013   0.0000  -0.0290
+ 300 C_g :3d1-   0.0075   0.0276   0.0278  -0.0000   0.0000  -0.0255  -0.0000
+ 301 C_g :3d0   -0.0000  -0.0000   0.0000  -0.0055   0.0038  -0.0000   0.0184
+ 303 C_g :3d2+   0.0000   0.0000  -0.0000   0.0261  -0.0110   0.0000  -0.0254
+ 304 C_g :3d2-  -0.0000   0.0000  -0.0000   0.1751   0.0401  -0.0000   0.1505
+ 305 C_g :3d1-  -0.0113  -0.0074   0.0041   0.0000   0.0000  -0.0561   0.0000
+ 306 C_g :3d0   -0.0000   0.0000   0.0000  -0.0870   0.0773   0.0000   0.1306
+ 307 C_g :3d1+   0.0119   0.0028  -0.0035  -0.0000  -0.0000   0.0002   0.0000
+ 308 C_g :3d2+   0.0000   0.0000  -0.0000  -0.6782  -0.4929   0.0000   1.1916
+ 316 C_g :4f3-   0.0000   0.0000  -0.0000  -0.0187  -0.0214   0.0000   0.0230
+ 318 C_g :4f1-  -0.0000  -0.0000   0.0000   0.0127   0.0031  -0.0000  -0.0100
+ 320 C_g :4f1+  -0.0000  -0.0000   0.0000  -0.0057   0.0070  -0.0000   0.0160
+ 322 C_g :4f3+   0.0000   0.0000  -0.0000  -0.0065  -0.0204   0.0000   0.0083
+ 326 C_h :1s    -0.0000   0.0000  -0.0000  -0.2305  -0.4243   0.0000   0.6394
+ 327 C_h :1s    -0.0000   0.0000  -0.0000   7.9126   6.7965   0.0000  -8.4083
+ 328 C_h :2px   -0.0000   0.0000  -0.0000   0.0014   0.0095  -0.0000   0.0117
+ 329 C_h :2py   -0.0000  -0.0000   0.0000  -0.0002   0.0027  -0.0000   0.0112
+ 330 C_h :2pz   -0.2311  -0.3964  -0.2878   0.0000  -0.0000   0.2710  -0.0000
+ 331 C_h :2px   -0.0000  -0.0000   0.0000  -0.0061  -0.0123  -0.0000   0.0089
+ 334 C_h :2px   -0.0000   0.0000  -0.0000  -0.8127  -0.4384   0.0000   1.5299
+ 335 C_h :2py   -0.0000   0.0000  -0.0000  -0.7555  -0.4882   0.0000   1.0483
+ 336 C_h :2pz    0.0015  -0.0151  -0.0210  -0.0000  -0.0000   0.0583   0.0000
+ 337 C_h :2px   -0.0000   0.0000  -0.0000   1.1059   1.5141  -0.0000  -0.4855
+ 338 C_h :2py   -0.0000  -0.0000   0.0000   0.7958   0.0219  -0.0000  -0.9372
+ 339 C_h :2pz    0.0066  -0.0167  -0.0251   0.0000  -0.0000   0.1398  -0.0000
+ 341 C_h :3d1-  -0.0041  -0.0055  -0.0015  -0.0000  -0.0000  -0.0114   0.0000
+ 345 C_h :3d2-  -0.0000   0.0000  -0.0000   0.0268   0.0095   0.0000  -0.0376
+ 346 C_h :3d1-  -0.0074  -0.0110  -0.0008   0.0000   0.0000  -0.0350  -0.0000
+ 347 C_h :3d0    0.0000   0.0000  -0.0000  -0.0210  -0.0005   0.0000   0.0215
+ 348 C_h :3d1+  -0.0031  -0.0065  -0.0042  -0.0000  -0.0000   0.0123  -0.0000
+ 349 C_h :3d2+   0.0000   0.0000  -0.0000   0.0113   0.0175   0.0000  -0.0261
+ 350 C_h :3d2-   0.0000   0.0000  -0.0000   0.2420   0.0268   0.0000  -0.1602
+ 351 C_h :3d1-   0.0097  -0.0181  -0.0114  -0.0000   0.0000  -0.0314  -0.0000
+ 352 C_h :3d0    0.0000   0.0000  -0.0000  -0.2064  -0.1015   0.0000   0.2481
+ 353 C_h :3d1+   0.0128   0.0009   0.0009  -0.0000  -0.0000   0.0239  -0.0000
+ 354 C_h :3d2+  -0.0000  -0.0000   0.0000   0.0462   0.1414  -0.0000   0.0821
+ 362 C_h :4f3-   0.0000   0.0000  -0.0000  -0.0323  -0.0172   0.0000   0.0396
+ 364 C_h :4f1-  -0.0000  -0.0000   0.0000   0.0124   0.0103  -0.0000  -0.0181
+ 366 C_h :4f1+  -0.0000   0.0000  -0.0000   0.0155   0.0020   0.0000  -0.0230
+ 368 C_h :4f3+   0.0000  -0.0000  -0.0000  -0.0287  -0.0188   0.0000   0.0383
+ 370 N_a :1s    -0.0000  -0.0000  -0.0000   0.0956  -0.0247   0.0000   0.0301
+ 372 N_a :1s    -0.0000  -0.0000  -0.0000  -0.5068   0.3716   0.0000   0.0587
+ 373 N_a :1s    -0.0000  -0.0000   0.0000  -5.9627   5.1176  -0.0000  -0.3414
+ 374 N_a :2px   -0.0000  -0.0000   0.0000  -0.0240   0.0469   0.0000   0.0054
+ 375 N_a :2py    0.0000  -0.0000   0.0000   0.0596   0.0160  -0.0000   0.0221
+ 376 N_a :2pz   -0.1890   0.3156  -0.2809   0.0000  -0.0000  -0.1307   0.0000
+ 380 N_a :2px   -0.0000   0.0000  -0.0000  -0.1348   0.0571  -0.0000   0.1733
+ 381 N_a :2py    0.0000   0.0000  -0.0000  -0.1464   0.1725  -0.0000   0.1891
+ 382 N_a :2pz   -0.0086   0.0188  -0.0277  -0.0000   0.0000  -0.0684  -0.0000
+ 383 N_a :2px   -0.0000  -0.0000   0.0000  -1.3770   0.7103   0.0000  -0.1340
+ 384 N_a :2py    0.0000  -0.0000   0.0000   1.3523  -1.0499  -0.0000   0.4924
+ 385 N_a :2pz   -0.0115   0.0287  -0.0486   0.0000   0.0000  -0.1832   0.0000
+ 391 N_a :3d2-  -0.0000   0.0000   0.0000  -0.0094   0.0118  -0.0000  -0.0048
+ 393 N_a :3d0   -0.0000   0.0000   0.0000   0.0148  -0.0074  -0.0000  -0.0035
+ 396 N_a :3d2-   0.0000   0.0000  -0.0000  -0.1039   0.1358  -0.0000  -0.0268
+ 398 N_a :3d0    0.0000   0.0000  -0.0000   0.0304  -0.0458   0.0000  -0.0542
+ 400 N_a :3d2+   0.0000  -0.0000   0.0000  -0.0610  -0.0131   0.0000   0.0134
+ 408 N_a :4f3-  -0.0000   0.0000   0.0000   0.0193   0.0066  -0.0000   0.0039
+ 410 N_a :4f1-  -0.0000   0.0000   0.0000  -0.0006  -0.0081  -0.0000  -0.0103
+ 414 N_a :4f3+  -0.0000   0.0000   0.0000   0.0051  -0.0088  -0.0000  -0.0207
+ 418 N_b :1s     0.0000   0.0000  -0.0000  -0.1405  -0.1321   0.0000  -0.0281
+ 419 N_b :1s     0.0000  -0.0000   0.0000  -1.8529  -1.1021  -0.0000   2.1202
+ 422 N_b :2pz    0.0163   0.0014  -0.0284  -0.0000  -0.0000   0.3216   0.0000
+ 426 N_b :2px   -0.0000   0.0000  -0.0000   0.0023  -0.0386   0.0000  -0.0680
+ 427 N_b :2py    0.0000   0.0000  -0.0000   0.0526   0.0731   0.0000  -0.1473
+ 428 N_b :2pz   -0.0062  -0.0082  -0.0062   0.0000   0.0000   0.0561  -0.0000
+ 429 N_b :2px    0.0000  -0.0000   0.0000   0.3496   0.0631  -0.0000  -0.5711
+ 430 N_b :2py   -0.0000   0.0000  -0.0000  -0.0981   0.4469   0.0000   0.3865
+ 431 N_b :2pz   -0.0016   0.0009  -0.0019  -0.0000  -0.0000   0.1939  -0.0000
+ 435 N_b :3d1+   0.0129   0.0041   0.0031   0.0000   0.0000  -0.0054  -0.0000
+ 438 N_b :3d1-   0.0243  -0.0135  -0.0108   0.0000  -0.0000   0.0176   0.0000
+ 440 N_b :3d1+   0.0378   0.0141   0.0111  -0.0000  -0.0000  -0.0190   0.0000
+ 442 N_b :3d2-  -0.0000   0.0000  -0.0000  -0.0933  -0.0561   0.0000   0.1646
+ 443 N_b :3d1-  -0.0138  -0.0057  -0.0035   0.0000  -0.0000  -0.0063   0.0000
+ 444 N_b :3d0    0.0000  -0.0000   0.0000   0.0588   0.0135  -0.0000  -0.0725
+ 446 N_b :3d2+  -0.0000  -0.0000   0.0000  -0.0315  -0.0068  -0.0000   0.0500
+ 454 N_b :4f3-   0.0000   0.0000  -0.0000  -0.0079  -0.0021   0.0000   0.0108
+ 460 N_b :4f3+   0.0000   0.0000  -0.0000  -0.0083  -0.0049   0.0000   0.0100
+ 464 O_a :1s     0.0000  -0.0000   0.0000   0.1145   0.0552  -0.0000  -0.1075
+ 465 O_a :1s     0.0000   0.0000   0.0000   0.3097   0.0921  -0.0000  -0.1959
+ 468 O_a :2pz    0.5656   0.1263   0.0929   0.0000  -0.0000  -0.2339   0.0000
+ 472 O_a :2px    0.0000  -0.0000  -0.0000  -0.0538  -0.0224   0.0000   0.0215
+ 473 O_a :2py   -0.0000  -0.0000  -0.0000   0.0013  -0.0113  -0.0000  -0.0348
+ 474 O_a :2pz    0.0526   0.0093   0.0083  -0.0000   0.0000  -0.0532  -0.0000
+ 475 O_a :2px   -0.0000   0.0000  -0.0000  -0.1168  -0.0222   0.0000   0.1042
+ 476 O_a :2py    0.0000   0.0000  -0.0000   0.0492  -0.0427   0.0000  -0.1030
+ 477 O_a :2pz    0.0396   0.0095   0.0120   0.0000  -0.0000  -0.1483   0.0000
+ 486 O_a :3d1+  -0.0141  -0.0018  -0.0004  -0.0000   0.0000  -0.0060  -0.0000
+ 488 O_a :3d2-   0.0000  -0.0000   0.0000  -0.0095   0.0023   0.0000   0.0254
+ 491 O_a :3d1+  -0.0166  -0.0015  -0.0003  -0.0000  -0.0000   0.0035   0.0000
+ 492 O_a :3d2+  -0.0000  -0.0000   0.0000   0.0108   0.0048  -0.0000  -0.0063
+ 510 O_b :1s     0.0000  -0.0000   0.0000   0.0967   0.0653  -0.0000  -0.1452
+ 511 O_b :1s    -0.0000   0.0000  -0.0000   0.3162   0.3205   0.0000  -0.1970
+ 514 O_b :2pz   -0.4178   0.1229   0.0988   0.0000   0.0000  -0.2707  -0.0000
+ 518 O_b :2px   -0.0000   0.0000   0.0000  -0.0161   0.0037  -0.0000   0.0399
+ 519 O_b :2py   -0.0000   0.0000  -0.0000   0.0431   0.0312   0.0000  -0.0465
+ 520 O_b :2pz   -0.0437   0.0095   0.0113  -0.0000  -0.0000  -0.0638   0.0000
+ 521 O_b :2px    0.0000   0.0000  -0.0000  -0.0206   0.0892   0.0000   0.0885
+ 522 O_b :2py    0.0000  -0.0000   0.0000   0.0585   0.0105  -0.0000  -0.0310
+ 523 O_b :2pz   -0.0311   0.0094   0.0134   0.0000   0.0000  -0.1687  -0.0000
+ 530 O_b :3d1-  -0.0110   0.0019   0.0007   0.0000   0.0000   0.0056  -0.0000
+ 534 O_b :3d2-  -0.0000   0.0000   0.0000  -0.0064   0.0056  -0.0000   0.0177
+ 535 O_b :3d1-  -0.0144   0.0016   0.0015  -0.0000  -0.0000  -0.0052   0.0000
+ 538 O_b :3d2+  -0.0000  -0.0000   0.0000  -0.0075  -0.0021  -0.0000   0.0109
+ 553 H_a :1s    -0.0000   0.0000   0.0000   0.0313  -0.0042  -0.0000  -0.0285
+ 554 H_a :1s    -0.0000   0.0000  -0.0000   0.1018   0.0394   0.0000   0.3023
+ 555 H_a :1s     0.0000  -0.0000  -0.0000   1.3103   0.8924   0.0000   3.5350
+ 556 H_a :1s    -0.0000  -0.0000  -0.0000  -2.1250  -4.6369   0.0000   1.1773
+ 560 H_a :2px    0.0000  -0.0000   0.0000  -0.0550  -0.0117  -0.0000  -0.0486
+ 561 H_a :2py    0.0000  -0.0000  -0.0000  -0.0308   0.0003  -0.0000  -0.0293
+ 563 H_a :2px    0.0000   0.0000  -0.0000  -0.1769  -0.1258  -0.0000  -0.6013
+ 564 H_a :2py   -0.0000  -0.0000   0.0000   0.0403  -0.2358  -0.0000  -0.1422
+ 565 H_a :2pz    0.0027  -0.0067   0.0108  -0.0000   0.0000   0.0320  -0.0000
+ 571 H_a :3d2-  -0.0000  -0.0000  -0.0000   0.0182   0.0084   0.0000   0.0014
+ 573 H_a :3d0    0.0000  -0.0000  -0.0000  -0.0043   0.0044   0.0000   0.0148
+ 575 H_a :3d2+  -0.0000   0.0000  -0.0000   0.0157  -0.0062   0.0000  -0.0290
+ 576 H_b :1s     0.0000   0.0000  -0.0000   0.0373   0.0035   0.0000  -0.0317
+ 577 H_b :1s    -0.0000  -0.0000   0.0000   0.0204  -0.2303  -0.0000   0.0780
+ 578 H_b :1s    -0.0000  -0.0000   0.0000   2.5532  -2.6492  -0.0000   0.1459
+ 579 H_b :1s    -0.0000   0.0000  -0.0000  -0.2951   3.7489  -0.0000   1.8476
+ 583 H_b :2px    0.0000  -0.0000   0.0000   0.0266  -0.0582   0.0000   0.0119
+ 584 H_b :2py   -0.0000  -0.0000   0.0000   0.0265  -0.0290  -0.0000   0.0134
+ 586 H_b :2px   -0.0000  -0.0000  -0.0000   0.5102  -0.5022   0.0000   0.1945
+ 587 H_b :2py   -0.0000   0.0000   0.0000  -0.1456  -0.0843  -0.0000  -0.3582
+ 588 H_b :2pz    0.0024  -0.0095   0.0097  -0.0000   0.0000   0.0193  -0.0000
+ 594 H_b :3d2-  -0.0000  -0.0000   0.0000   0.0174  -0.0138   0.0000  -0.0081
+ 598 H_b :3d2+  -0.0000  -0.0000  -0.0000   0.0191   0.0052   0.0000  -0.0078
+ 599 H_c :1s     0.0000  -0.0000   0.0000   0.0071  -0.0041   0.0000  -0.0107
+ 600 H_c :1s    -0.0000   0.0000   0.0000   0.0267  -0.0370  -0.0000  -0.0109
+ 601 H_c :1s    -0.0000   0.0000  -0.0000   0.7643  -0.1780  -0.0000   0.3504
+ 602 H_c :1s     0.0000  -0.0000  -0.0000  -1.4903   1.9080   0.0000  -0.3571
+ 606 H_c :2px    0.0000   0.0000   0.0000   0.0306  -0.0200  -0.0000   0.0051
+ 607 H_c :2py   -0.0000   0.0000   0.0000  -0.0198  -0.0061   0.0000  -0.0181
+ 608 H_c :2pz   -0.0071   0.0127  -0.0117  -0.0000  -0.0000  -0.0051  -0.0000
+ 609 H_c :2px    0.0000   0.0000  -0.0000   0.3159  -0.0303  -0.0000   0.1257
+ 610 H_c :2py    0.0000   0.0000   0.0000  -0.2105   0.0225  -0.0000  -0.1958
+ 617 H_c :3d2-  -0.0000  -0.0000   0.0000  -0.0235  -0.0085   0.0000  -0.0166
+ 621 H_c :3d2+  -0.0000   0.0000   0.0000   0.0202  -0.0002  -0.0000   0.0059
+ 623 H_d :1s     0.0000  -0.0000  -0.0000   0.1293  -0.1303   0.0000  -0.1125
+ 624 H_d :1s     0.0000  -0.0000  -0.0000   0.4579  -0.9485   0.0000  -0.0961
+ 625 H_d :1s    -0.0000   0.0000   0.0000  -2.1126  -0.5089  -0.0000  -2.0953
+ 629 H_d :2px    0.0000  -0.0000  -0.0000  -0.0185  -0.0088   0.0000  -0.0047
+ 630 H_d :2py   -0.0000   0.0000  -0.0000  -0.0458   0.0286   0.0000   0.0101
+ 631 H_d :2pz   -0.0077   0.0134  -0.0124  -0.0000  -0.0000  -0.0052  -0.0000
+ 632 H_d :2px   -0.0000   0.0000  -0.0000   0.0593  -0.1084   0.0000   0.0556
+ 633 H_d :2py   -0.0000   0.0000  -0.0000  -0.1685   0.2137  -0.0000  -0.0842
+ 634 H_d :2pz   -0.0050   0.0106  -0.0115   0.0000  -0.0000  -0.0101   0.0000
+ 640 H_d :3d2-  -0.0000   0.0000   0.0000   0.0026   0.0171  -0.0000   0.0060
+ 645 H_e :1s    -0.0000   0.0000   0.0000   0.0184  -0.0049  -0.0000  -0.0385
+ 646 H_e :1s     0.0000  -0.0000  -0.0000  -0.0849   0.1782   0.0000   0.1000
+ 647 H_e :1s     0.0000  -0.0000  -0.0000  -0.4845   1.8755   0.0000  -1.3755
+ 648 H_e :1s     0.0000  -0.0000   0.0000   1.1211  -0.9140  -0.0000   0.5371
+ 652 H_e :2px    0.0000  -0.0000   0.0000   0.0118  -0.0241  -0.0000  -0.0050
+ 653 H_e :2py   -0.0000   0.0000  -0.0000   0.0125  -0.0137   0.0000   0.0031
+ 654 H_e :2pz    0.0053  -0.0027  -0.0062   0.0000   0.0000  -0.0108   0.0000
+ 655 H_e :2px    0.0000   0.0000   0.0000   0.0856  -0.2019  -0.0000   0.2105
+ 656 H_e :2py   -0.0000  -0.0000   0.0000  -0.0918  -0.2306  -0.0000   0.1157
+ 663 H_e :3d2-   0.0000   0.0000   0.0000  -0.0007   0.0005   0.0000  -0.0109
+ 665 H_e :3d0    0.0000   0.0000  -0.0000  -0.0033   0.0171   0.0000   0.0064
+ 667 H_e :3d2+  -0.0000   0.0000  -0.0000   0.0097  -0.0160   0.0000  -0.0220
+ 668 H_f :1s     0.0000   0.0000   0.0000   0.0150   0.0016  -0.0000  -0.0422
+ 669 H_f :1s    -0.0000  -0.0000   0.0000  -0.1133  -0.1019   0.0000   0.0326
+ 670 H_f :1s     0.0000  -0.0000   0.0000  -2.6386  -1.3463   0.0000  -0.4142
+ 671 H_f :1s    -0.0000  -0.0000   0.0000   0.1512   1.4672  -0.0000   1.9091
+ 675 H_f :2px   -0.0000   0.0000   0.0000  -0.0201  -0.0205  -0.0000  -0.0245
+ 676 H_f :2py   -0.0000  -0.0000   0.0000  -0.0144  -0.0064  -0.0000  -0.0024
+ 678 H_f :2px    0.0000   0.0000   0.0000  -0.4336  -0.1905  -0.0000  -0.0468
+ 679 H_f :2py    0.0000   0.0000  -0.0000  -0.1851  -0.0115  -0.0000  -0.0388
+ 680 H_f :2pz    0.0061   0.0068  -0.0106  -0.0000  -0.0000   0.0125   0.0000
+ 686 H_f :3d2-   0.0000  -0.0000   0.0000  -0.0012   0.0036  -0.0000  -0.0130
+ 690 H_f :3d2+   0.0000   0.0000   0.0000   0.0114   0.0052  -0.0000  -0.0251
+ 691 H_g :1s     0.0000   0.0000   0.0000   0.0047  -0.0019  -0.0000  -0.0401
+ 692 H_g :1s    -0.0000  -0.0000  -0.0000  -0.0581   0.0652  -0.0000   0.0956
+ 693 H_g :1s     0.0000  -0.0000   0.0000  -0.6677   0.2022  -0.0000   0.8696
+ 694 H_g :1s    -0.0000   0.0000  -0.0000  -1.1345  -2.0506   0.0000   1.7066
+ 698 H_g :2px   -0.0000  -0.0000   0.0000   0.0100  -0.0191   0.0000   0.0060
+ 700 H_g :2pz    0.0002   0.0067   0.0039   0.0000   0.0000   0.0111   0.0000
+ 701 H_g :2px   -0.0000   0.0000  -0.0000   0.1229   0.0435   0.0000  -0.1387
+ 702 H_g :2py   -0.0000  -0.0000   0.0000   0.1540  -0.1881   0.0000  -0.0455
+ 703 H_g :2pz   -0.0027   0.0089   0.0026  -0.0000  -0.0000   0.0196  -0.0000
+ 709 H_g :3d2-   0.0000  -0.0000   0.0000   0.0039  -0.0025  -0.0000  -0.0128
+ 713 H_g :3d2+   0.0000   0.0000  -0.0000   0.0030   0.0033  -0.0000  -0.0264
+ 714 H_h :1s    -0.0000  -0.0000   0.0000   0.0031   0.0023  -0.0000  -0.0324
+ 715 H_h :1s     0.0000   0.0000  -0.0000  -0.0064  -0.1076   0.0000   0.0980
+ 716 H_h :1s     0.0000  -0.0000  -0.0000   1.5220  -0.8708   0.0000  -0.4490
+ 717 H_h :1s     0.0000   0.0000  -0.0000  -0.1831   1.4808   0.0000   0.9499
+ 721 H_h :2px   -0.0000  -0.0000  -0.0000  -0.0056  -0.0286   0.0000   0.0034
+ 722 H_h :2py    0.0000   0.0000   0.0000  -0.0105  -0.0114  -0.0000   0.0005
+ 724 H_h :2px   -0.0000  -0.0000  -0.0000   0.2335  -0.1905   0.0000  -0.0197
+ 725 H_h :2py   -0.0000   0.0000  -0.0000   0.0554   0.0444   0.0000  -0.2019
+ 726 H_h :2pz   -0.0066   0.0088   0.0104  -0.0000   0.0000  -0.0003  -0.0000
+ 732 H_h :3d2-   0.0000  -0.0000   0.0000  -0.0060  -0.0020  -0.0000  -0.0130
+ 736 H_h :3d2+  -0.0000  -0.0000  -0.0000   0.0029  -0.0034  -0.0000  -0.0205
+ 737 H_i :1s    -0.0000  -0.0000  -0.0000   0.0032  -0.0045   0.0000  -0.0223
+ 738 H_i :1s     0.0000  -0.0000   0.0000  -0.0222   0.0792  -0.0000   0.0633
+ 739 H_i :1s     0.0000  -0.0000   0.0000   0.4454   1.4232  -0.0000  -0.9311
+ 740 H_i :1s     0.0000  -0.0000   0.0000   0.6203  -0.5724  -0.0000   0.1703
+ 744 H_i :2px    0.0000   0.0000  -0.0000   0.0080  -0.0157   0.0000  -0.0175
+ 745 H_i :2py   -0.0000   0.0000  -0.0000   0.0139  -0.0081   0.0000  -0.0135
+ 747 H_i :2px    0.0000   0.0000  -0.0000  -0.0140  -0.1995   0.0000   0.0547
+ 748 H_i :2py   -0.0000   0.0000  -0.0000  -0.1179  -0.2200   0.0000   0.1528
+ 760 H_j :1s     0.0000  -0.0000   0.0000   0.0061   0.0002   0.0000  -0.0232
+ 761 H_j :1s     0.0000   0.0000  -0.0000  -0.1653  -0.0713   0.0000   0.2328
+ 762 H_j :1s    -0.0000   0.0000  -0.0000  -2.0819  -1.0302   0.0000   2.6746
+ 763 H_j :1s    -0.0000   0.0000   0.0000   0.8729   0.7519  -0.0000  -0.2508
+ 767 H_j :2px    0.0000  -0.0000  -0.0000  -0.0252  -0.0093   0.0000   0.0294
+ 768 H_j :2py   -0.0000  -0.0000   0.0000  -0.0173  -0.0114   0.0000   0.0260
+ 769 H_j :2pz   -0.0059  -0.0097  -0.0075  -0.0000  -0.0000   0.0105   0.0000
+ 770 H_j :2px   -0.0000  -0.0000   0.0000  -0.3897  -0.1538  -0.0000   0.5245
+ 771 H_j :2py    0.0000   0.0000  -0.0000  -0.1059  -0.1460   0.0000   0.1328
+ 772 H_j :2pz    0.0092  -0.0071  -0.0070  -0.0000  -0.0000   0.0317  -0.0000
+ 780 H_j :3d0    0.0000   0.0000  -0.0000  -0.0064  -0.0044   0.0000   0.0116
+ 782 H_j :3d2+   0.0000  -0.0000  -0.0000   0.0073   0.0093   0.0000  -0.0145
+
+    Orbital        49       50       51       52       53       54
+   2 C_a :1s    -0.0083  -0.0309  -0.0237   0.0125  -0.0000   0.0059
+   4 C_a :1s     0.6217   0.0131   0.1265   0.5801  -0.0000   0.3687
+   5 C_a :1s     5.9348  11.1819   0.1399   4.8348  -0.0000 -19.4752
+   6 C_a :2px   -0.0077  -0.0232  -0.0291   0.0030  -0.0000   0.0127
+   7 C_a :2py   -0.0008  -0.0240  -0.0069   0.0119  -0.0000   0.0001
+   8 C_a :2pz    0.0000  -0.0000  -0.0000  -0.0000  -0.0158   0.0000
+   9 C_a :2px   -0.0281   0.0269   0.0246   0.0028   0.0000  -0.0252
+  10 C_a :2py   -0.0458   0.0260   0.0525  -0.0330  -0.0000  -0.0169
+  12 C_a :2px   -0.2497  -0.3589  -0.5271   1.2745   0.0000  -0.6872
+  13 C_a :2py   -0.3948   0.4695  -0.0084   0.4944  -0.0000  -0.3629
+  14 C_a :2pz   -0.0000   0.0000   0.0000   0.0000   0.6614  -0.0000
+  15 C_a :2px   -1.1193  -4.6796  -1.1886   2.4886   0.0000   6.7020
+  16 C_a :2py   -1.5868   0.2851  -2.0071  -5.1408  -0.0000   2.0177
+  17 C_a :2pz    0.0000  -0.0000  -0.0000  -0.0000   2.9931   0.0000
+  23 C_a :3d2-  -0.0004   0.0090  -0.0171   0.0062   0.0000   0.0129
+  24 C_a :3d1-  -0.0000   0.0000   0.0000   0.0000  -0.0309  -0.0000
+  25 C_a :3d0    0.0030  -0.0145   0.0063  -0.0154   0.0000   0.0096
+  26 C_a :3d1+   0.0000   0.0000  -0.0000  -0.0000   0.0685   0.0000
+  27 C_a :3d2+  -0.0130   0.0056   0.0201   0.0176   0.0000  -0.0305
+  28 C_a :3d2-  -0.2796   0.2572   0.3568  -0.0185   0.0000  -0.5176
+  29 C_a :3d1-  -0.0000  -0.0000   0.0000  -0.0000  -0.4214  -0.0000
+  30 C_a :3d0    0.1199  -0.1062   0.0356  -0.1628   0.0000   0.3244
+  31 C_a :3d1+   0.0000  -0.0000   0.0000  -0.0000   0.1573   0.0000
+  32 C_a :3d2+   0.1758  -0.0913   0.0419   0.4517  -0.0000  -0.2569
+  40 C_a :4f3-   0.0139  -0.0459   0.0070   0.0482  -0.0000  -0.0098
+  41 C_a :4f2-  -0.0000  -0.0000  -0.0000  -0.0000   0.0124  -0.0000
+  42 C_a :4f1-  -0.0045  -0.0086   0.0119  -0.0076   0.0000  -0.0046
+  43 C_a :4f0    0.0000   0.0000   0.0000  -0.0000  -0.0180   0.0000
+  44 C_a :4f1+  -0.0002   0.0151   0.0193  -0.0248  -0.0000   0.0063
+  45 C_a :4f2+  -0.0000   0.0000  -0.0000   0.0000   0.0101  -0.0000
+  46 C_a :4f3+  -0.0125   0.0264  -0.0364   0.0210  -0.0000  -0.0066
+  48 C_b :1s     0.0206  -0.0164   0.0041   0.0278   0.0000  -0.0333
+  49 C_b :1s     0.0110   0.0010  -0.0068   0.0034   0.0000  -0.0007
+  50 C_b :1s    -0.4482   0.7814   0.4552  -0.4995   0.0000   1.1832
+  51 C_b :1s   -10.0578   6.3057   5.0098 -17.3353   0.0000   9.6592
+  52 C_b :2px   -0.0138   0.0297  -0.0084  -0.0261  -0.0000   0.0230
+  53 C_b :2py   -0.0032   0.0130   0.0037  -0.0135   0.0000  -0.0047
+  54 C_b :2pz   -0.0000   0.0000   0.0000   0.0000  -0.1202   0.0000
+  55 C_b :2px    0.0100  -0.0186  -0.0046  -0.0091  -0.0000  -0.0485
+  56 C_b :2py    0.0138  -0.0088   0.0225  -0.0061   0.0000  -0.0081
+  57 C_b :2pz   -0.0000  -0.0000  -0.0000  -0.0000  -0.0181  -0.0000
+  58 C_b :2px    0.1916   0.3932  -0.1412  -0.3446   0.0000   0.7018
+  59 C_b :2py   -0.2389   0.1216  -0.5683   0.5090  -0.0000   0.4050
+  60 C_b :2pz    0.0000  -0.0000  -0.0000  -0.0000  -0.3779  -0.0000
+  61 C_b :2px   -2.4927   4.0747   0.8374  -6.5971  -0.0000   1.7352
+  62 C_b :2py    0.1160  -8.9887   1.2081   5.6127   0.0000  18.7667
+  63 C_b :2pz    0.0000   0.0000   0.0000   0.0000  -1.6193   0.0000
+  69 C_b :3d2-  -0.0061   0.0643   0.0118  -0.0198   0.0000  -0.0255
+  71 C_b :3d0    0.0372  -0.0097  -0.0217   0.0243   0.0000  -0.0031
+  73 C_b :3d2+  -0.0235   0.0687  -0.0385  -0.0401   0.0000   0.0484
+  74 C_b :3d2-  -0.3707   0.2439   0.3413   0.2666  -0.0000  -0.9004
+  75 C_b :3d1-   0.0000  -0.0000   0.0000  -0.0000  -0.4895   0.0000
+  76 C_b :3d0    0.2678  -0.1365  -0.0959   0.3653   0.0000   0.1915
+  77 C_b :3d1+  -0.0000  -0.0000  -0.0000  -0.0000  -0.3330  -0.0000
+  78 C_b :3d2+   0.3511   0.3323   0.1852  -0.7732   0.0000   1.0761
+  86 C_b :4f3-   0.0249  -0.0231  -0.0125   0.0218   0.0000  -0.0143
+  88 C_b :4f1-  -0.0015  -0.0077   0.0142  -0.0107   0.0000   0.0027
+  89 C_b :4f0   -0.0000   0.0000  -0.0000   0.0000   0.0247   0.0000
+  90 C_b :4f1+  -0.0096   0.0019   0.0061  -0.0021   0.0000  -0.0179
+  91 C_b :4f2+  -0.0000  -0.0000  -0.0000  -0.0000  -0.0305  -0.0000
+  92 C_b :4f3+   0.0312  -0.0044  -0.0368   0.0487  -0.0000   0.0028
+  94 C_c :1s     0.0063  -0.0075  -0.0087  -0.0277  -0.0000  -0.0341
+  96 C_c :1s    -0.7008   0.1750  -0.0746   1.1701  -0.0000   2.2519
+  97 C_c :1s    -6.7585  -6.7815  -0.0472  11.2821  -0.0000   8.8169
+  98 C_c :2px    0.0245   0.0020  -0.0135  -0.0298   0.0000  -0.0339
+  99 C_c :2py    0.0020   0.0030   0.0056  -0.0171  -0.0000  -0.0053
+ 100 C_c :2pz   -0.0000  -0.0000  -0.0000  -0.0000  -0.0532  -0.0000
+ 101 C_c :2px   -0.0250  -0.0030  -0.0234  -0.0097  -0.0000   0.0516
+ 102 C_c :2py    0.0237   0.0191  -0.0617  -0.0023   0.0000  -0.0125
+ 104 C_c :2px    0.2832   0.2087   0.0617  -1.0485   0.0000  -0.6739
+ 105 C_c :2py   -0.2047  -0.3844  -0.3495   0.5619  -0.0000  -0.1965
+ 106 C_c :2pz    0.0000   0.0000   0.0000   0.0000   0.4638   0.0000
+ 107 C_c :2px    1.4471   3.8364   3.5400  -3.2439  -0.0000  -2.4658
+ 108 C_c :2py    2.9849  -3.5246  -7.6822  -0.6781  -0.0000 -11.2812
+ 109 C_c :2pz   -0.0000   0.0000  -0.0000  -0.0000  -0.0640  -0.0000
+ 115 C_c :3d2-  -0.0624  -0.0237   0.0111   0.0201  -0.0000   0.0606
+ 116 C_c :3d1-  -0.0000  -0.0000  -0.0000  -0.0000  -0.0123  -0.0000
+ 117 C_c :3d0   -0.0036  -0.0192   0.0046  -0.0093  -0.0000  -0.0134
+ 119 C_c :3d2+  -0.0561   0.0222  -0.0504  -0.0243  -0.0000   0.0786
+ 120 C_c :3d2-  -0.2702   0.2731  -0.1472   0.4383   0.0000   1.0563
+ 121 C_c :3d1-  -0.0000   0.0000   0.0000   0.0000  -0.2593   0.0000
+ 122 C_c :3d0    0.0400  -0.0431   0.0353  -0.0882   0.0000   0.0994
+ 123 C_c :3d1+  -0.0000   0.0000  -0.0000  -0.0000   0.3056  -0.0000
+ 124 C_c :3d2+   0.0296   0.2861  -0.2247  -0.8418   0.0000   2.0396
+ 132 C_c :4f3-   0.0095   0.0275  -0.0114  -0.0110   0.0000   0.0216
+ 133 C_c :4f2-   0.0000   0.0000  -0.0000   0.0000  -0.0175   0.0000
+ 134 C_c :4f1-   0.0103   0.0091  -0.0053   0.0024   0.0000  -0.0076
+ 135 C_c :4f0   -0.0000  -0.0000  -0.0000   0.0000  -0.0216  -0.0000
+ 136 C_c :4f1+  -0.0031  -0.0063  -0.0016   0.0056   0.0000   0.0108
+ 137 C_c :4f2+   0.0000  -0.0000  -0.0000   0.0000  -0.0631  -0.0000
+ 138 C_c :4f3+  -0.0077  -0.0306  -0.0010   0.0524   0.0000   0.0227
+ 140 C_d :1s    -0.0176  -0.0083   0.0375  -0.0083  -0.0000  -0.0056
+ 141 C_d :1s    -0.0019  -0.0021   0.0102  -0.0004  -0.0000   0.0004
+ 142 C_d :1s     0.6099   0.0641  -1.4945  -0.2752   0.0000   1.9172
+ 143 C_d :1s    18.3523  14.4060 -14.1170   5.6808   0.0000 -18.0969
+ 144 C_d :2px    0.0215   0.0109  -0.0327   0.0169  -0.0000  -0.0065
+ 145 C_d :2py    0.0063   0.0121  -0.0035   0.0071   0.0000  -0.0006
+ 146 C_d :2pz   -0.0000   0.0000  -0.0000  -0.0000  -0.0322   0.0000
+ 147 C_d :2px    0.0109   0.0058   0.0146  -0.0346   0.0000  -0.0222
+ 148 C_d :2py   -0.0532  -0.0210   0.0168  -0.0511  -0.0000   0.0145
+ 149 C_d :2pz   -0.0000  -0.0000  -0.0000  -0.0000  -0.0266  -0.0000
+ 150 C_d :2px   -0.3129  -0.8613   0.0836  -0.1277   0.0000   1.8048
+ 151 C_d :2py    0.3684  -0.2614  -0.2198   0.4497  -0.0000  -1.3107
+ 152 C_d :2pz   -0.0000  -0.0000   0.0000   0.0000  -0.1171  -0.0000
+ 153 C_d :2px    2.7662   4.3324  -4.8764   1.6175   0.0000  -6.3559
+ 154 C_d :2py    6.5038  -8.2642   5.1968   5.6600  -0.0000   9.7435
+ 155 C_d :2pz   -0.0000  -0.0000  -0.0000  -0.0000   0.6303   0.0000
+ 161 C_d :3d2-  -0.0444  -0.0262  -0.0038   0.0475  -0.0000   0.0502
+ 162 C_d :3d1-  -0.0000  -0.0000   0.0000   0.0000  -0.0314  -0.0000
+ 163 C_d :3d0   -0.0174  -0.0171   0.0373  -0.0101   0.0000  -0.0046
+ 164 C_d :3d1+   0.0000  -0.0000  -0.0000  -0.0000  -0.0328  -0.0000
+ 165 C_d :3d2+   0.0235   0.0199   0.0060   0.1147  -0.0000   0.0382
+ 166 C_d :3d2-  -0.3493   0.3025  -0.3443   0.3612  -0.0000   0.2431
+ 167 C_d :3d1-  -0.0000  -0.0000   0.0000  -0.0000  -0.3923   0.0000
+ 168 C_d :3d0   -0.2387  -0.2401   0.1581  -0.2125  -0.0000   0.2588
+ 169 C_d :3d1+   0.0000  -0.0000   0.0000   0.0000  -0.2286  -0.0000
+ 170 C_d :3d2+  -0.0965  -0.1534  -0.3165   1.4362   0.0000   1.1548
+ 178 C_d :4f3-  -0.0739  -0.0342   0.0358  -0.0245  -0.0000   0.0502
+ 179 C_d :4f2-   0.0000   0.0000   0.0000   0.0000  -0.0314  -0.0000
+ 180 C_d :4f1-  -0.0171   0.0015   0.0042  -0.0192  -0.0000   0.0080
+ 182 C_d :4f1+   0.0127   0.0151  -0.0059  -0.0009  -0.0000  -0.0186
+ 183 C_d :4f2+   0.0000   0.0000  -0.0000   0.0000  -0.0223  -0.0000
+ 184 C_d :4f3+   0.0085  -0.0260   0.0279   0.0126   0.0000   0.0140
+ 186 C_e :1s     0.0285   0.0287   0.0106  -0.0176  -0.0000  -0.0169
+ 188 C_e :1s    -1.2717  -0.7738  -0.5615  -0.2301  -0.0000  -1.6383
+ 189 C_e :1s   -24.4952 -15.1906  10.1679  -3.1626  -0.0000  18.9374
+ 190 C_e :2px    0.0301   0.0331   0.0218  -0.0154   0.0000  -0.0198
+ 191 C_e :2py    0.0063   0.0165   0.0003  -0.0094  -0.0000   0.0007
+ 192 C_e :2pz   -0.0000  -0.0000  -0.0000   0.0000  -0.0227  -0.0000
+ 193 C_e :2px   -0.0009  -0.0112  -0.0246   0.0186  -0.0000  -0.0048
+ 194 C_e :2py    0.0048   0.0001   0.0213   0.0764  -0.0000   0.0412
+ 196 C_e :2px   -0.7733  -0.3773   0.7589  -0.3503   0.0000   1.5443
+ 197 C_e :2py   -0.5417  -0.1659   0.1834  -0.5725  -0.0000  -1.8578
+ 198 C_e :2pz    0.0000   0.0000   0.0000  -0.0000   0.4666   0.0000
+ 199 C_e :2px    5.0960   4.5189  -2.9750   3.0740   0.0000  -4.8064
+ 200 C_e :2py   -1.9245  -6.2537  -1.2992  -9.6590   0.0000  -2.7834
+ 201 C_e :2pz    0.0000  -0.0000  -0.0000   0.0000   0.7938  -0.0000
+ 207 C_e :3d2-  -0.0168   0.0195  -0.0670   0.0040   0.0000  -0.0553
+ 208 C_e :3d1-   0.0000  -0.0000   0.0000   0.0000  -0.0144   0.0000
+ 209 C_e :3d0    0.0404   0.0182  -0.0099  -0.0177   0.0000   0.0012
+ 210 C_e :3d1+  -0.0000  -0.0000   0.0000  -0.0000   0.0223   0.0000
+ 211 C_e :3d2+   0.0251   0.0096  -0.0349   0.1103   0.0000  -0.0048
+ 212 C_e :3d2-  -0.3341  -0.5475  -0.4744  -0.3459  -0.0000  -0.4575
+ 213 C_e :3d1-  -0.0000  -0.0000   0.0000   0.0000  -0.3486  -0.0000
+ 214 C_e :3d0    0.3725   0.1186  -0.1430  -0.1966   0.0000  -0.2389
+ 215 C_e :3d1+   0.0000  -0.0000   0.0000  -0.0000   0.1872  -0.0000
+ 216 C_e :3d2+  -0.2286  -0.8325  -0.2546   0.9022   0.0000  -0.7555
+ 224 C_e :4f3-  -0.0503  -0.0226   0.0458   0.0069  -0.0000   0.0496
+ 225 C_e :4f2-  -0.0000  -0.0000  -0.0000  -0.0000  -0.0178  -0.0000
+ 226 C_e :4f1-   0.0099   0.0065   0.0025   0.0175   0.0000   0.0240
+ 227 C_e :4f0   -0.0000  -0.0000  -0.0000  -0.0000  -0.0122  -0.0000
+ 228 C_e :4f1+   0.0186   0.0037  -0.0140   0.0065  -0.0000  -0.0169
+ 229 C_e :4f2+   0.0000   0.0000  -0.0000   0.0000  -0.0407  -0.0000
+ 230 C_e :4f3+  -0.0826  -0.0473  -0.0084  -0.0264  -0.0000  -0.0139
+ 232 C_f :1s    -0.0275   0.0166   0.0036  -0.0236  -0.0000   0.0356
+ 234 C_f :1s     0.6328  -0.5741  -0.0160   0.0757   0.0000  -1.6771
+ 235 C_f :1s    20.5029   8.8636  -3.2412  20.3350   0.0000  -6.1452
+ 236 C_f :2px    0.0415  -0.0175  -0.0032   0.0253  -0.0000  -0.0370
+ 237 C_f :2py    0.0076  -0.0080  -0.0024   0.0130   0.0000  -0.0077
+ 238 C_f :2pz    0.0000   0.0000   0.0000   0.0000  -0.0576   0.0000
+ 239 C_f :2px   -0.0017   0.0086   0.0376   0.0012   0.0000   0.0551
+ 240 C_f :2py    0.0480   0.0430  -0.0333   0.0189   0.0000  -0.0339
+ 241 C_f :2pz   -0.0000  -0.0000   0.0000   0.0000  -0.0108  -0.0000
+ 242 C_f :2px   -0.6105  -0.8443  -0.5572  -0.1691   0.0000  -0.4425
+ 243 C_f :2py   -0.0525  -0.6147   0.7346  -0.3207  -0.0000  -0.5883
+ 244 C_f :2pz   -0.0000  -0.0000   0.0000  -0.0000  -0.2293  -0.0000
+ 245 C_f :2px   -0.1057   3.0047  -2.3963   3.3760   0.0000  -4.0172
+ 246 C_f :2py   10.2797  -3.9868  -0.4421   2.4750  -0.0000  -4.7262
+ 247 C_f :2pz    0.0000   0.0000   0.0000   0.0000  -1.0622   0.0000
+ 253 C_f :3d2-   0.0014   0.0116  -0.0717   0.0178   0.0000  -0.0709
+ 254 C_f :3d1-  -0.0000  -0.0000   0.0000   0.0000  -0.0264   0.0000
+ 255 C_f :3d0   -0.0194  -0.0071   0.0097  -0.0223   0.0000   0.0078
+ 257 C_f :3d2+  -0.0271  -0.0269  -0.0472  -0.0308  -0.0000  -0.0899
+ 258 C_f :3d2-  -0.0770  -0.4200  -0.0751  -0.0924  -0.0000  -1.3439
+ 259 C_f :3d1-  -0.0000  -0.0000   0.0000   0.0000  -0.5431  -0.0000
+ 260 C_f :3d0   -0.2843  -0.2301   0.1095  -0.3713   0.0000  -0.1581
+ 261 C_f :3d1+  -0.0000   0.0000  -0.0000  -0.0000  -0.1401  -0.0000
+ 262 C_f :3d2+   0.6311  -0.4315  -0.2912  -1.0654  -0.0000  -1.8394
+ 270 C_f :4f3-  -0.0593   0.0022  -0.0214  -0.0198   0.0000  -0.0120
+ 271 C_f :4f2-  -0.0000  -0.0000  -0.0000   0.0000  -0.0378  -0.0000
+ 272 C_f :4f1-   0.0120   0.0195  -0.0192   0.0122   0.0000  -0.0112
+ 273 C_f :4f0    0.0000   0.0000  -0.0000  -0.0000   0.0107   0.0000
+ 274 C_f :4f1+   0.0076   0.0131   0.0104   0.0102   0.0000   0.0132
+ 275 C_f :4f2+  -0.0000   0.0000  -0.0000   0.0000  -0.0219  -0.0000
+ 276 C_f :4f3+  -0.0413  -0.0557   0.0337  -0.0849   0.0000  -0.0052
+ 278 C_g :1s     0.0106   0.0236   0.0241   0.0333  -0.0000   0.0220
+ 280 C_g :1s    -0.2870  -0.4768   0.3129  -0.7694  -0.0000  -1.3989
+ 281 C_g :1s   -13.1761  -1.8962 -20.5409 -12.5486   0.0000 -25.1638
+ 282 C_g :2px    0.0158   0.0361   0.0239   0.0195   0.0000   0.0194
+ 283 C_g :2py    0.0064   0.0129  -0.0002   0.0170  -0.0000  -0.0010
+ 285 C_g :2px    0.0155  -0.0218  -0.0109  -0.0069   0.0000  -0.0343
+ 286 C_g :2py   -0.0407  -0.0424   0.0065  -0.0622   0.0000   0.0079
+ 288 C_g :2px   -0.8219   0.9493  -0.7422   0.3977   0.0000   0.1452
+ 289 C_g :2py    0.1102   0.4175   0.0811   0.5692  -0.0000  -0.6287
+ 290 C_g :2pz   -0.0000   0.0000  -0.0000  -0.0000   0.1090   0.0000
+ 291 C_g :2px    2.2359   4.2558   1.9768   9.4499  -0.0000   2.2931
+ 292 C_g :2py   -2.2600  -7.3004   9.2786 -15.1917   0.0000  15.1715
+ 293 C_g :2pz    0.0000  -0.0000   0.0000  -0.0000   0.3864  -0.0000
+ 299 C_g :3d2-  -0.0009  -0.0418  -0.0108  -0.0480  -0.0000  -0.0050
+ 300 C_g :3d1-  -0.0000   0.0000  -0.0000   0.0000  -0.0147  -0.0000
+ 301 C_g :3d0    0.0137  -0.0013   0.0287   0.0270  -0.0000   0.0278
+ 302 C_g :3d1+   0.0000   0.0000   0.0000   0.0000   0.0235   0.0000
+ 303 C_g :3d2+  -0.0302  -0.0744   0.0013  -0.0929  -0.0000  -0.0340
+ 304 C_g :3d2-  -0.1007  -0.5193   0.1392  -0.6329   0.0000   0.5091
+ 305 C_g :3d1-  -0.0000  -0.0000   0.0000   0.0000  -0.0911  -0.0000
+ 306 C_g :3d0    0.2313  -0.0061   0.4036   0.2608  -0.0000   0.1968
+ 307 C_g :3d1+   0.0000  -0.0000   0.0000  -0.0000   0.3355   0.0000
+ 308 C_g :3d2+   0.5236  -0.2484   0.0679  -0.3736  -0.0000  -1.4200
+ 316 C_g :4f3-  -0.0383  -0.0032  -0.0675  -0.0271   0.0000  -0.1005
+ 318 C_g :4f1-  -0.0125  -0.0154   0.0048  -0.0078   0.0000   0.0148
+ 320 C_g :4f1+   0.0212  -0.0141   0.0111   0.0009   0.0000   0.0029
+ 321 C_g :4f2+  -0.0000   0.0000  -0.0000   0.0000  -0.0256  -0.0000
+ 322 C_g :4f3+  -0.0078  -0.0075  -0.0188  -0.0524  -0.0000  -0.0126
+ 324 C_h :1s    -0.0236   0.0335  -0.0301   0.0291   0.0000   0.0023
+ 326 C_h :1s     1.1076  -0.3004   1.3933   0.4886  -0.0000   0.2984
+ 327 C_h :1s    10.0997 -11.0134  25.0378  -9.1526  -0.0000  33.5673
+ 328 C_h :2px    0.0329  -0.0233   0.0334   0.0001  -0.0000   0.0049
+ 329 C_h :2py    0.0149  -0.0211   0.0099  -0.0118   0.0000  -0.0074
+ 330 C_h :2pz   -0.0000   0.0000  -0.0000   0.0000  -0.0142   0.0000
+ 331 C_h :2px   -0.0207   0.0269  -0.0229   0.0262   0.0000  -0.0277
+ 332 C_h :2py   -0.0030   0.0103   0.0199   0.0398  -0.0000   0.0276
+ 334 C_h :2px    0.4167  -0.3194  -0.1368  -0.4006   0.0000  -1.4163
+ 335 C_h :2py   -0.2394   0.3334  -0.5368   0.0745  -0.0000  -1.5536
+ 336 C_h :2pz    0.0000  -0.0000   0.0000   0.0000  -0.0236  -0.0000
+ 337 C_h :2px    0.2400  -3.0280   4.3483  -5.2613  -0.0000   5.9106
+ 338 C_h :2py    5.2404  -3.1763   6.9519   2.4030   0.0000   6.5347
+ 339 C_h :2pz   -0.0000   0.0000  -0.0000   0.0000   0.4203   0.0000
+ 345 C_h :3d2-   0.0267  -0.0518   0.0495  -0.0457  -0.0000   0.0660
+ 346 C_h :3d1-  -0.0000  -0.0000  -0.0000   0.0000  -0.0120  -0.0000
+ 347 C_h :3d0   -0.0073   0.0301  -0.0385   0.0320  -0.0000  -0.0465
+ 348 C_h :3d1+   0.0000   0.0000  -0.0000  -0.0000  -0.0154  -0.0000
+ 349 C_h :3d2+   0.0296  -0.0166   0.0232  -0.0172  -0.0000   0.0536
+ 350 C_h :3d2-   0.0789  -0.3041   0.0096   0.0056  -0.0000   0.4315
+ 351 C_h :3d1-  -0.0000  -0.0000   0.0000   0.0000  -0.1747  -0.0000
+ 352 C_h :3d0   -0.0229   0.1851  -0.2386   0.2139  -0.0000  -0.5016
+ 353 C_h :3d1+   0.0000   0.0000  -0.0000  -0.0000  -0.1478  -0.0000
+ 354 C_h :3d2+   0.3688  -0.1049   0.5760   0.2855   0.0000   0.5902
+ 362 C_h :4f3-  -0.0119   0.0084  -0.0579  -0.0082  -0.0000  -0.0857
+ 364 C_h :4f1-   0.0103   0.0025   0.0119   0.0087   0.0000   0.0268
+ 366 C_h :4f1+  -0.0117   0.0042   0.0074   0.0038  -0.0000   0.0274
+ 368 C_h :4f3+   0.0081   0.0440   0.0039   0.0584  -0.0000  -0.0313
+ 370 N_a :1s     0.0038   0.0253   0.0008   0.0088   0.0000  -0.0071
+ 372 N_a :1s    -0.0787  -0.3734  -0.0702   0.1238   0.0000  -0.2273
+ 373 N_a :1s    -1.9667  -4.1486  -0.5692   1.7381   0.0000   1.3420
+ 374 N_a :2px   -0.0429  -0.0036   0.0331   0.0052   0.0000  -0.0158
+ 375 N_a :2py   -0.0246   0.0079   0.0181   0.0063   0.0000  -0.0084
+ 376 N_a :2pz   -0.0000   0.0000   0.0000   0.0000  -0.0910  -0.0000
+ 377 N_a :2px   -0.0101  -0.0018   0.0198   0.0125   0.0000  -0.0142
+ 378 N_a :2py   -0.0088  -0.0047   0.0055   0.0172  -0.0000  -0.0208
+ 379 N_a :2pz    0.0000  -0.0000  -0.0000  -0.0000  -0.0110   0.0000
+ 380 N_a :2px   -0.1791  -0.0533   0.4989   0.1923  -0.0000  -0.3956
+ 381 N_a :2py   -0.2360   0.0407   0.3946   0.1698  -0.0000  -0.2290
+ 382 N_a :2pz    0.0000  -0.0000  -0.0000  -0.0000  -0.0438   0.0000
+ 383 N_a :2px   -0.6593  -0.7899   1.3734   1.3772   0.0000  -1.0473
+ 384 N_a :2py    0.1999   0.9422   1.3530   0.6861   0.0000  -0.2812
+ 385 N_a :2pz   -0.0000   0.0000   0.0000   0.0000  -0.9447  -0.0000
+ 392 N_a :3d1-   0.0000  -0.0000   0.0000   0.0000  -0.0112   0.0000
+ 393 N_a :3d0    0.0008   0.0137   0.0072  -0.0067  -0.0000  -0.0003
+ 394 N_a :3d1+  -0.0000   0.0000  -0.0000  -0.0000   0.0101  -0.0000
+ 395 N_a :3d2+   0.0097  -0.0130  -0.0138  -0.0100   0.0000   0.0117
+ 396 N_a :3d2-  -0.0631  -0.1272   0.0471   0.1247  -0.0000   0.0294
+ 397 N_a :3d1-  -0.0000   0.0000   0.0000   0.0000  -0.0765  -0.0000
+ 398 N_a :3d0    0.0003   0.0818   0.0360  -0.0227   0.0000  -0.0698
+ 399 N_a :3d1+   0.0000  -0.0000  -0.0000  -0.0000   0.0885   0.0000
+ 400 N_a :3d2+   0.1035  -0.0738  -0.1647  -0.1178   0.0000   0.1220
+ 408 N_a :4f3-  -0.0169   0.0123   0.0058  -0.0104  -0.0000  -0.0143
+ 409 N_a :4f2-  -0.0000  -0.0000   0.0000   0.0000  -0.0173   0.0000
+ 410 N_a :4f1-   0.0080  -0.0046  -0.0123   0.0013  -0.0000   0.0032
+ 412 N_a :4f1+   0.0068  -0.0023  -0.0130  -0.0020   0.0000   0.0114
+ 416 N_b :1s     0.0040  -0.0168   0.0077  -0.0176  -0.0000   0.0053
+ 418 N_b :1s    -0.0996   0.5421  -0.3406   0.7275  -0.0000  -0.3047
+ 419 N_b :1s    -1.1296   2.6210  -4.0538   4.1261   0.0000  -5.4411
+ 420 N_b :2px   -0.0066  -0.0046  -0.0090  -0.0143  -0.0000  -0.0094
+ 422 N_b :2pz    0.0000   0.0000  -0.0000  -0.0000  -0.0535  -0.0000
+ 423 N_b :2px    0.0027   0.0041   0.0112   0.0030   0.0000   0.0136
+ 424 N_b :2py   -0.0024  -0.0037  -0.0006  -0.0045  -0.0000  -0.0104
+ 426 N_b :2px    0.0146   0.1080   0.0598   0.0539  -0.0000  -0.0250
+ 427 N_b :2py   -0.2229   0.0351  -0.1835  -0.1813   0.0000  -0.0671
+ 428 N_b :2pz   -0.0000  -0.0000   0.0000  -0.0000   0.0214   0.0000
+ 429 N_b :2px    0.0064  -0.0431   0.4047  -0.7188  -0.0000   0.5828
+ 430 N_b :2py   -1.6665   0.5232  -1.5144  -1.8737   0.0000  -0.9038
+ 431 N_b :2pz    0.0000   0.0000  -0.0000  -0.0000  -0.5121  -0.0000
+ 437 N_b :3d2-  -0.0051   0.0152  -0.0090   0.0122  -0.0000  -0.0122
+ 439 N_b :3d0   -0.0004  -0.0160   0.0045  -0.0208   0.0000   0.0039
+ 442 N_b :3d2-  -0.0388   0.0786  -0.1275   0.1281  -0.0000  -0.2610
+ 444 N_b :3d0   -0.0055  -0.0555   0.0135  -0.0577   0.0000   0.0809
+ 445 N_b :3d1+   0.0000   0.0000  -0.0000   0.0000   0.0379  -0.0000
+ 446 N_b :3d2+   0.0055   0.0361   0.0354  -0.0183   0.0000  -0.0292
+ 454 N_b :4f3-   0.0106   0.0064   0.0049   0.0182  -0.0000  -0.0050
+ 460 N_b :4f3+  -0.0033   0.0085  -0.0066   0.0045  -0.0000  -0.0160
+ 462 O_a :1s     0.0026   0.0323   0.0075   0.0412   0.0000   0.0186
+ 464 O_a :1s     0.0239  -0.1979   0.0635  -0.1705   0.0000   0.2345
+ 465 O_a :1s     0.2627  -0.9640   0.3674  -0.6845  -0.0000   0.5795
+ 466 O_a :2px    0.0095  -0.0029   0.0113   0.0083  -0.0000   0.0077
+ 467 O_a :2py    0.0071   0.0030   0.0121  -0.0015  -0.0000   0.0129
+ 468 O_a :2pz    0.0000   0.0000   0.0000   0.0000   0.0210   0.0000
+ 472 O_a :2px   -0.0110   0.1445  -0.0357   0.1429  -0.0000  -0.0923
+ 473 O_a :2py    0.0173   0.0445   0.0582   0.0183   0.0000   0.0513
+ 474 O_a :2pz   -0.0000  -0.0000  -0.0000  -0.0000  -0.0303  -0.0000
+ 475 O_a :2px    0.0125   0.2757   0.0550   0.3836  -0.0000  -0.0010
+ 476 O_a :2py    0.1666  -0.0715   0.2188  -0.0822  -0.0000   0.1824
+ 477 O_a :2pz    0.0000   0.0000   0.0000   0.0000   0.1482   0.0000
+ 488 O_a :3d2-  -0.0089  -0.0090  -0.0294   0.0016  -0.0000  -0.0401
+ 490 O_a :3d0    0.0069   0.0126   0.0093   0.0169   0.0000   0.0069
+ 492 O_a :3d2+   0.0018  -0.0278   0.0058  -0.0382   0.0000   0.0103
+ 508 O_b :1s    -0.0057   0.0230  -0.0197   0.0373   0.0000  -0.0099
+ 510 O_b :1s    -0.0511  -0.0815   0.0518  -0.1988   0.0000   0.1513
+ 511 O_b :1s    -0.4171  -0.4895   0.3468  -1.6849  -0.0000   0.6169
+ 512 O_b :2px    0.0101  -0.0005   0.0166   0.0066   0.0000   0.0154
+ 514 O_b :2pz    0.0000  -0.0000  -0.0000  -0.0000   0.0288   0.0000
+ 518 O_b :2px   -0.0534  -0.0043  -0.0554  -0.0579  -0.0000  -0.0753
+ 519 O_b :2py   -0.0373  -0.0800   0.0455  -0.1536  -0.0000   0.0681
+ 521 O_b :2px   -0.2470   0.0764  -0.2179  -0.3275   0.0000  -0.1009
+ 522 O_b :2py    0.0253  -0.2050   0.2319  -0.2891   0.0000   0.1638
+ 523 O_b :2pz    0.0000  -0.0000   0.0000  -0.0000   0.1271   0.0000
+ 534 O_b :3d2-  -0.0258  -0.0018  -0.0308  -0.0363  -0.0000  -0.0310
+ 536 O_b :3d0    0.0069   0.0080   0.0025   0.0066   0.0000   0.0120
+ 538 O_b :3d2+   0.0006   0.0207  -0.0186   0.0255  -0.0000  -0.0178
+ 553 H_a :1s     0.0058  -0.0138  -0.0143   0.0156   0.0000  -0.0093
+ 554 H_a :1s     0.0410   0.0027   0.0614  -0.1930  -0.0000   0.0870
+ 555 H_a :1s     0.6394  -0.3943   0.1168  -2.5962  -0.0000   2.7979
+ 556 H_a :1s     1.9086   6.3650   4.9628  -1.8898   0.0000 -11.4096
+ 560 H_a :2px   -0.0181   0.0213   0.0116   0.0300   0.0000  -0.0270
+ 561 H_a :2py   -0.0102   0.0217  -0.0078  -0.0078  -0.0000  -0.0133
+ 562 H_a :2pz    0.0000  -0.0000   0.0000  -0.0000  -0.0295   0.0000
+ 563 H_a :2px   -0.2199   0.2481   0.0966   0.3868  -0.0000  -0.5948
+ 564 H_a :2py    0.1795  -0.0981  -0.2093   0.1394  -0.0000  -0.0554
+ 565 H_a :2pz   -0.0000   0.0000  -0.0000   0.0000  -0.3799  -0.0000
+ 571 H_a :3d2-   0.0000  -0.0151   0.0012   0.0135   0.0000   0.0107
+ 572 H_a :3d1-   0.0000   0.0000  -0.0000   0.0000   0.0199   0.0000
+ 573 H_a :3d0   -0.0033   0.0146   0.0043  -0.0196   0.0000   0.0015
+ 574 H_a :3d1+  -0.0000   0.0000   0.0000   0.0000   0.0610  -0.0000
+ 575 H_a :3d2+   0.0076  -0.0164  -0.0312   0.0179   0.0000   0.0010
+ 576 H_b :1s     0.0047  -0.0155  -0.0038   0.0061  -0.0000  -0.0192
+ 577 H_b :1s     0.1345  -0.1061  -0.0660   0.1395   0.0000  -0.0060
+ 578 H_b :1s     0.8873  -0.9890  -1.2959   1.7791   0.0000  -0.2203
+ 579 H_b :1s    -2.2740   4.8419  -1.9703  -9.4468  -0.0000   5.9920
+ 583 H_b :2px    0.0434  -0.0522  -0.0147   0.0319  -0.0000  -0.0289
+ 584 H_b :2py    0.0103   0.0028   0.0076   0.0075  -0.0000  -0.0201
+ 585 H_b :2pz    0.0000   0.0000   0.0000   0.0000   0.0214   0.0000
+ 586 H_b :2px    0.2484  -0.2125  -0.2710   0.1879   0.0000  -0.0374
+ 587 H_b :2py   -0.1338   0.0224   0.1443   0.2473  -0.0000  -0.7130
+ 588 H_b :2pz   -0.0000   0.0000  -0.0000   0.0000  -0.1765  -0.0000
+ 594 H_b :3d2-   0.0021   0.0049   0.0139   0.0099  -0.0000  -0.0441
+ 595 H_b :3d1-  -0.0000   0.0000  -0.0000   0.0000   0.0193  -0.0000
+ 596 H_b :3d0   -0.0074   0.0075   0.0005   0.0064   0.0000   0.0102
+ 598 H_b :3d2+  -0.0023  -0.0161   0.0043   0.0002  -0.0000  -0.0277
+ 599 H_c :1s     0.0148  -0.0020  -0.0212  -0.0153  -0.0000   0.0045
+ 600 H_c :1s    -0.0850   0.1092   0.2089   0.0564  -0.0000  -0.1848
+ 601 H_c :1s    -0.4646   0.5214   1.4200   0.3937  -0.0000  -0.8439
+ 602 H_c :1s    -2.3655  -1.4939   3.6391   3.2822   0.0000  -4.5639
+ 606 H_c :2px   -0.0150   0.0275   0.0471   0.0159  -0.0000  -0.0319
+ 607 H_c :2py    0.0181  -0.0265  -0.0102   0.0236  -0.0000   0.0199
+ 608 H_c :2pz    0.0000  -0.0000  -0.0000   0.0000   0.0145  -0.0000
+ 609 H_c :2px   -0.1060   0.0873   0.2404   0.0540  -0.0000  -0.0645
+ 610 H_c :2py    0.0475  -0.1877  -0.0796   0.1628   0.0000   0.0226
+ 611 H_c :2pz   -0.0000   0.0000   0.0000   0.0000   0.2420  -0.0000
+ 617 H_c :3d2-   0.0265  -0.0220  -0.0248   0.0051  -0.0000   0.0283
+ 619 H_c :3d0   -0.0026   0.0055   0.0128   0.0019   0.0000  -0.0133
+ 620 H_c :3d1+  -0.0000   0.0000   0.0000   0.0000   0.0286  -0.0000
+ 621 H_c :3d2+  -0.0060   0.0003  -0.0044  -0.0012  -0.0000   0.0108
+ 622 H_d :1s    -0.0125   0.0024   0.0133   0.0018  -0.0000  -0.0068
+ 623 H_d :1s     0.1179   0.0796  -0.1686  -0.1372   0.0000   0.0932
+ 624 H_d :1s     1.0282   0.3608  -0.9671  -0.9453   0.0000   0.8646
+ 625 H_d :1s     1.8643  -1.8602  -3.8938   0.2527  -0.0000   4.5247
+ 629 H_d :2px    0.0084   0.0029  -0.0015   0.0143   0.0000  -0.0017
+ 630 H_d :2py   -0.0349  -0.0203   0.0244   0.0304   0.0000  -0.0425
+ 631 H_d :2pz    0.0000  -0.0000  -0.0000  -0.0000   0.0119  -0.0000
+ 632 H_d :2px    0.0657   0.1035   0.0319   0.0124   0.0000   0.0262
+ 633 H_d :2py   -0.2583  -0.0652   0.1169   0.1156   0.0000  -0.3287
+ 634 H_d :2pz   -0.0000   0.0000   0.0000   0.0000   0.2209  -0.0000
+ 640 H_d :3d2-  -0.0223  -0.0025   0.0174   0.0004  -0.0000  -0.0128
+ 641 H_d :3d1-   0.0000  -0.0000  -0.0000  -0.0000  -0.0250   0.0000
+ 642 H_d :3d0    0.0047   0.0073  -0.0190  -0.0119   0.0000  -0.0030
+ 644 H_d :3d2+  -0.0150   0.0002   0.0071   0.0017   0.0000  -0.0306
+ 645 H_e :1s     0.0053  -0.0073   0.0002  -0.0135   0.0000  -0.0154
+ 646 H_e :1s     0.0625  -0.0349   0.0656   0.0188   0.0000  -0.1359
+ 647 H_e :1s     0.3538  -1.2169   0.8138   1.2351  -0.0000  -3.8632
+ 648 H_e :1s    -3.3255  -3.8531  -2.0772   3.8365  -0.0000  10.3190
+ 652 H_e :2px   -0.0375   0.0185  -0.0302   0.0015  -0.0000   0.0720
+ 654 H_e :2pz   -0.0000  -0.0000   0.0000  -0.0000   0.0190   0.0000
+ 655 H_e :2px   -0.1644   0.2287  -0.2432  -0.1134   0.0000   0.7017
+ 656 H_e :2py    0.1694   0.0111  -0.0500  -0.3302   0.0000   0.2292
+ 657 H_e :2pz    0.0000  -0.0000  -0.0000  -0.0000  -0.2230  -0.0000
+ 663 H_e :3d2-   0.0050   0.0024   0.0017   0.0047  -0.0000  -0.0102
+ 664 H_e :3d1-  -0.0000  -0.0000  -0.0000  -0.0000   0.0109  -0.0000
+ 667 H_e :3d2+   0.0096   0.0021   0.0197  -0.0108  -0.0000  -0.0351
+ 668 H_f :1s     0.0041   0.0065   0.0129  -0.0101   0.0000  -0.0127
+ 669 H_f :1s    -0.1069  -0.1241   0.1129  -0.1482   0.0000   0.0330
+ 670 H_f :1s    -0.3478  -1.8029   1.8654  -3.2795  -0.0000  -0.2489
+ 671 H_f :1s     3.5423   0.0228  -1.8006   5.9879   0.0000  -0.9762
+ 675 H_f :2px   -0.0240  -0.0223   0.0439  -0.0645   0.0000  -0.0260
+ 676 H_f :2py    0.0016  -0.0102   0.0089  -0.0234   0.0000   0.0031
+ 678 H_f :2px    0.0011  -0.3569   0.3898  -0.5445  -0.0000   0.0366
+ 679 H_f :2py   -0.1923   0.0120   0.0392  -0.3474  -0.0000  -0.0844
+ 680 H_f :2pz    0.0000  -0.0000   0.0000   0.0000  -0.2708  -0.0000
+ 686 H_f :3d2-   0.0031   0.0061  -0.0026  -0.0196   0.0000   0.0002
+ 688 H_f :3d0   -0.0055  -0.0073  -0.0038   0.0064  -0.0000   0.0117
+ 689 H_f :3d1+   0.0000  -0.0000   0.0000  -0.0000  -0.0148   0.0000
+ 690 H_f :3d2+  -0.0014   0.0112   0.0065  -0.0156   0.0000  -0.0226
+ 691 H_g :1s    -0.0089   0.0149   0.0184  -0.0099   0.0000   0.0029
+ 692 H_g :1s     0.2228   0.0917  -0.0378  -0.0815  -0.0000  -0.0292
+ 693 H_g :1s     2.8444   2.8611   0.0007  -1.2259  -0.0000   0.1851
+ 694 H_g :1s    -2.2869  -0.6110   1.5438   3.6613  -0.0000   0.5185
+ 698 H_g :2px   -0.0406  -0.0242  -0.0197   0.0476  -0.0000  -0.0077
+ 699 H_g :2py   -0.0172  -0.0200  -0.0126   0.0306  -0.0000   0.0136
+ 701 H_g :2px   -0.5133  -0.4370  -0.0611   0.1363   0.0000  -0.0217
+ 702 H_g :2py    0.0276  -0.2576   0.1000   0.4095   0.0000   0.2598
+ 703 H_g :2pz    0.0000   0.0000  -0.0000   0.0000  -0.1504  -0.0000
+ 709 H_g :3d2-  -0.0048   0.0084   0.0116  -0.0304   0.0000  -0.0128
+ 710 H_g :3d1-   0.0000  -0.0000   0.0000   0.0000   0.0171   0.0000
+ 711 H_g :3d0    0.0141   0.0040  -0.0126   0.0090   0.0000   0.0013
+ 713 H_g :3d2+  -0.0110  -0.0088   0.0104  -0.0111   0.0000   0.0192
+ 714 H_h :1s    -0.0066   0.0293   0.0082  -0.0092  -0.0000   0.0108
+ 715 H_h :1s    -0.1302  -0.0891   0.0806  -0.0981   0.0000   0.0804
+ 716 H_h :1s    -2.2229  -0.2560   0.6377   0.1393   0.0000   3.8042
+ 717 H_h :1s     2.4578   1.5371  -3.6951   3.2868  -0.0000  -7.3934
+ 721 H_h :2px   -0.0197   0.0104   0.0404  -0.0155   0.0000   0.0607
+ 722 H_h :2py   -0.0002  -0.0078   0.0127  -0.0175   0.0000   0.0188
+ 723 H_h :2pz    0.0000  -0.0000   0.0000  -0.0000   0.0208   0.0000
+ 724 H_h :2px   -0.2363  -0.0179   0.1705  -0.0711   0.0000   0.7236
+ 725 H_h :2py   -0.2800  -0.0170   0.0210   0.2148   0.0000   0.2980
+ 726 H_h :2pz   -0.0000   0.0000  -0.0000   0.0000  -0.1351  -0.0000
+ 732 H_h :3d2-   0.0067   0.0059   0.0093   0.0054   0.0000   0.0299
+ 733 H_h :3d1-   0.0000   0.0000   0.0000   0.0000   0.0150   0.0000
+ 734 H_h :3d0   -0.0144  -0.0116  -0.0091  -0.0004   0.0000  -0.0091
+ 736 H_h :3d2+   0.0098   0.0236   0.0150   0.0084   0.0000   0.0216
+ 737 H_i :1s    -0.0155   0.0259  -0.0039   0.0017  -0.0000   0.0095
+ 738 H_i :1s     0.1423   0.0341   0.1600   0.1877   0.0000   0.1924
+ 739 H_i :1s     0.6228  -0.0495   1.5860   1.4728   0.0000   2.6168
+ 740 H_i :1s    -2.2253  -3.4389  -4.6448  -7.6036   0.0000  -5.5826
+ 744 H_i :2px   -0.0255  -0.0388  -0.0375  -0.0585   0.0000  -0.0644
+ 745 H_i :2py   -0.0087  -0.0165   0.0013  -0.0366  -0.0000   0.0032
+ 747 H_i :2px   -0.1458  -0.0227  -0.3356  -0.2513  -0.0000  -0.4157
+ 748 H_i :2py    0.1391  -0.0009  -0.0715   0.0159  -0.0000  -0.5058
+ 749 H_i :2pz   -0.0000  -0.0000  -0.0000   0.0000  -0.2951  -0.0000
+ 755 H_i :3d2-  -0.0090   0.0237  -0.0043   0.0265  -0.0000   0.0156
+ 758 H_i :3d1+  -0.0000   0.0000   0.0000   0.0000   0.0176   0.0000
+ 759 H_i :3d2+  -0.0072   0.0303   0.0005   0.0202  -0.0000   0.0149
+ 760 H_j :1s    -0.0100   0.0209  -0.0016   0.0089   0.0000   0.0199
+ 761 H_j :1s    -0.0540   0.1052  -0.2062   0.0657  -0.0000  -0.3714
+ 762 H_j :1s    -0.5520   1.1384  -2.0781   0.1808   0.0000  -4.9802
+ 763 H_j :1s     3.3920  -4.5275   7.9143  -3.1991  -0.0000   8.5185
+ 767 H_j :2px   -0.0361   0.0418  -0.0596   0.0351   0.0000  -0.0700
+ 768 H_j :2py   -0.0013   0.0372  -0.0116   0.0497  -0.0000  -0.0356
+ 770 H_j :2px   -0.0876   0.2970  -0.3139   0.1794   0.0000  -0.8167
+ 771 H_j :2py   -0.0638   0.0640  -0.3300   0.0196  -0.0000  -0.5333
+ 772 H_j :2pz    0.0000   0.0000  -0.0000  -0.0000  -0.2149  -0.0000
+ 778 H_j :3d2-  -0.0054   0.0187  -0.0029   0.0256  -0.0000  -0.0037
+ 780 H_j :3d0    0.0004  -0.0117  -0.0039  -0.0218  -0.0000  -0.0128
+ 781 H_j :3d1+   0.0000   0.0000  -0.0000  -0.0000  -0.0161  -0.0000
+ 782 H_j :3d2+  -0.0155   0.0084  -0.0103   0.0079  -0.0000   0.0155
+
+  Total CPU  time used in SIRIUS :  5 minutes 42 seconds
+  Total wall time used in SIRIUS :  5 minutes 45 seconds
+
+ 
+     Date and time (Linux)  : Thu May  8 15:08:49 2025
+     Host name              : xm046                                   
+
+ NOTE:    1 warnings have been issued.
+ Check output, result, and error files for "WARNING".
+
+
+                     .---------------------------------------.
+                     | End of Wave Function Section (SIRIUS) |
+                     `---------------------------------------'
+
+
+
+                 .------------------------------------------------.
+                 | Starting in Dynamic Property Section (RESPONS) |
+                 `------------------------------------------------'
+
+
+ ----------------------------------------------------------------------------------------
+  RESPONSE  -  an MCSCF, MC-srDFT, DFT, SOPPA and SOPPA-srDFT response property program
+ ----------------------------------------------------------------------------------------
+
+
+ -------- OUTPUT FROM RESPONSE INPUT PROCESSING --------
+
+
+
+
+ Quadratic Response calculation
+ ------------------------------
+
+ First hyperpolarizability calculation : HYPCAL= T
+
+ Spin of operator A , ISPINA=    0
+ Spin of operator B , ISPINB=    0
+ Spin of operator C , ISPINC=    0
+
+  2 B-frequencies  0.000000D+00  2.330000D-02
+  2 C-frequencies  0.000000D+00  2.330000D-02
+
+
+ Print level                                    : IPRHYP =   2
+ Maximum number of iterations in lin.rsp. solver: MAXITL =  60
+ Threshold for convergence of linear resp. eq.s : THCLR  = 1.000D-03
+ Maximum iterations in optimal orbital algorithm: MAXITO =   5
+ Direct one-index transformation                : DIROIT = T
+
+    3 A OPERATORS OF SYMMETRY NO:    1 AND LABELS:
+
+          XDIPLEN 
+          YDIPLEN 
+          ZDIPLEN 
+
+    3 B OPERATORS OF SYMMETRY NO:    1 AND LABELS:
+
+          XDIPLEN 
+          YDIPLEN 
+          ZDIPLEN 
+
+    3 C OPERATORS OF SYMMETRY NO:    1 AND LABELS:
+
+          XDIPLEN 
+          YDIPLEN 
+          ZDIPLEN 
+
+
+   SCF energy         :     -567.410514446290222
+ -- inactive part     :    -1142.035631571998010
+ -- nuclear repulsion :      574.625117125707789
+
+
+                     ***************************************
+                     *** RHF response calculation (TDHF) ***
+                     ***************************************
+
+
+
+ Linear response calculations for quadratic response
+ - singlet property operator of symmetry    1  ( A  )
+
+
+ Perturbation symmetry.     KSYMOP:           1
+ Perturbation spin symmetry.TRPLET:           F
+ Orbital variables.         KZWOPT:       32428
+ Configuration variables.   KZCONF:           0
+ Total number of variables. KZVAR :       32428
+
+
+ QRLRVE -- linear response calculation for symmetry  1  ( A  )
+ QRLRVE -- operator label : XDIPLEN 
+ QRLRVE -- operator spin  :   0
+ QRLRVE -- frequencies :  0.000000  0.023300  0.046600
+
+
+
+ ---  SOLVING SETS OF LINEAR EQUATIONS FOR LINEAR RESPONSE PROPERTIES ---
+
+ Operator symmetry = 1  ( A  ); triplet =   F
+
+
+ ** RSPCTL MICROITERATION NUMBER    1
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    5.96495D+00  0.00D+00  5.96D+00  9.34D+00    0.00000D+00
+         2    5.98779D+00  0.00D+00  5.99D+00  9.46D+00    2.33000D-02
+         3    6.06098D+00  0.00D+00  6.06D+00  9.85D+00    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    2
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    2.13010D+00  0.00D+00  2.13D+00  1.08D+01    0.00000D+00
+         2    2.15392D+00  0.00D+00  2.15D+00  1.10D+01    2.33000D-02
+         3    2.23432D+00  0.00D+00  2.23D+00  1.17D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    3
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    7.42926D-01  0.00D+00  7.43D-01  1.12D+01    0.00000D+00
+         2    7.55793D-01  0.00D+00  7.56D-01  1.14D+01    2.33000D-02
+         3    7.99224D-01  0.00D+00  7.99D-01  1.22D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    4
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    3.00279D-01  0.00D+00  3.00D-01  1.13D+01    0.00000D+00
+         2    3.08487D-01  0.00D+00  3.08D-01  1.15D+01    2.33000D-02
+         3    3.36523D-01  0.00D+00  3.37D-01  1.23D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    5
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    1.00686D-01  0.00D+00  1.01D-01  1.13D+01    0.00000D+00
+         2    1.03686D-01  0.00D+00  1.04D-01  1.15D+01    2.33000D-02
+         3    1.13935D-01  0.00D+00  1.14D-01  1.23D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    6
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    3.42205D-02  0.00D+00  3.42D-02  1.13D+01    0.00000D+00
+         2    3.53726D-02  0.00D+00  3.54D-02  1.15D+01    2.33000D-02
+         3    3.92889D-02  0.00D+00  3.93D-02  1.23D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    7
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    1.32289D-02  0.00D+00  1.32D-02  1.13D+01    0.00000D+00
+         2    1.37630D-02  0.00D+00  1.38D-02  1.15D+01    2.33000D-02
+         3    1.55803D-02  0.00D+00  1.56D-02  1.23D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    8
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    4.81473D-03  0.00D+00  4.81D-03  1.13D+01    0.00000D+00
+         2    5.04077D-03  0.00D+00  5.04D-03  1.15D+01    2.33000D-02
+         3    5.81816D-03  0.00D+00  5.82D-03  1.23D+01    4.66000D-02
+
+ *** THE REQUESTED    3 SOLUTION VECTORS CONVERGED
+
+ Convergence of RSP solution vectors, threshold = 1.00D-03
+ ---------------------------------------------------------------
+ (dimension of paired reduced space:   48)
+ RSP solution vector no.    1; norm of residual   4.27D-04
+ RSP solution vector no.    2; norm of residual   4.38D-04
+ RSP solution vector no.    3; norm of residual   4.74D-04
+
+ *** RSPCTL MICROITERATIONS CONVERGED
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   XDIPLEN     FREQUENCY   0.000000D+00
+
+@ QRLRVE:  << XDIPLEN  ; XDIPLEN  >> (   0.00000):     119.328212670    
+
+@ QRLRVE:  << YDIPLEN  ; XDIPLEN  >> (   0.00000):    -58.1564841500    
+
+@ QRLRVE:  << ZDIPLEN  ; XDIPLEN  >> (   0.00000):   -2.912216950734E-15
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   XDIPLEN     FREQUENCY   0.233000D-01
+
+@ QRLRVE:  << XDIPLEN  ; XDIPLEN  >> (   0.02330):     119.932506741    
+
+@ QRLRVE:  << YDIPLEN  ; XDIPLEN  >> (   0.02330):    -59.8936093686    
+
+@ QRLRVE:  << ZDIPLEN  ; XDIPLEN  >> (   0.02330):   -3.254372446685E-15
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   XDIPLEN     FREQUENCY   0.466000D-01
+
+@ QRLRVE:  << XDIPLEN  ; XDIPLEN  >> (   0.04660):     121.902038151    
+
+@ QRLRVE:  << YDIPLEN  ; XDIPLEN  >> (   0.04660):    -65.7739636606    
+
+@ QRLRVE:  << ZDIPLEN  ; XDIPLEN  >> (   0.04660):   -4.437667678698E-15
+
+
+ QRLRVE -- linear response calculation for symmetry  1  ( A  )
+ QRLRVE -- operator label : YDIPLEN 
+ QRLRVE -- operator spin  :   0
+ QRLRVE -- frequencies :  0.000000  0.023300  0.046600
+
+
+
+ ---  SOLVING SETS OF LINEAR EQUATIONS FOR LINEAR RESPONSE PROPERTIES ---
+
+ Operator symmetry = 1  ( A  ); triplet =   F
+
+
+ ** RSPCTL MICROITERATION NUMBER    1
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    1.44359D+01  0.00D+00  1.44D+01  2.44D+01    0.00000D+00
+         2    1.46631D+01  0.00D+00  1.47D+01  2.52D+01    2.33000D-02
+         3    1.54029D+01  0.00D+00  1.54D+01  2.76D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    2
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    5.58404D+00  0.00D+00  5.58D+00  3.22D+01    0.00000D+00
+         2    5.72056D+00  0.00D+00  5.72D+00  3.34D+01    2.33000D-02
+         3    6.17975D+00  0.00D+00  6.18D+00  3.75D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    3
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    2.34499D+00  0.00D+00  2.34D+00  3.37D+01    0.00000D+00
+         2    2.41125D+00  0.00D+00  2.41D+00  3.51D+01    2.33000D-02
+         3    2.63597D+00  0.00D+00  2.64D+00  3.96D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    4
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    7.08622D-01  0.00D+00  7.09D-01  3.39D+01    0.00000D+00
+         2    7.31967D-01  0.00D+00  7.32D-01  3.52D+01    2.33000D-02
+         3    8.12043D-01  0.00D+00  8.12D-01  3.98D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    5
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    2.09569D-01  0.00D+00  2.10D-01  3.39D+01    0.00000D+00
+         2    2.17974D-01  0.00D+00  2.18D-01  3.53D+01    2.33000D-02
+         3    2.47235D-01  0.00D+00  2.47D-01  3.99D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    6
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    6.77715D-02  0.00D+00  6.78D-02  3.39D+01    0.00000D+00
+         2    7.04061D-02  0.00D+00  7.04D-02  3.53D+01    2.33000D-02
+         3    7.95924D-02  0.00D+00  7.96D-02  3.99D+01    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    7
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    2.35583D-02  0.00D+00  2.36D-02  3.39D+01    0.00000D+00
+         2    2.45941D-02  0.00D+00  2.46D-02  3.53D+01    2.33000D-02
+         3    2.82285D-02  0.00D+00  2.82D-02  3.99D+01    4.66000D-02
+
+ *** THE REQUESTED    3 SOLUTION VECTORS CONVERGED
+
+ Convergence of RSP solution vectors, threshold = 1.00D-03
+ ---------------------------------------------------------------
+ (dimension of paired reduced space:   42)
+ RSP solution vector no.    1; norm of residual   6.95D-04
+ RSP solution vector no.    2; norm of residual   6.97D-04
+ RSP solution vector no.    3; norm of residual   7.08D-04
+
+ *** RSPCTL MICROITERATIONS CONVERGED
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   YDIPLEN     FREQUENCY   0.000000D+00
+
+@ QRLRVE:  << XDIPLEN  ; YDIPLEN  >> (   0.00000):    -58.1598577842    
+
+@ QRLRVE:  << YDIPLEN  ; YDIPLEN  >> (   0.00000):     408.152955641    
+
+@ QRLRVE:  << ZDIPLEN  ; YDIPLEN  >> (   0.00000):    2.287515382136E-14
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   YDIPLEN     FREQUENCY   0.233000D-01
+
+@ QRLRVE:  << XDIPLEN  ; YDIPLEN  >> (   0.02330):    -59.8970665093    
+
+@ QRLRVE:  << YDIPLEN  ; YDIPLEN  >> (   0.02330):     416.950118391    
+
+@ QRLRVE:  << ZDIPLEN  ; YDIPLEN  >> (   0.02330):    2.433601660172E-14
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   YDIPLEN     FREQUENCY   0.466000D-01
+
+@ QRLRVE:  << XDIPLEN  ; YDIPLEN  >> (   0.04660):    -65.7777263671    
+
+@ QRLRVE:  << YDIPLEN  ; YDIPLEN  >> (   0.04660):     446.553080522    
+
+@ QRLRVE:  << ZDIPLEN  ; YDIPLEN  >> (   0.04660):    2.939824367856E-14
+
+
+ QRLRVE -- linear response calculation for symmetry  1  ( A  )
+ QRLRVE -- operator label : ZDIPLEN 
+ QRLRVE -- operator spin  :   0
+ QRLRVE -- frequencies :  0.000000  0.023300  0.046600
+
+
+
+ ---  SOLVING SETS OF LINEAR EQUATIONS FOR LINEAR RESPONSE PROPERTIES ---
+
+ Operator symmetry = 1  ( A  ); triplet =   F
+
+
+ ** RSPCTL MICROITERATION NUMBER    1
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    2.84991D+00  0.00D+00  2.85D+00  6.85D+00    0.00000D+00
+         2    2.85341D+00  0.00D+00  2.85D+00  6.88D+00    2.33000D-02
+         3    2.86402D+00  0.00D+00  2.86D+00  6.97D+00    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    2
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    6.92054D-01  0.00D+00  6.92D-01  7.19D+00    0.00000D+00
+         2    6.94548D-01  0.00D+00  6.95D-01  7.22D+00    2.33000D-02
+         3    7.02166D-01  0.00D+00  7.02D-01  7.33D+00    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    3
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    1.47207D-01  0.00D+00  1.47D-01  7.22D+00    0.00000D+00
+         2    1.48778D-01  0.00D+00  1.49D-01  7.25D+00    2.33000D-02
+         3    1.53629D-01  0.00D+00  1.54D-01  7.36D+00    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    4
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    3.88716D-02  0.00D+00  3.89D-02  7.22D+00    0.00000D+00
+         2    3.98920D-02  0.00D+00  3.99D-02  7.26D+00    2.33000D-02
+         3    4.31742D-02  0.00D+00  4.32D-02  7.36D+00    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    5
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    1.51535D-02  0.00D+00  1.52D-02  7.22D+00    0.00000D+00
+         2    1.59026D-02  0.00D+00  1.59D-02  7.26D+00    2.33000D-02
+         3    1.83236D-02  0.00D+00  1.83D-02  7.36D+00    4.66000D-02
+
+ ** RSPCTL MICROITERATION NUMBER    6
+
+       No.  Residual tot.,    conf., and orb.    Bnorm      Frequency 
+      ----------------------------------------------------------------
+         1    5.61694D-03  0.00D+00  5.62D-03  7.22D+00    0.00000D+00
+         2    5.99361D-03  0.00D+00  5.99D-03  7.26D+00    2.33000D-02
+         3    7.24414D-03  0.00D+00  7.24D-03  7.36D+00    4.66000D-02
+
+ *** THE REQUESTED    3 SOLUTION VECTORS CONVERGED
+
+ Convergence of RSP solution vectors, threshold = 1.00D-03
+ ---------------------------------------------------------------
+ (dimension of paired reduced space:   36)
+ RSP solution vector no.    1; norm of residual   7.77D-04
+ RSP solution vector no.    2; norm of residual   8.26D-04
+ RSP solution vector no.    3; norm of residual   9.84D-04
+
+ *** RSPCTL MICROITERATIONS CONVERGED
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   ZDIPLEN     FREQUENCY   0.000000D+00
+
+@ QRLRVE:  << XDIPLEN  ; ZDIPLEN  >> (   0.00000):   -5.707187210538E-15
+
+@ QRLRVE:  << YDIPLEN  ; ZDIPLEN  >> (   0.00000):    1.968188395597E-14
+
+@ QRLRVE:  << ZDIPLEN  ; ZDIPLEN  >> (   0.00000):     75.6561781080    
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   ZDIPLEN     FREQUENCY   0.233000D-01
+
+@ QRLRVE:  << XDIPLEN  ; ZDIPLEN  >> (   0.02330):   -6.310465774654E-15
+
+@ QRLRVE:  << YDIPLEN  ; ZDIPLEN  >> (   0.02330):    2.068597785102E-14
+
+@ QRLRVE:  << ZDIPLEN  ; ZDIPLEN  >> (   0.02330):     75.7971277427    
+
+@ QRLRVE: SINGLET SOLUTION FOR SYMMETRY    1  ( A  )    LABEL   ZDIPLEN     FREQUENCY   0.466000D-01
+
+@ QRLRVE:  << XDIPLEN  ; ZDIPLEN  >> (   0.04660):   -8.407986923750E-15
+
+@ QRLRVE:  << YDIPLEN  ; ZDIPLEN  >> (   0.04660):    2.403513549392E-14
+
+@ QRLRVE:  << ZDIPLEN  ; ZDIPLEN  >> (   0.04660):     76.2260533348    
+ 
+ ======================================================================
+ ---  L I N E A R   R E S P O N S E   F U N C T I O N S --- 
+ ======================================================================
+
+ The -<<A;B>>(omega_b) functions from vectors generated
+ in a *QUADRA calculation of <<A;B,C>>(omega_b,omega_c)
+
+ Note: the accuracy of off-diagonal elements will be linear
+ in the convergence threshold THCLR =  1.00D-03
+
+
+ Perturbation symmetry.     KSYMOP:           1
+ Perturbation spin symmetry.TRPLET:           F
+ Orbital variables.         KZWOPT:       32428
+ Configuration variables.   KZCONF:           0
+ Total number of variables. KZVAR :       32428
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   XDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   XDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):     119.328212669899
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   YDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   XDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):     -58.156484150012
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   ZDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   XDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):      -0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   XDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   XDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):     119.932506740618
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   YDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   XDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):     -59.893609368579
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   ZDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   XDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):      -0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   XDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   YDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):     -58.159857784169
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   YDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   YDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):     408.152955641073
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   ZDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   YDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):       0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   XDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   YDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):     -59.897066509335
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   YDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   YDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):     416.950118390508
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   ZDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   YDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):       0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   XDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   ZDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):      -0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   YDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   ZDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):       0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   ZDIPLEN    1 -0.000000
+@ B operator, symmetry, frequency:   ZDIPLEN    1  0.000000
+
+@ Value of linear response -<<A;B>>(omega):      75.656178108017
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   XDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   ZDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):      -0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   YDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   ZDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):       0.000000000000
+
+@ Singlet linear response function in a.u.
+
+@ A operator, symmetry, frequency:   ZDIPLEN    1 -0.023300
+@ B operator, symmetry, frequency:   ZDIPLEN    1  0.023300
+
+@ Value of linear response -<<A;B>>(omega):      75.797127742663
+
+
+  Results from quadratic response calculation
+ --------------------------------------------
+
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;X,X) =   -331.77006124
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;X,X) =   1167.71058098
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;X,X) =      0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;X,X) =   -347.98924825
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;X,X) =   1225.91627908
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;X,X) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Y,X) = beta(Y,X,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Y,X) =   1167.71062449
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Y,X) =  -3099.77623247
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;Y,X) =     -0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;Y,X) =   1225.91632491
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;Y,X) =  -3290.71694632
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;Y,X) =     -0.00000000
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Z,X) = beta(Z,X,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Z,X) = beta(Z,Y,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Z,X) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Z,X) =     -0.00000000
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;Z,X) =     16.92140510
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;Z,X) =      0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;Z,X) =     -0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;Z,X) =     17.14105385
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;X,X) = beta(X,X,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;X,X) = beta(Y,X,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;X,X) = beta(Z,X,X)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;X,X) =   -384.44350516
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;X,X) =   1372.42998215
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;X,X) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;Y,X) =   1213.16384534
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;Y,X) =  -3242.53603800
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;Y,X) =     -0.00000000
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;Y,X) =   1328.64158090
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;Y,X) =  -3673.81169468
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;Y,X) =     -0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;Z,X) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;Z,X) =     -0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;Z,X) =     17.21360089
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;Z,X) =      0.00000000
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;Z,X) =     -0.00000000
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;Z,X) =     17.67389208
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;X,Y) = beta(Y,X,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;X,Y) = beta(Y,Y,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;X,Y) = beta(Z,Y,X)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;X,Y) = beta(X,Y,X)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;X,Y) = beta(Y,Y,X)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;X,Y) = beta(Z,Y,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Y,Y) = beta(Y,Y,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Y,Y) =  -3099.77665509
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Y,Y) =   5695.38304628
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;Y,Y) =      0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;Y,Y) =  -3242.53648494
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;Y,Y) =   6069.34066720
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;Y,Y) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Z,Y) = beta(Z,Y,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Z,Y) = beta(Z,Y,Y)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Z,Y) =     -0.00000000
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Z,Y) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;Z,Y) =    -38.05943692
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;Z,Y) =     -0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;Z,Y) =      0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;Z,Y) =    -38.78351199
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;X,Y) = beta(X,Y,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;X,Y) = beta(Y,Y,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;X,Y) = beta(Z,Y,X)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;X,Y) = beta(X,Y,X)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;X,Y) = beta(Y,Y,X)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;X,Y) = beta(Z,Y,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;Y,Y) = beta(X,Y,Y)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;Y,Y) = beta(Y,Y,Y)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;Y,Y) = beta(Z,Y,Y)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;Y,Y) =  -3508.65851708
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;Y,Y) =   6928.61934420
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;Y,Y) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;Z,Y) =     -0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;Z,Y) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;Z,Y) =    -39.09279268
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;Z,Y) =     -0.00000000
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;Z,Y) =      0.00000000
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;Z,Y) =    -40.63073578
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;X,Z) = beta(Z,X,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;X,Z) = beta(Z,Y,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;X,Z) = beta(Z,Z,X)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;X,Z) = beta(X,Z,X)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;X,Z) = beta(Y,Z,X)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;X,Z) = beta(Z,Z,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Y,Z) = beta(Z,Y,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Y,Z) = beta(Z,Y,Y)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;Y,Z) = beta(Z,Z,Y)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;Y,Z) = beta(X,Z,Y)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;Y,Z) = beta(Y,Z,Y)
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;Y,Z) = beta(Z,Z,Y)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Z,Z) = beta(Z,Z,X)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Z,Z) = beta(Z,Z,Y)
+@ B-freq = 0.000000  C-freq = 0.000000     beta(X;Z,Z) =     16.92139816
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Y;Z,Z) =    -38.05941242
+@ B-freq = 0.000000  C-freq = 0.000000     beta(Z;Z,Z) =      0.00000000
+@ B-freq = 0.023300  C-freq = 0.000000     beta(X;Z,Z) =     17.21359366
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Y;Z,Z) =    -39.09276696
+@ B-freq = 0.023300  C-freq = 0.000000     beta(Z;Z,Z) =      0.00000000
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;X,Z) = beta(X,Z,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;X,Z) = beta(Y,Z,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;X,Z) = beta(Z,Z,X)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;X,Z) = beta(X,Z,X)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;X,Z) = beta(Y,Z,X)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;X,Z) = beta(Z,Z,X)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;Y,Z) = beta(X,Z,Y)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;Y,Z) = beta(Y,Z,Y)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;Y,Z) = beta(Z,Z,Y)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;Y,Z) = beta(X,Z,Y)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;Y,Z) = beta(Y,Z,Y)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;Y,Z) = beta(Z,Z,Y)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(X;Z,Z) = beta(X,Z,Z)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Y;Z,Z) = beta(Y,Z,Z)
+@ B-freq = 0.000000  C-freq = 0.023300     beta(Z;Z,Z) = beta(Z,Z,Z)
+@ B-freq = 0.023300  C-freq = 0.023300     beta(X;Z,Z) =     17.93049362
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Y;Z,Z) =    -41.73964818
+@ B-freq = 0.023300  C-freq = 0.023300     beta(Z;Z,Z) =      0.00000000
+
+  Total CPU  time used in RESPONSE: 23 minutes 13 seconds
+  Total wall time used in RESPONSE: 23 minutes 23 seconds
+
+
+                   .-------------------------------------------.
+                   | End of Dynamic Property Section (RESPONS) |
+                   `-------------------------------------------'
+
+  Total CPU  time used in DALTON: 29 minutes  0 seconds
+  Total wall time used in DALTON: 29 minutes 12 seconds
+
+ 
+     Date and time (Linux)  : Thu May  8 15:32:12 2025
+     Host name              : xm046                                   
