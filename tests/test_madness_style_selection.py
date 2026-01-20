@@ -10,6 +10,7 @@ def test_parse_madqc_beta():
     calc = gecko.load_calc("tests/fixtures/madness_madqc")
     assert calc.code == "madness"
     assert calc.meta["style"] == "madqc"
+    assert calc.meta.get("basis") == "MRA"
 
     beta = calc.data.get("beta")
     assert beta is not None
@@ -22,6 +23,7 @@ def test_parse_molresponse_beta():
     calc = gecko.load_calc("tests/fixtures/madness_molresponse")
     assert calc.code == "madness"
     assert calc.meta["style"] == "molresponse"
+    assert calc.meta.get("basis") == "MRA"
 
     beta = calc.data.get("beta")
     assert beta is not None

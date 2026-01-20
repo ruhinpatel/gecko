@@ -25,3 +25,9 @@ This means:
 - Molecule parsing + canonicalization is required for stable IDs across codes.
 - `mol_id` does not distinguish isomers; it is composition-only.
 - `geom_id` is geometry-sensitive and reflects exact coordinates after canonicalization.
+
+## MADNESS basis metadata
+
+For MADNESS calculations, `calc.meta["basis"]` is currently forced to "MRA".
+This is a temporary label until we standardize MRA accuracy metadata (e.g.,
+orbital residual + density thresholds).

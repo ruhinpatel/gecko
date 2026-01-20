@@ -28,7 +28,7 @@ def calc_id(calc: Calculation) -> str:
 def mol_id_from_molecule(mol: qcel.models.Molecule | None) -> Optional[str]:
     if mol is None:
         return None
-    formula = getattr(mol, "formula", None)
+    formula = str(mol.get_molecular_formula())
     if formula is None:
         return None
     return str(formula)

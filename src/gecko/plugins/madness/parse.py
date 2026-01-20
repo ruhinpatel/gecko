@@ -60,6 +60,7 @@ def parse_run(calc: Calculation) -> None:
         return
 
     calc.meta["style"] = style
+    calc.meta["basis"] = "MRA"
 
     from gecko.plugins.madness.legacy.madness_data import madqc_parser
 
