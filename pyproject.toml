@@ -16,6 +16,9 @@ authors = [
 
 dependencies = []
 
+[project.scripts]
+gecko = "gecko.cli:main"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 

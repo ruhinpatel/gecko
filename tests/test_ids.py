@@ -31,7 +31,14 @@ def test_mol_id_matches_qcel_formula():
             ]
         ),
     )
-    assert mol_id_from_molecule(mol) == str(mol.formula)
+    if hasattr(mol, "formula"):
+        expected = str(mol.formula)
+    elif hasattr(mol, "get_molecular_formula"):
+        expected = str(mol.get_molecular_formula())
+    else:
+        expected = str(qcel.molutil.molecular_formula(mol.symbols))
+
+    assert mol_id_from_molecule(mol) == expected
 
 
 def test_ids_handle_none_molecule():
