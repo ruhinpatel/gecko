@@ -1,4 +1,4 @@
-from gecko.core.load import load_calc
+from gecko.core.load import load_calc, load_calcs
 from gecko.enrich import enrich
 from gecko.ids import calc_id, geom_id, mol_id
 from gecko.index import CalcIndex
@@ -8,6 +8,7 @@ from gecko.tables import TableBuilder
 
 __all__ = [
 	"load_calc",
+	"load_calcs",
 	"enrich",
 	"calc_id",
 	"geom_id",

@@ -32,4 +32,4 @@ def test_build_beta_table_missing_geometry_allowed():
         verbose=False,
     )
 
-    assert df.empty
+    assert not df.empty

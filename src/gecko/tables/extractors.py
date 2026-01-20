@@ -33,8 +33,6 @@ def extract_beta(calc: Calculation) -> list[dict[str, Any]]:
         return []
 
     env = make_envelope(calc)
-    if not _require_geom(env):
-        return []
 
     omega = np.asarray(beta["omega"], dtype=float)
     comps = list(beta["components"])

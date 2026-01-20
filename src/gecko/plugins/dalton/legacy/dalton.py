@@ -19,6 +19,7 @@ ISO_POLAR_RE = re.compile(
 )
 FLOAT_RE = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?")
 HF_ENERGY_RE = re.compile(r"^@\s*Final HF energy:\s*(-?\d+\.\d+)\s*$")
+MOL_BLOCK_HDR_RE = re.compile(r"^\s*Content of the \.mol file\s*$", re.IGNORECASE)
 
 
 def parse_last_molecular_geometry(
@@ -61,6 +62,102 @@ def parse_last_molecular_geometry(
     bohr_to_ang = qcel.constants.bohr2angstroms
     coords = [[c * bohr_to_ang for c in vec] for vec in coords]
     return qcel.models.Molecule(symbols=atoms, geometry=coords)
+
+
+def parse_molfile_geometry(lines: Sequence[str]) -> qcel.models.Molecule:
+    units = "angstrom"
+    atoms: List[str] = []
+    coords: List[List[float]] = []
+
+    for line in lines:
+        if "angstrom" in line.lower():
+            units = "angstrom"
+        elif "bohr" in line.lower():
+            units = "bohr"
+
+    for line in lines:
+        if not line.strip():
+            continue
+        if line.strip().startswith("Charge=") or line.strip().startswith("Charge:"):
+            continue
+        if line.strip().startswith("Atomtype="):
+            continue
+        if line.strip().upper() in {"BASIS"}:
+            continue
+        if line.strip().upper().startswith("END"):
+            break
+
+        parts = line.split()
+        if len(parts) >= 4 and parts[0][0].isalpha():
+            label = parts[0].split("_", 1)[0]
+            try:
+                x, y, z = float(parts[1]), float(parts[2]), float(parts[3])
+            except ValueError:
+                continue
+            atoms.append(label)
+            coords.append([x, y, z])
+
+    if not atoms:
+        raise ValueError("No atom coordinates found in mol file")
+
+    if units == "bohr":
+        bohr_to_ang = qcel.constants.bohr2angstroms
+        coords = [[c * bohr_to_ang for c in vec] for vec in coords]
+
+    return qcel.models.Molecule(symbols=atoms, geometry=coords)
+
+
+def parse_mol_block_from_output(lines: Sequence[str]) -> tuple[qcel.models.Molecule, Optional[str]]:
+    header_idx: Optional[int] = None
+    for i, line in enumerate(lines):
+        if MOL_BLOCK_HDR_RE.match(line):
+            header_idx = i
+            break
+    if header_idx is None:
+        raise ValueError("No 'Content of the .mol file' block found.")
+
+    block: list[str] = []
+    started = False
+    found_atoms = False
+    sep_re = re.compile(r"^\s*-{3,}\s*$")
+
+    for j in range(header_idx + 1, len(lines)):
+        line = lines[j]
+        if sep_re.match(line):
+            if started:
+                continue
+            continue
+
+        if not line.strip():
+            if found_atoms:
+                break
+            if not started:
+                continue
+            continue
+
+        started = True
+        block.append(line)
+        if line.strip().startswith("Charge="):
+            continue
+        if line.strip().startswith("Atomtype="):
+            continue
+        parts = line.split()
+        if len(parts) >= 4 and parts[0][0].isalpha():
+            found_atoms = True
+
+    if not block:
+        raise ValueError("Empty .mol block in output.")
+
+    basis_name: Optional[str] = None
+    for i, line in enumerate(block):
+        if line.strip().upper() == "BASIS":
+            for j in range(i + 1, len(block)):
+                if block[j].strip():
+                    basis_name = block[j].strip()
+                    break
+            break
+
+    return parse_molfile_geometry(block), basis_name
 
 
 def parse_frequency_polarizability_tensors(
@@ -163,9 +260,21 @@ class DaltonParser:
         self.molecule: Optional[qcel.models.Molecule] = None
         self.polarizability: Optional[np.ndarray] = None
         self.hf_energy: Optional[float] = None
+        self.mol_block_basis: Optional[str] = None
 
     def parse_geometry(self) -> qcel.models.Molecule:
-        self.molecule = parse_last_molecular_geometry(self.lines)
+        try:
+            self.molecule = parse_last_molecular_geometry(self.lines)
+        except Exception:
+            mol, basis = parse_mol_block_from_output(self.lines)
+            self.molecule = mol
+            self.mol_block_basis = basis
+        return self.molecule
+
+    def parse_geometry_from_mol_block(self) -> qcel.models.Molecule:
+        mol, basis = parse_mol_block_from_output(self.lines)
+        self.molecule = mol
+        self.mol_block_basis = basis
         return self.molecule
 
     def parse_polarizability(self) -> np.ndarray:

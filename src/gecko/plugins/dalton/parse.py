@@ -175,10 +175,15 @@ def parse_run(calc: Calculation) -> None:
 
     parser = DaltonParser(out_path)
 
-    try:
-        calc.molecule = parser.parse_geometry()
-    except Exception:
-        pass
+    calc.molecule = parser.parse_geometry()
+    if calc.molecule is not None:
+        calc.meta.setdefault("molecule_source", "out")
+        calc.meta.setdefault("molecule_path", str(out_path))
+
+    if "basis" not in calc.meta or calc.meta.get("basis") is None:
+        if parser.mol_block_basis:
+            calc.meta["basis"] = parser.mol_block_basis
+            calc.meta.setdefault("inferred_from", {}).setdefault("basis", "mol_block")
 
     try:
         calc.meta["ground_state_energy"] = parser.parse_final_hf_energy()

@@ -14,7 +14,7 @@ def load(
     meta: dict | None = None,
 ) -> Calculation:
     root = path.expanduser().resolve()
-    if not can_load(root):
+    if output_file is None and not can_load(root):
         raise ValueError(f"Not a DALTON run directory: {root}")
 
     artifacts = _discover_artifacts(root, output_file=output_file)

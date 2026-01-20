@@ -91,6 +91,10 @@ def build_beta_table(
                     geometry = row.get("geometry_angstrom")
                     if symbols is None or geometry is None:
                         return None
+                    if isinstance(symbols, float) and pd.isna(symbols):
+                        return None
+                    if isinstance(geometry, float) and pd.isna(geometry):
+                        return None
                     return json.dumps(
                         {"symbols": symbols, "geometry": geometry},
                         separators=(",", ":"),
