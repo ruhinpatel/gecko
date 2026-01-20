@@ -9,6 +9,7 @@ import numpy as np
 import qcelemental as qcel
 
 from gecko.core.model import Calculation
+from gecko.molecule.canonical import canonicalize_atom_order
 from gecko.mol.io import read_mol
 from gecko.mol.resolver import MoleculeResolver, mol_label_from_calc
 
@@ -78,7 +79,8 @@ def _molecule_from_calc_info(calc: Calculation) -> Optional[qcel.models.Molecule
     if units in ("bohr", "atomic"):
         coords = coords * qcel.constants.bohr2angstroms
 
-    return qcel.models.Molecule(symbols=list(symbols), geometry=coords)
+    symbols_sorted, coords_sorted = canonicalize_atom_order(list(symbols), coords, decimals=10)
+    return qcel.models.Molecule(symbols=symbols_sorted, geometry=coords_sorted)
 
 
 def resolve_molecule(

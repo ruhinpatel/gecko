@@ -5,6 +5,8 @@ from pathlib import Path
 import numpy as np
 import qcelemental as qcel
 
+from gecko.molecule.canonical import canonicalize_atom_order
+
 
 _MADNESS_DIRECTIVES = {
     "eprec",
@@ -67,7 +69,8 @@ def _parse_madness_mol(path: Path) -> qcel.models.Molecule:
     if units in {"atomic", "bohr"}:
         geometry = geometry * qcel.constants.bohr2angstroms
 
-    return qcel.models.Molecule(symbols=symbols, geometry=geometry)
+    symbols_sorted, geometry_sorted = canonicalize_atom_order(symbols, geometry, decimals=10)
+    return qcel.models.Molecule(symbols=symbols_sorted, geometry=geometry_sorted)
 
 
 def read_mol(path: Path) -> qcel.models.Molecule:
@@ -86,9 +89,12 @@ def read_mol(path: Path) -> qcel.models.Molecule:
             madmol = MADMolecule()
             madmol.from_molfile(mol_path)
             mol_json = madmol.to_json()
+            symbols_sorted, geometry_sorted = canonicalize_atom_order(
+                mol_json["symbols"], mol_json["geometry"], decimals=10
+            )
             return qcel.models.Molecule(
-                symbols=mol_json["symbols"],
-                geometry=mol_json["geometry"],
+                symbols=symbols_sorted,
+                geometry=geometry_sorted,
             )
         except Exception as exc:
             raise ValueError(f"Failed to read .mol file with MADMolecule: {mol_path}") from exc

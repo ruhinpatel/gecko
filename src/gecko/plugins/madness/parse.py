@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from gecko.core.model import Calculation
+from gecko.molecule.canonical import canonicalize_atom_order
 
 
 def _beta_df_to_tensor(beta_df) -> dict[str, Any]:
@@ -136,9 +137,10 @@ def _load_molecule_from_input(path: Path | None):
     coords = np.asarray(geometry, dtype=float)
     if isinstance(units, str) and units.lower() in ("bohr", "atomic", "au"):
         coords = coords * qcel.constants.bohr2angstroms
+    symbols_sorted, coords_sorted = canonicalize_atom_order(list(symbols), coords, decimals=10)
     kwargs = {
-        "symbols": list(symbols),
-        "geometry": coords,
+        "symbols": symbols_sorted,
+        "geometry": coords_sorted,
     }
     mol_charge = mol.get("charge")
     mol_mult = mol.get("multiplicity")

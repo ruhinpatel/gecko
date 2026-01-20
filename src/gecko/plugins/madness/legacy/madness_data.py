@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import qcelemental as qcel
 
+from gecko.molecule.canonical import canonicalize_atom_order
+
 
 def find_task_by_type(json_data: dict, task_type: str) -> Optional[dict]:
     tasks = json_data.get("tasks", [])
@@ -92,7 +94,10 @@ def to_qcel(mol: dict) -> qcel.models.Molecule:
     units = mol.get("parameters", {}).get("units", None)
     if units == "atomic":
         geometry = np.array(geometry) * qcel.constants.bohr2angstroms
-    return qcel.models.Molecule(symbols=mol["symbols"], geometry=geometry)
+    symbols_sorted, geometry_sorted = canonicalize_atom_order(
+        mol["symbols"], geometry, decimals=10
+    )
+    return qcel.models.Molecule(symbols=symbols_sorted, geometry=geometry_sorted)
 
 
 def tensor_to_numpy(tensor: dict) -> np.ndarray:

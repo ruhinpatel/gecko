@@ -7,6 +7,8 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 import qcelemental as qcel
 
+from gecko.molecule.canonical import canonicalize_atom_order
+
 BLANK_RE = re.compile(r"^\s*$")
 MOLECULAR_GEOMETRY_RE = re.compile(r"^\s*Molecular geometry\s*\(au\)\s*$", re.IGNORECASE)
 POLAR_FREQ_TITLE_RE = re.compile(r"^\s*\++\s*Frequency dependent polarizabilities\s*\++\s*$", re.IGNORECASE)
@@ -61,6 +63,8 @@ def parse_last_molecular_geometry(
 
     bohr_to_ang = qcel.constants.bohr2angstroms
     coords = [[c * bohr_to_ang for c in vec] for vec in coords]
+    atoms, coords = canonicalize_atom_order(atoms, coords, decimals=10)
+
     return qcel.models.Molecule(symbols=atoms, geometry=coords)
 
 
@@ -103,7 +107,7 @@ def parse_molfile_geometry(lines: Sequence[str]) -> qcel.models.Molecule:
     if units == "bohr":
         bohr_to_ang = qcel.constants.bohr2angstroms
         coords = [[c * bohr_to_ang for c in vec] for vec in coords]
-
+    atoms, coords = canonicalize_atom_order(atoms, coords, decimals=10)
     return qcel.models.Molecule(symbols=atoms, geometry=coords)
 
 
