@@ -3,28 +3,23 @@
 This replaces the old demo that read a static `.vtu` file.
 
 Run:
-    python -m gecko.viz.apps.beta_viewer
+  python notebooks/scripts/application.py
 
 Then open the printed URL in a browser.
-
 """
 
 from __future__ import annotations
 
 import argparse
 import base64
-import json
 import io
 import os
 import re
-from types import SimpleNamespace
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-
 _DEBUG_STARTUP = os.environ.get("BETA_TRAME_DEBUG", "0") == "1"
-_MOL_RESOLVER = None
 
 _GLOBAL_CLIM_PERCENTILE = 99.0
 
@@ -53,22 +48,25 @@ from trame.widgets import vtk, vuetify
 _dprint("[startup] trame imported")
 
 from trame_vtk.modules.vtk.serializers import configure_serializer
-
-from vtkmodules.vtkCommonCore import vtkLookupTable
+from vtkmodules.util.numpy_support import numpy_to_vtk
+from vtkmodules.vtkCommonCore import vtkLookupTable, vtkPoints
 from vtkmodules.vtkCommonDataModel import vtkPolyData
-from vtkmodules.vtkRenderingCore import (
-    vtkActor,
-    vtkCamera,
-    vtkRenderer,
-    vtkRenderWindow,
-    vtkRenderWindowInteractor,
-)
+from vtkmodules.vtkFiltersCore import vtkGlyph3D
+from vtkmodules.vtkFiltersSources import vtkArrowSource, vtkSphereSource
+from vtkmodules.vtkRenderingAnnotation import (vtkAxesActor,
+                                               vtkCornerAnnotation,
+                                               vtkScalarBarActor)
+from vtkmodules.vtkRenderingCore import (vtkActor, vtkCamera,
+                                         vtkColorTransferFunction,
+                                         vtkLogLookupTable, vtkPolyDataMapper,
+                                         vtkRenderer, vtkRenderWindow,
+                                         vtkRenderWindowInteractor,
+                                         vtkTextActor)
 
 _dprint("[startup] vtk modules imported")
 
 # Rendering backend import (safe to include)
 import vtkmodules.vtkRenderingOpenGL2  # noqa
-
 
 configure_serializer(encode_lut=True, skip_light=True)
 
@@ -76,98 +74,147 @@ _dprint("[startup] serializer configured")
 
 
 def _repo_root() -> Path:
-    # src/gecko/viz/apps/beta_viewer.py -> apps -> viz -> gecko -> src -> repo
     return Path(__file__).resolve().parents[4]
 
-from gecko.viz import vtk_scene as _vtk_scene
-from gecko.viz.fields import (
-    ErrorSettings,
-    compute_error_fields,
-    evaluate_field,
-    load_lebedev_grid,
-    tensor_from_long as _tensor_from_long_impl,
-)
-from gecko.viz.state import (
-    FIELD_CHOICES as _FIELD_CHOICES,
-    METRIC_CHOICES as _METRIC_CHOICES,
-    auto_clim as _auto_clim_impl,
-    default_state as _default_state,
-    metric_style as _metric_style_impl,
-)
 
+def _ensure_import_paths() -> None:
+    import sys
+
+    repo_root = _repo_root()
+    notebooks_root = repo_root / "notebooks"
+
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+    if str(notebooks_root) not in sys.path:
+        sys.path.insert(0, str(notebooks_root))
+
+
+_ensure_import_paths()
+
+from field_error import (ErrorSettings, compute_error_fields,  # noqa: E402
+                         evaluate_field, load_lebedev_grid)
 
 _SHG_CSV_PATH: Path | None = None
-_SHG_DB_DIR: Path | None = None
-_GEOM_MAP_PATH: Path | None = None
-_BUNDLE_DIR: Path | None = None
-_WRITE_BUNDLE_DIR: Path | None = None
+_MOLECULE_DIR: Path | None = None
 
+
+def _default_shg_csv_path() -> Path:
+    return _repo_root() / "data" / "csv_data" / "shg_ijk.csv"
+
+
+def _resolve_shg_csv_path() -> Path:
+    default_path = _default_shg_csv_path()
+    if _SHG_CSV_PATH is not None:
+        candidate = Path(_SHG_CSV_PATH).expanduser()
+        if candidate.exists():
+            return candidate
+        if default_path.exists():
+            print(
+                f"Warning: SHG CSV not found at {candidate}; falling back to {default_path}",
+                flush=True,
+            )
+            return default_path
+        raise FileNotFoundError(
+            f"SHG CSV not found at {candidate} and no default at {default_path}. "
+            "Provide --shg_csv pointing to a valid file."
+        )
+
+    if default_path.exists():
+        return default_path
+    raise FileNotFoundError(
+        f"Default SHG CSV not found at {default_path}. Provide --shg_csv to override."
+    )
+
+
+def _parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Host interface to bind (default: 127.0.0.1; use 0.0.0.0 for remote access)",
+    )
+    parser.add_argument(
+        "--shg_csv",
+        default="",
+        help="Path to SHG CSV file to load (overrides built-in data)",
+    )
+    parser.add_argument(
+        "--molecule_dir",
+        default="",
+        help="Path to directory containing .mol files (overrides built-in data)",
+    )
+    parser.add_argument(
+        "--port",
+        default=9010,
+        type=int,
+        help="Port to bind (default: 9010; use 0 to auto-pick a free port)",
+    )
+    return parser.parse_args()
+
+
+def _select_free_port(host: str, preferred_port: int, *, max_tries: int = 50) -> int:
+    import errno
+    import socket
+
+    bind_host = host or "127.0.0.1"
+    if preferred_port == 0:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.bind((bind_host, 0))
+            return int(sock.getsockname()[1])
+
+    port = int(preferred_port)
+    for _ in range(max_tries):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                sock.bind((bind_host, port))
+                return port
+            except OSError as exc:
+                if exc.errno == errno.EADDRINUSE:
+                    port += 1
+                    continue
+                raise
+
+    raise RuntimeError(
+        f"Could not find a free port starting at {preferred_port} after {max_tries} attempts"
+    )
+
+
+_CLI_ARGS = None
+if __name__ == "__main__":
+    _CLI_ARGS = _parse_args()
+    if _CLI_ARGS.shg_csv:
+        _SHG_CSV_PATH = Path(_CLI_ARGS.shg_csv).expanduser()
+    if _CLI_ARGS.molecule_dir:
+        _MOLECULE_DIR = Path(_CLI_ARGS.molecule_dir).expanduser()
 
 @lru_cache(maxsize=1)
 def _shg_long():
-    from gecko.viz.io import load_shg_df_from_csv
+    import pandas as pd
 
-    csv_path = _SHG_CSV_PATH or (_repo_root() / "data" / "csv_data" / "shg_ijk.csv")
+    csv_path = _resolve_shg_csv_path()
     print(f"Loading SHG tensors from {csv_path} ...", flush=True)
-    try:
-        return load_shg_df_from_csv(csv_path)
-    except FileNotFoundError:
-        _dprint(f"[shg] CSV not found: {csv_path}")
-        import pandas as pd
-
-        return pd.DataFrame(columns=["molecule", "basis", "omega", "ijk", "Beta"])
-
-
-def _normalize_label(label: str | None) -> str | None:
-    if label is None:
-        return None
-    cleaned = str(label).strip()
-    cleaned = re.sub(r"\s+", "", cleaned)
-    return cleaned or None
-
-
-def _load_geometry_map_from_json(path: Path) -> Dict[str, Dict[str, Any]]:
-    try:
-        raw = path.read_text(encoding="utf-8")
-        data = json.loads(raw)
-    except Exception as exc:
-        _dprint(f"[geom] failed to read geometry map: {path}: {exc}")
-        return {}
-    if not isinstance(data, dict):
-        _dprint(f"[geom] geometry map must be a JSON object: {path}")
-        return {}
-    mapped: Dict[str, Dict[str, Any]] = {}
-    for key, value in data.items():
-        norm = _normalize_label(str(key))
-        if norm is None:
-            continue
-        if isinstance(value, dict) and "symbols" in value and "geometry" in value:
-            mapped[norm] = value
-    return mapped
-
-
-@lru_cache(maxsize=1)
-def _geometry_map() -> Dict[str, Dict[str, Any]]:
-    if _GEOM_MAP_PATH is not None and _GEOM_MAP_PATH.exists():
-        return _load_geometry_map_from_json(_GEOM_MAP_PATH)
-    if _BUNDLE_DIR is not None:
-        geom_path = _BUNDLE_DIR / "geometries.json"
-        if geom_path.exists():
-            return _load_geometry_map_from_json(geom_path)
-
-    df = _data()
-    if "geometry" not in df.columns:
-        return {}
-    from gecko.viz.io import geometry_map_from_df
-
-    return geometry_map_from_df(df, key="molecule")
+    shg_ijk = pd.read_csv(csv_path)
+    # Expected columns: molecule, basis, omega, ijk, Beta
+    # Normalize string columns so basis-family parsing and lookups are robust.
+    for col in ("molecule", "basis", "ijk"):
+        if col in shg_ijk.columns:
+            shg_ijk[col] = (
+                shg_ijk[col]
+                .astype(str)
+                .str.strip()
+                .str.replace(r"\s+", "", regex=True)
+            )
+    if "omega" in shg_ijk.columns:
+        shg_ijk["omega"] = shg_ijk["omega"].astype(float)
+    return shg_ijk
 
 
 def _beta_df_to_np(beta_df) -> np.ndarray:
-    ijk_map = {"X": 0, "Y": 1, "Z": 2}
+    ijk_map = {"x": 0, "y": 1, "z": 2}
     beta_np = np.zeros((3, 3, 3), dtype=float)
     for ijk, value in beta_df.items():
-        i, j, k = ijk_map[ijk[0]], ijk_map[ijk[1]], ijk_map[ijk[2]]
+        i, j, k = ijk_map[ijk[0].lower()],ijk_map[ijk[1].lower()],ijk_map[ijk[2].lower()]
         try:
             beta_np[i, j, k] = float(value)
         except Exception:
@@ -176,62 +223,35 @@ def _beta_df_to_np(beta_df) -> np.ndarray:
 
 
 def _tensor_from_long(shg_long, mol: str, basis: str, omega: float | int) -> np.ndarray:
-    tensor = _tensor_from_long_impl(shg_long, mol, basis, omega)
-    if not np.any(tensor):
-        _dprint(f"[shg] Missing tensor for (mol={mol}, basis={basis}, omega={omega}); using zeros")
-    return tensor
+    sub = shg_long[
+        (shg_long["molecule"] == mol)
+        & (shg_long["basis"] == basis)
+        & (shg_long["omega"] == float(omega))
+    ]
+    if sub.shape[0] == 0:
+        raise KeyError(f"No SHG tensor found for (mol={mol}, basis={basis}, omega={omega})")
+    series = {str(ijk): beta for ijk, beta in zip(sub["ijk"], sub["Beta"], strict=False)}
+    return _beta_df_to_np(series)
 
 
 @lru_cache(maxsize=1)
 def _data():
     # Intentionally only load the SHG tensor table here.
-    if _SHG_DB_DIR is not None:
-        from gecko.viz.io import build_shg_df_from_db, write_beta_viewer_bundle
-
-        df = build_shg_df_from_db(_SHG_DB_DIR, include_geometry=True)
-        if _WRITE_BUNDLE_DIR is not None:
-            try:
-                write_beta_viewer_bundle(df, _WRITE_BUNDLE_DIR)
-                _dprint(f"[bundle] wrote beta viewer bundle to {_WRITE_BUNDLE_DIR}")
-            except Exception as exc:
-                _dprint(f"[bundle] failed to write bundle: {exc}")
-        return df
-
     return _shg_long()
 
 
 @lru_cache(maxsize=256)
 def _load_molecule(mol_name: str):
-    from gecko.mol.io import read_mol
+    import qcelemental as _qcel
 
-    norm_label = _normalize_label(mol_name)
-    geom_map = _geometry_map()
-    if norm_label is not None and norm_label in geom_map:
-        try:
-            import qcelemental as _qcel
+    from gecko.plugins.madness.legacy.madness_molecule import MADMolecule
 
-            payload = geom_map[norm_label]
-            symbols = payload.get("symbols")
-            geometry = payload.get("geometry")
-            if symbols is not None and geometry is not None:
-                return _qcel.models.Molecule(symbols=symbols, geometry=geometry)
-        except Exception as exc:
-            _dprint(f"[molecule] failed to build molecule from geometry map: {exc}")
-
-    if _MOL_RESOLVER is not None:
-        fake_calc = SimpleNamespace(meta={"molecule": mol_name}, data={}, root=Path(mol_name), molecule=None)
-        res = _MOL_RESOLVER.resolve(fake_calc)
-        if res.molecule is not None:
-            return res.molecule
-
-    mol_path = _repo_root() / "data" / "molecules" / f"{mol_name}.mol"
-    if mol_path.exists():
-        try:
-            return read_mol(mol_path)
-        except Exception as exc:
-            _dprint(f"[molecule] failed to load fallback .mol ({mol_path}): {exc}")
-
-    return None
+    mol_dir = _MOLECULE_DIR or (_repo_root() / "data" / "molecules")
+    mol_path = mol_dir / f"{mol_name}.mol"
+    madmol = MADMolecule()
+    madmol.from_molfile(mol_path)
+    mol_json = madmol.to_json()
+    return _qcel.models.Molecule(symbols=mol_json["symbols"], geometry=mol_json["geometry"])
 
 
 # -----------------------------------------------------------------------------
@@ -245,11 +265,117 @@ def _new_scene(
     viewport: Tuple[float, float, float, float],
     background: Tuple[float, float, float] = (0.08, 0.08, 0.10),
 ) -> Dict[str, Any]:
-    return _vtk_scene.new_scene(renderWindow=renderWindow, viewport=viewport, background=background)
+    """Create a renderer + actors within a shared renderWindow.
+
+    We use two renderers in a single render window (left/right viewports) and
+    share a single camera to guarantee linked camera interaction.
+    """
+
+    renderer = vtkRenderer()
+    renderer.SetBackground(float(background[0]), float(background[1]), float(background[2]))
+    renderer.SetViewport(float(viewport[0]), float(viewport[1]), float(viewport[2]), float(viewport[3]))
+    renderWindow.AddRenderer(renderer)
+
+    # Always render *something* even if glyphs/molecule fail.
+    sphere_source = vtkSphereSource()
+    sphere_source.SetRadius(1.0)
+    sphere_source.SetThetaResolution(48)
+    sphere_source.SetPhiResolution(48)
+
+    sphere_mapper = vtkPolyDataMapper()
+    sphere_mapper.SetInputConnection(sphere_source.GetOutputPort())
+
+
+    sphere_actor = vtkActor()
+    sphere_actor.SetMapper(sphere_mapper)
+    sphere_actor.GetProperty().SetRepresentationToWireframe()
+    sphere_actor.GetProperty().SetColor(0.75, 0.75, 0.80)
+    sphere_actor.GetProperty().SetOpacity(0.10)
+    renderer.AddActor(sphere_actor)
+
+    # Coordinate axes (3D actor) so the frame is visible.
+    axes_actor = vtkAxesActor()
+    axes_actor.SetTotalLength(0.55, 0.55, 0.55)
+    axes_actor.SetShaftTypeToCylinder()
+    axes_actor.SetCylinderRadius(0.02)
+    axes_actor.AxisLabelsOn()
+    renderer.AddActor(axes_actor)
+
+    # Scalar bar to show the active color range for the glyphs.
+    scalar_bar = vtkScalarBarActor()
+    scalar_bar.SetNumberOfLabels(5)
+    scalar_bar.SetLabelFormat("%-#6.3g")
+    scalar_bar.SetPosition(0.83, 0.10)
+    scalar_bar.SetPosition2(0.15, 0.80)
+    scalar_bar.VisibilityOff()
+    renderer.AddViewProp(scalar_bar)
+
+    # Big, always-visible title in the upper-left of each viewport.
+    title_actor = vtkTextActor()
+    title_actor.SetInput("")
+    title_actor.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
+    title_actor.SetPosition(0.02, 0.98)
+    title_actor.GetTextProperty().SetJustificationToLeft()
+    title_actor.GetTextProperty().SetVerticalJustificationToTop()
+    title_actor.GetTextProperty().SetFontSize(22)
+    title_actor.GetTextProperty().BoldOn()
+    title_actor.GetTextProperty().SetColor(0.92, 0.92, 0.92)
+    renderer.AddViewProp(title_actor)
+
+    # Show coordinate system / view context.
+    corner = vtkCornerAnnotation()
+    corner.SetLinearFontScaleFactor(2)
+    corner.SetNonlinearFontScaleFactor(1)
+    corner.SetMaximumFontSize(26)
+    corner.GetTextProperty().SetColor(0.92, 0.92, 0.92)
+    corner.SetText(2, "")
+    renderer.AddViewProp(corner)
+
+    return {
+        "renderer": renderer,
+        "renderWindow": renderWindow,
+        "sphere_actor": sphere_actor,
+        "axes_actor": axes_actor,
+        "scalar_bar": scalar_bar,
+        "title_actor": title_actor,
+        "corner": corner,
+        "glyph_actor": None,
+        "mol_actors": [],
+    }
 
 
 def _create_render_window() -> vtkRenderWindow:
-    return _vtk_scene.create_render_window(debug_fn=_dprint)
+    """Create a render window compatible with headless environments.
+
+    Even when using client-side VTK.js rendering, VTK may try to create an X-backed
+    OpenGL context when instantiating a plain `vtkRenderWindow()` on Linux.
+    Prefer EGL offscreen rendering when no DISPLAY is available.
+    """
+
+    egl_mode = os.environ.get("BETA_VTK_EGL", "auto").strip().lower()
+    prefer_egl = egl_mode != "0"
+    require_egl = egl_mode == "1"
+
+    if prefer_egl:
+        try:
+            from vtkmodules.vtkRenderingOpenGL2 import vtkEGLRenderWindow
+
+            rw = vtkEGLRenderWindow()
+            rw.SetOffScreenRendering(1)
+            _dprint("[startup] using vtkEGLRenderWindow (offscreen)")
+            return rw
+        except Exception as exc:
+            if require_egl:
+                raise RuntimeError(
+                    "BETA_VTK_EGL=1 requested EGL offscreen rendering, but vtkEGLRenderWindow "
+                    f"could not be created: {exc}"
+                ) from exc
+            _dprint(f"[startup] vtkEGLRenderWindow unavailable, falling back: {exc}")
+
+    # Fall back to the platform-default render window (may require a working DISPLAY).
+    rw = vtkRenderWindow()
+    _dprint("[startup] using default vtkRenderWindow")
+    return rw
 
 
 _dprint("[startup] creating VTK render window")
@@ -292,9 +418,6 @@ def _principal_axes_rotation(mol) -> np.ndarray:
 
         import numpy as _np
         import qcelemental as _qcel
-
-        if mol is None:
-            return _np.eye(3, dtype=float)
 
         symbols = list(mol.symbols)
         coords = _np.asarray(mol.geometry, dtype=float)
@@ -341,23 +464,51 @@ _dprint("[startup] VTK render window created")
 
 
 def _polydata_from_points(points: np.ndarray) -> vtkPolyData:
-    return _vtk_scene.polydata_from_points(points)
+    points = np.asarray(points, dtype=float)
+    vtk_pts = vtkPoints()
+    vtk_pts.SetData(numpy_to_vtk(points, deep=True))
+    pd = vtkPolyData()
+    pd.SetPoints(vtk_pts)
+    return pd
 
 
 def _set_vectors(pd: vtkPolyData, name: str, vectors: np.ndarray) -> None:
-    _vtk_scene.set_vectors(pd, name, vectors)
+    vectors = np.asarray(vectors, dtype=float)
+    vtk_arr = numpy_to_vtk(vectors, deep=True)
+    vtk_arr.SetName(name)
+    vtk_arr.SetNumberOfComponents(3)
+    pd.GetPointData().SetVectors(vtk_arr)
 
 
 def _set_scalars(pd: vtkPolyData, name: str, scalars: np.ndarray) -> None:
-    _vtk_scene.set_scalars(pd, name, scalars)
+    scalars = np.asarray(scalars, dtype=float).reshape(-1)
+    vtk_arr = numpy_to_vtk(scalars, deep=True)
+    vtk_arr.SetName(name)
+    vtk_arr.SetNumberOfComponents(1)
+    pd.GetPointData().SetScalars(vtk_arr)
 
 
 def _add_array(pd: vtkPolyData, name: str, arr: np.ndarray) -> None:
-    _vtk_scene.add_array(pd, name, arr)
+    arr = np.asarray(arr)
+    vtk_arr = numpy_to_vtk(arr, deep=True)
+    vtk_arr.SetName(name)
+    pd.GetPointData().AddArray(vtk_arr)
 
 
 def _element_rgb(symbol: str) -> Tuple[float, float, float]:
-    return _vtk_scene.element_rgb(symbol)
+    table = {
+        "H": (1.0, 1.0, 1.0),
+        "C": (0.1, 0.1, 0.1),
+        "N": (0.2, 0.2, 1.0),
+        "O": (1.0, 0.1, 0.1),
+        "S": (1.0, 0.9, 0.1),
+        "P": (1.0, 0.5, 0.1),
+        "Cl": (0.1, 0.8, 0.1),
+        "F": (0.1, 0.8, 0.1),
+        "Br": (0.6, 0.3, 0.1),
+        "I": (0.5, 0.2, 0.8),
+    }
+    return table.get(symbol, (0.6, 0.6, 0.6))
 
 
 def _default_clim(values: np.ndarray, *, symmetric: bool) -> Tuple[float, float]:
@@ -377,17 +528,71 @@ def _default_clim(values: np.ndarray, *, symmetric: bool) -> Tuple[float, float]
 
 
 def _auto_clim(values: np.ndarray, *, mode: str) -> Tuple[float, float]:
-    return _auto_clim_impl(values, mode=mode)
+    values = np.asarray(values, dtype=float).reshape(-1)
+    finite = values[np.isfinite(values)]
+    style = _metric_style(mode)
+
+    if finite.size == 0:
+        return (-1.0, 1.0) if style["signed"] else (0.0, 1.0)
+
+    vmin, vmax = float(np.min(finite)), float(np.max(finite))
+    if style["signed"]:
+        bound = max(abs(vmin), abs(vmax))
+        if bound == 0:
+            bound = 1.0
+        return (-bound, bound)
+
+    # Unsigned metrics: enforce 0 -> max
+    vmax = float(np.max(finite))
+    if not np.isfinite(vmax) or vmax <= 0:
+        vmax = 1.0
+    return (0.0, vmax)
 
 
 def _metric_style(mode: str) -> Dict[str, Any]:
     """Return styling metadata for a scalar metric."""
-    return _metric_style_impl(mode)
+    signed = mode in ("dv_par_scalar", "par_rel_signed")
+    # Everything else currently displayed is non-negative.
+    sequential = not signed
+    return {"signed": signed, "sequential": sequential}
 
 
 def _build_lut(*, kind: str, clim: Tuple[float, float], scalar_mode: str) -> vtkLookupTable:
     """Create a LUT consistent with our metric semantics."""
-    return _vtk_scene.build_lut(kind=kind, clim=clim, scalar_mode=scalar_mode)
+
+    vmin, vmax = float(clim[0]), float(clim[1])
+    if vmin == vmax:
+        vmax = vmin + 1.0
+
+    # Base colors from a color transfer function (RGB).
+    ctf = vtkColorTransferFunction()
+    ctf.SetRange(vmin, vmax)
+    if kind == "diverging":
+        ctf.SetColorSpaceToDiverging()
+        ctf.AddRGBPoint(vmin, 0.230, 0.299, 0.754)
+        ctf.AddRGBPoint(0.5 * (vmin + vmax), 0.865, 0.865, 0.865)
+        ctf.AddRGBPoint(vmax, 0.706, 0.016, 0.150)
+    else:
+        ctf.SetColorSpaceToRGB()
+        ctf.AddRGBPoint(vmin, 0.267, 0.005, 0.329)
+        ctf.AddRGBPoint(vmin + 0.25 * (vmax - vmin), 0.283, 0.141, 0.458)
+        ctf.AddRGBPoint(vmin + 0.50 * (vmax - vmin), 0.254, 0.265, 0.530)
+        ctf.AddRGBPoint(vmin + 0.75 * (vmax - vmin), 0.207, 0.372, 0.553)
+        ctf.AddRGBPoint(vmax, 0.993, 0.906, 0.144)
+
+    table_size = 256
+    lut = vtkLookupTable()
+    lut.SetNumberOfTableValues(table_size)
+    lut.SetRange(vmin, vmax)
+    lut.Build()
+
+    for i in range(table_size):
+        t = i / float(table_size - 1)
+        x = vmin + t * (vmax - vmin)
+        r, g, b = ctf.GetColor(x)
+        lut.SetTableValue(i, float(r), float(g), float(b), 1.0)
+
+    return lut
 
 
 def _build_glyph_actor(
@@ -401,20 +606,77 @@ def _build_glyph_actor(
     lut_kind: str,
     scalar_mode: str,
 ) -> vtkActor:
-    return _vtk_scene.build_glyph_actor(
-        points=n_hat,
-        vectors=vectors,
-        scalars=scalars,
-        scale=scale,
-        scale_factor=float(glyph_factor),
-        clim=clim,
-        lut_kind=str(lut_kind),
-        scalar_mode=str(scalar_mode),
-    )
+    pd = _polydata_from_points(n_hat)
+    _set_vectors(pd, "vectors", vectors)
+
+    # Preserve the color scalars array even though we also need an active scalar
+    # array ('scale') for glyph sizing.
+    scalars = np.asarray(scalars, dtype=float).reshape(-1)
+    _add_array(pd, "scalars", scalars)
+
+    # Normalize scale so glyph sizing is stable.
+    scale = np.asarray(scale, dtype=float).reshape(-1)
+    scale_max = float(np.max(scale)) if scale.size else 0.0
+    if not np.isfinite(scale_max) or scale_max <= 0:
+        scale_norm = np.ones_like(scale)
+    else:
+        scale_norm = scale / scale_max
+        # Preserve explicit masking via zero scale.
+        scale_norm = np.where(scale_norm <= 0.0, 0.0, np.clip(scale_norm, 0.05, 1.0))
+
+    # Use 'scale' as the active scalars for vtkGlyph3D scaling.
+    _set_scalars(pd, "scale", scale_norm)
+
+    arrow = vtkArrowSource()
+    arrow.SetTipLength(0.35)
+    arrow.SetTipRadius(0.10)
+    arrow.SetShaftRadius(0.03)
+
+    glyph = vtkGlyph3D()
+    glyph.SetInputData(pd)
+    glyph.SetSourceConnection(arrow.GetOutputPort())
+    glyph.OrientOn()
+    glyph.SetVectorModeToUseVector()
+    glyph.SetScaleModeToScaleByScalar()
+    glyph.SetScaleFactor(float(glyph_factor))
+
+    mapper = vtkPolyDataMapper()
+    mapper.SetInputConnection(glyph.GetOutputPort())
+    mapper.ScalarVisibilityOn()
+    mapper.SetScalarModeToUsePointFieldData()
+    mapper.SelectColorArray("scalars")
+
+    vmin, vmax = float(clim[0]), float(clim[1])
+    if vmin == vmax:
+        vmax = vmin + 1.0
+    lut = _build_lut(kind=str(lut_kind), clim=(vmin, vmax), scalar_mode=str(scalar_mode))
+    mapper.SetLookupTable(lut)
+    mapper.SetScalarRange(vmin, vmax)
+
+    actor = vtkActor()
+    actor.SetMapper(mapper)
+    return actor
 
 
 def _build_atom_actor(points: np.ndarray, *, radius: float, rgb: Tuple[float, float, float]) -> vtkActor:
-    return _vtk_scene.build_atom_actor(points, radius=radius, rgb=rgb)
+    pd = _polydata_from_points(points)
+    sphere = vtkSphereSource()
+    sphere.SetRadius(float(radius))
+    sphere.SetThetaResolution(24)
+    sphere.SetPhiResolution(24)
+
+    glyph = vtkGlyph3D()
+    glyph.SetInputData(pd)
+    glyph.SetSourceConnection(sphere.GetOutputPort())
+    glyph.ScalingOff()
+    glyph.OrientOff()
+
+    mapper = vtkPolyDataMapper()
+    mapper.SetInputConnection(glyph.GetOutputPort())
+    actor = vtkActor()
+    actor.SetMapper(mapper)
+    actor.GetProperty().SetColor(float(rgb[0]), float(rgb[1]), float(rgb[2]))
+    return actor
 
 
 # -----------------------------------------------------------------------------
@@ -434,6 +696,7 @@ def _reset_camera() -> None:
     global _camera_initialized
     _scene_left["renderer"].ResetCamera()
     _camera_initialized = True
+    renderWindow.Modified()
     ctrl.view_update()
 
 
@@ -456,11 +719,28 @@ def _molecule_list() -> List[str]:
 
 def _omega_list(mol: str) -> List[float]:
     df = _data()
-    return sorted(set((float(x) for x in df.omega.unique())))
+    sub = df[df["molecule"] == mol]
+    return sorted(set(float(x) for x in sub["omega"].unique()))
 
 
-METRIC_CHOICES = _METRIC_CHOICES
-FIELD_CHOICES = _FIELD_CHOICES
+METRIC_CHOICES = [
+    ("|v_ref|", "ref_mag"),
+    ("|v_bas|", "bas_mag"),
+    ("|dv|", "abs_err"),
+    ("|dv| / ref_scale", "rel_err"),
+    ("angle(v_bas,v_ref) [deg]", "ang_err"),
+    ("signed dv_parallel", "dv_par_scalar"),
+    ("signed dv_parallel/ref_scale", "par_rel_signed"),
+    ("|dv_perp|", "perp_mag"),
+    ("|dv_parallel|/ref_scale", "par_rel"),
+    ("|dv_perp|/ref_scale", "perp_rel"),
+]
+
+FIELD_CHOICES = [
+    ("Reference", "ref"),
+    ("Basis", "bas"),
+    ("Delta (bas-ref)", "dv"),
+]
 
 
 def _scalar_mode_label(mode: str) -> str:
@@ -550,6 +830,9 @@ def _global_metric_clims(
             "abs_err",
             "rel_err",
             "ang_err",
+            "dv_par_scalar",
+            "par_rel_signed",
+            "perp_mag",
             "par_rel",
             "perp_rel",
         ):
@@ -633,14 +916,11 @@ PLOT_METRIC_CHOICES: List[Tuple[str, str]] = [
 ]
 
 
-def _posneg_l2_from_signed_field(x: np.ndarray, w: np.ndarray) -> Tuple[float, float]:
-    """Return (L2_positive, L2_negative) for a signed field over the sphere.
+def _posneg_mean_from_signed_field(x: np.ndarray, w: np.ndarray) -> Tuple[float, float]:
+    """Return (mean_positive, mean_negative) for a signed field over the sphere.
 
-    L2 norms are computed using the Lebedev weights with the convention:
-      L2(x) = sqrt( (1/(4π)) * Σ w_i * x_i^2 )
-
-    The negative contribution is returned as a negative value so it plots below
-    zero: (-L2(|min(x,0)|)).
+    Means are computed as integrals over the sphere divided by 4π using the
+    Lebedev weights (same convention as other metrics in this app).
     """
 
     x = np.asarray(x, dtype=float).reshape(-1)
@@ -654,10 +934,8 @@ def _posneg_l2_from_signed_field(x: np.ndarray, w: np.ndarray) -> Tuple[float, f
 
     xf = x[finite]
     wf = w[finite]
-    pos_sq = float(np.sum(wf * (np.maximum(xf, 0.0) ** 2)) / (4.0 * np.pi))
-    neg_sq = float(np.sum(wf * (np.minimum(xf, 0.0) ** 2)) / (4.0 * np.pi))
-    pos = float(np.sqrt(max(0.0, pos_sq)))
-    neg = -float(np.sqrt(max(0.0, neg_sq)))
+    pos = float(np.sum(wf * np.maximum(xf, 0.0)) / (4.0 * np.pi))
+    neg = float(np.sum(wf * np.minimum(xf, 0.0)) / (4.0 * np.pi))
     return pos, neg
 
 
@@ -729,7 +1007,7 @@ def _posneg_par_rel_signed_across_bases(
         v_bas = evaluate_field(beta_bas, n_hat)
         arrays, _metrics = compute_error_fields(v_ref, v_bas, n_hat, w, settings=settings)
 
-        pos, neg = _posneg_l2_from_signed_field(arrays["par_rel_signed"], w)
+        pos, neg = _posneg_mean_from_signed_field(arrays["par_rel_signed"], w)
         out[str(basis)] = (pos, neg)
 
     return out
@@ -744,7 +1022,7 @@ def _posneg_par_rel_signed_across_omegas_for_basis(
     coord_system: str,
     rel_norm: str,
 ) -> Dict[float, Tuple[float, float]]:
-    """Return {omega: (L2_pos, L2_neg)} for a single basis across all omegas."""
+    """Return {omega: (mean_pos, mean_neg)} for a single basis across all omegas."""
     grid = load_lebedev_grid(int(lebedev_order))
     df = _data()
 
@@ -777,7 +1055,7 @@ def _posneg_par_rel_signed_across_omegas_for_basis(
         v_ref = evaluate_field(beta_ref, n_hat)
         v_bas = evaluate_field(beta_bas, n_hat)
         arrays, _metrics = compute_error_fields(v_ref, v_bas, n_hat, w, settings=settings)
-        out[float(omega)] = _posneg_l2_from_signed_field(arrays["par_rel_signed"], w)
+        out[float(omega)] = _posneg_mean_from_signed_field(arrays["par_rel_signed"], w)
 
     return out
 
@@ -1314,7 +1592,7 @@ def _triple_metric_plot_data_url(
                 linestyle="--",
                 label=f"{fam} (-)",
             )
-    ax2.set_ylabel("L2 par_rel_signed (+ / -)")
+    ax2.set_ylabel("mean par_rel_signed (+ / -)")
     ax2.grid(True, axis="y", alpha=0.25)
     if str(posneg_yscale) == "symlog":
         ax2.set_yscale("symlog", linthresh=1e-3)
@@ -1376,6 +1654,10 @@ def _triple_metric_plot_data_url(
 
 
 def _update_metric_plot() -> None:
+    if not _selection_ready():
+        state.metric_plot_src = ""
+        state.metric_plot_error = ""
+        return
     try:
         src = _triple_metric_plot_data_url(
             str(state.mol),
@@ -1393,14 +1675,14 @@ def _update_metric_plot() -> None:
         state.metric_plot_error = f"Plot error: {type(exc).__name__}: {exc}"
 
 
-state.setdefault("mol", "H2O")
-state.setdefault("omega", 0.0)
-state.setdefault("ref_basis", "MRA")
-state.setdefault("bas_basis_a", "aug-cc-pVDZ")
-state.setdefault("bas_basis_b", "d-aug-cc-pVDZ")
+state.setdefault("mol", "")
+state.setdefault("omega", None)
+state.setdefault("ref_basis", "")
+state.setdefault("bas_basis_a", "")
+state.setdefault("bas_basis_b", "")
 state.setdefault("lebedev_order", 29)
 state.setdefault("field_mode", "bas")
-state.setdefault("scalar_mode", "par_rel_signed")
+state.setdefault("scalar_mode", "rel_err")
 state.setdefault("glyph_factor", 0.12)
 state.setdefault("molecule_scale", 0.7)
 state.setdefault("atom_radius", 0.25)
@@ -1409,6 +1691,9 @@ state.setdefault("view_layout", "compare_bases")
 state.setdefault("scale_by_metric", False)
 state.setdefault("rel_norm", "global_rms")
 state.setdefault("show_axes", True)
+state.setdefault("clim_mode", "auto")
+state.setdefault("clim_min", 0.0)
+state.setdefault("clim_max", 1.0)
 state.setdefault("metrics", {})
 state.setdefault("metric_rows", [])
 state.setdefault("posneg_yscale", "linear")
@@ -1424,12 +1709,45 @@ state.setdefault(
 )
 
 
+def _set_waiting_status() -> None:
+    state.status = "select data"
+    state.status_color = "blue"
+    state.last_error = ""
+    state.metric_rows = []
+    state.metric_plot_src = ""
+    state.metric_plot_error = ""
+
+
+def _selection_ready() -> bool:
+    mol = str(state.mol).strip()
+    if not mol:
+        return False
+    bases = _basis_list()
+    if not bases:
+        return False
+    if str(state.ref_basis) not in bases:
+        return False
+    if str(state.bas_basis_a) not in bases:
+        return False
+    if str(state.bas_basis_b) not in bases:
+        return False
+    omegas = _omega_list(mol)
+    if not omegas:
+        return False
+    try:
+        omega_val = float(state.omega)
+    except (TypeError, ValueError):
+        return False
+    return any(float(o) == omega_val for o in omegas)
+
+
 @state.change("show_axes")
 def _on_show_axes(show_axes, **_):
     vis = bool(show_axes)
     _scene_left["axes_actor"].SetVisibility(1 if vis else 0)
     _scene_mid["axes_actor"].SetVisibility(1 if vis else 0)
     _scene_right["axes_actor"].SetVisibility(1 if vis else 0)
+    renderWindow.Modified()
     ctrl.view_update()
 
 
@@ -1484,6 +1802,7 @@ def _apply_view_layout() -> None:
 def _on_layout_change(**_):
     _apply_view_layout()
     _update_corner_annotations()
+    renderWindow.Modified()
     ctrl.view_update()
 
 
@@ -1637,9 +1956,6 @@ def _rebuild_scene(
     _set_scalar_bar(scene, actor=glyph_actor, title=scalar_title, mode=str(scalar_mode), clim=clim)
 
     mol = _load_molecule(state.mol)
-    if mol is None:
-        return
-
     symbols = list(mol.symbols)
     coords = np.asarray(mol.geometry, dtype=float)
     coords = coords - np.mean(coords, axis=0, keepdims=True)
@@ -1666,6 +1982,13 @@ def _rebuild_both() -> None:
     global _camera_initialized
 
     try:
+        if not _selection_ready():
+            _set_waiting_status()
+            _scene_left["scalar_bar"].VisibilityOff()
+            _scene_mid["scalar_bar"].VisibilityOff()
+            _scene_right["scalar_bar"].VisibilityOff()
+            ctrl.view_update()
+            return
         print("[trame] rebuilding scenes ...", flush=True)
         state.status = "building scene"
         state.status_color = "orange"
@@ -1710,19 +2033,28 @@ def _rebuild_both() -> None:
         style = _metric_style(mode)
         lut_kind = "diverging" if style["signed"] else "sequential"
 
-        global_clims = _global_metric_clims(
-            str(state.mol),
-            float(state.omega),
-            str(state.ref_basis),
-            int(state.lebedev_order),
-            str(state.coord_system),
-            str(state.rel_norm),
-        )
+        global_clims = None
+        if str(state.clim_mode) == "auto":
+            global_clims = _global_metric_clims(
+                str(state.mol),
+                float(state.omega),
+                str(state.ref_basis),
+                int(state.lebedev_order),
+                str(state.coord_system),
+                str(state.rel_norm),
+            )
 
         # BASIS A scene
         a_vectors, a_scale = _vectors_and_scale(str(state.field_mode), v_bas=v_a, arrays=arrays_a)
         a_scalars = arrays_a[mode]
-        a_clim = global_clims.get(mode, _auto_clim(a_scalars, mode=mode))
+        if state.clim_mode == "manual":
+            a_clim = (float(state.clim_min), float(state.clim_max))
+        else:
+            a_clim = (
+                global_clims.get(mode)  # type: ignore[union-attr]
+                if global_clims is not None and mode in global_clims
+                else _auto_clim(a_scalars, mode=mode)
+            )
         if bool(state.scale_by_metric):
             a_scale = np.abs(a_scalars) if style["signed"] else a_scalars
         _rebuild_scene(
@@ -1741,7 +2073,14 @@ def _rebuild_both() -> None:
         # BASIS B scene
         b_vectors, b_scale = _vectors_and_scale(str(state.field_mode), v_bas=v_b, arrays=arrays_b)
         b_scalars = arrays_b[mode]
-        b_clim = global_clims.get(mode, _auto_clim(b_scalars, mode=mode))
+        if state.clim_mode == "manual":
+            b_clim = (float(state.clim_min), float(state.clim_max))
+        else:
+            b_clim = (
+                global_clims.get(mode)  # type: ignore[union-attr]
+                if global_clims is not None and mode in global_clims
+                else _auto_clim(b_scalars, mode=mode)
+            )
         if bool(state.scale_by_metric):
             b_scale = np.abs(b_scalars) if style["signed"] else b_scalars
         _rebuild_scene(
@@ -1788,7 +2127,7 @@ def _rebuild_both() -> None:
         print("[trame] scenes rebuilt", flush=True)
         state.status = "ready"
         state.status_color = "green"
-
+        renderWindow.Modified()
         ctrl.view_update()
 
     except Exception as exc:
@@ -1801,6 +2140,7 @@ def _rebuild_both() -> None:
             _scene_left["scalar_bar"].VisibilityOff()
             _scene_mid["scalar_bar"].VisibilityOff()
             _scene_right["scalar_bar"].VisibilityOff()
+            renderWindow.Modified()
             ctrl.view_update()
         except Exception:
             pass
@@ -1809,11 +2149,25 @@ def _rebuild_both() -> None:
 @state.change("mol")
 def _on_mol_change(mol, **_):
     global _camera_initialized
+    if not str(mol).strip():
+        state.omega = None
+        _set_waiting_status()
+        ctrl.view_update()
+        return
     omegas = _omega_list(mol)
-    if omegas and float(state.omega) not in omegas:
-        state.omega = float(omegas[0])
+    if omegas:
+        try:
+            omega_val = float(state.omega)
+        except (TypeError, ValueError):
+            omega_val = None
+        if omega_val is None or omega_val not in omegas:
+            state.omega = float(omegas[0])
+    _ensure_basis_selections()
     _camera_initialized = False
-    _rebuild_both()
+    if _selection_ready():
+        _rebuild_both()
+    else:
+        _set_waiting_status()
 
 
 @state.change(
@@ -1830,14 +2184,21 @@ def _on_mol_change(mol, **_):
     "coord_system",
     "rel_norm",
     "scale_by_metric",
+    "clim_mode",
+    "clim_min",
+    "clim_max",
 )
 def _on_params_change(**_):
-    _rebuild_both()
+    if _selection_ready():
+        _rebuild_both()
+    else:
+        _set_waiting_status()
 
 
 @state.change("posneg_yscale")
 def _on_posneg_yscale_change(**_):
     _update_metric_plot()
+    renderWindow.Modified()
     ctrl.view_update()
 
 
@@ -2037,6 +2398,43 @@ with SinglePageWithDrawerLayout(server) as layout:
             classes="mb-2",
         )
 
+        vuetify.VSelect(
+            label="Color limits (basis/errors)",
+            v_model=("clim_mode", state.clim_mode),
+            items=(
+                "clim_mode_items",
+                [
+                    {"text": "Auto", "value": "auto"},
+                    {"text": "Manual", "value": "manual"},
+                ],
+            ),
+            dense=True,
+            outlined=True,
+            hide_details=True,
+            classes="mb-2",
+        )
+
+        vuetify.VTextField(
+            label="Min",
+            v_model=("clim_min", state.clim_min),
+            type="number",
+            dense=True,
+            outlined=True,
+            hide_details=True,
+            disabled=("clim_mode !== 'manual'",),
+            classes="mb-2",
+        )
+        vuetify.VTextField(
+            label="Max",
+            v_model=("clim_max", state.clim_max),
+            type="number",
+            dense=True,
+            outlined=True,
+            hide_details=True,
+            disabled=("clim_mode !== 'manual'",),
+            classes="mb-2",
+        )
+
         vuetify.VSlider(
             label="Arrow scale",
             v_model=("glyph_factor", state.glyph_factor),
@@ -2120,136 +2518,17 @@ with SinglePageWithDrawerLayout(server) as layout:
                     )
 
             # Now that we have live views, build the initial scenes.
-            _rebuild_both()
+            if _selection_ready():
+                _rebuild_both()
+            else:
+                _set_waiting_status()
 
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
 
-def _parse_args(argv: list[str] | None = None):
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="Host interface to bind (default: 127.0.0.1; use 0.0.0.0 for remote access)",
-    )
-    parser.add_argument(
-        "--port",
-        default=9010,
-        type=int,
-        help="Port to bind (default: 9010; use 0 to auto-pick a free port)",
-    )
-    parser.add_argument(
-        "--mol-file",
-        dest="mol_file",
-        default=None,
-        help="Path to a single .mol file used when geometry is missing",
-    )
-    parser.add_argument(
-        "--mol-dir",
-        dest="mol_dir",
-        default=None,
-        help="Directory of .mol files (matched by molecule label)",
-    )
-    parser.add_argument(
-        "--mol-map",
-        dest="mol_map",
-        default=None,
-        help="JSON map of molecule label -> .mol path",
-    )
-    parser.add_argument(
-        "--shg-csv",
-        dest="shg_csv",
-        default=None,
-        help="Path to shg_ijk.csv (default: data/csv_data/shg_ijk.csv)",
-    )
-    parser.add_argument(
-        "--db-dir",
-        dest="db_dir",
-        default=None,
-        help="Path to a calculation database directory (builds SHG table on the fly)",
-    )
-    parser.add_argument(
-        "--bundle-dir",
-        dest="bundle_dir",
-        default=None,
-        help="Directory containing shg_ijk.csv and optional geometries.json",
-    )
-    parser.add_argument(
-        "--geom-json",
-        dest="geom_json",
-        default=None,
-        help="Path to a geometry map JSON (label -> {symbols, geometry})",
-    )
-    parser.add_argument(
-        "--write-bundle",
-        dest="write_bundle",
-        default=None,
-        help="If set with --db-dir, writes a bundle directory (CSV + geometries.json)",
-    )
-    return parser.parse_args(argv)
-
-
-def _select_free_port(host: str, preferred_port: int, *, max_tries: int = 50) -> int:
-    import errno
-    import socket
-
-    bind_host = host or "127.0.0.1"
-    if preferred_port == 0:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.bind((bind_host, 0))
-            return int(sock.getsockname()[1])
-
-    port = int(preferred_port)
-    for _ in range(max_tries):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            try:
-                sock.bind((bind_host, port))
-                return port
-            except OSError as exc:
-                if exc.errno == errno.EADDRINUSE:
-                    port += 1
-                    continue
-                raise
-
-    raise RuntimeError(
-        f"Could not find a free port starting at {preferred_port} after {max_tries} attempts"
-    )
-
-
-def main(argv: list[str] | None = None) -> int:
-    global _MOL_RESOLVER
-    global _SHG_CSV_PATH
-    global _SHG_DB_DIR
-    global _GEOM_MAP_PATH
-    global _BUNDLE_DIR
-    global _WRITE_BUNDLE_DIR
-
-    args = _parse_args(argv)
-    if args.bundle_dir:
-        _BUNDLE_DIR = Path(args.bundle_dir).expanduser().resolve()
-        _SHG_CSV_PATH = _BUNDLE_DIR / "shg_ijk.csv"
-    elif args.db_dir:
-        _SHG_DB_DIR = Path(args.db_dir).expanduser().resolve()
-    elif args.shg_csv:
-        _SHG_CSV_PATH = Path(args.shg_csv).expanduser().resolve()
-
-    if args.geom_json:
-        _GEOM_MAP_PATH = Path(args.geom_json).expanduser().resolve()
-
-    if args.write_bundle:
-        _WRITE_BUNDLE_DIR = Path(args.write_bundle).expanduser().resolve()
-    try:
-        from gecko.mol.resolver import MoleculeResolver
-
-        _MOL_RESOLVER = MoleculeResolver.from_sources(
-            mol_file=args.mol_file,
-            mol_dir=args.mol_dir,
-            mol_map=args.mol_map,
-        )
-    except Exception as exc:
-        _dprint(f"[molecule] failed to initialize MoleculeResolver: {exc}")
+if __name__ == "__main__":
+    args = _CLI_ARGS or _parse_args()
     kwargs: Dict[str, Any] = {}
     host = args.host
     port = _select_free_port(host, args.port)
@@ -2261,8 +2540,3 @@ def main(argv: list[str] | None = None) -> int:
         url_host = "127.0.0.1"
     print(f"Trame server running at http://{url_host}:{port}/")
     server.start(**kwargs)
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
