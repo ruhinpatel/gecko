@@ -220,37 +220,57 @@ def build_lut(*, kind: str, clim: Tuple[float, float], scalar_mode: str) -> vtkL
 
 
 def build_glyph_actor(
+    *,
     points: np.ndarray,
     vectors: np.ndarray,
     scalars: np.ndarray,
-    *,
+    scale: np.ndarray,
     scale_factor: float,
-    lut: vtkLookupTable,
+    clim: Tuple[float, float],
+    lut_kind: str,
+    scalar_mode: str,
 ) -> vtkActor:
     pd = polydata_from_points(points)
     set_vectors(pd, "vectors", vectors)
-    set_scalars(pd, "scalars", scalars)
-    add_array(pd, "scale", scalars)
+
+    scalars = np.asarray(scalars, dtype=float).reshape(-1)
+    add_array(pd, "scalars", scalars)
+
+    scale = np.asarray(scale, dtype=float).reshape(-1)
+    scale_max = float(np.max(scale)) if scale.size else 0.0
+    if not np.isfinite(scale_max) or scale_max <= 0:
+        scale_norm = np.ones_like(scale)
+    else:
+        scale_norm = scale / scale_max
+        scale_norm = np.where(scale_norm <= 0.0, 0.0, np.clip(scale_norm, 0.05, 1.0))
+
+    set_scalars(pd, "scale", scale_norm)
 
     arrow = vtkArrowSource()
-    arrow.SetTipResolution(24)
-    arrow.SetShaftResolution(24)
+    arrow.SetTipLength(0.35)
+    arrow.SetTipRadius(0.10)
+    arrow.SetShaftRadius(0.03)
 
     glyph = vtkGlyph3D()
     glyph.SetInputData(pd)
     glyph.SetSourceConnection(arrow.GetOutputPort())
+    glyph.OrientOn()
     glyph.SetVectorModeToUseVector()
     glyph.SetScaleModeToScaleByScalar()
-    glyph.OrientOn()
     glyph.SetScaleFactor(float(scale_factor))
 
     mapper = vtkPolyDataMapper()
     mapper.SetInputConnection(glyph.GetOutputPort())
-    mapper.SetLookupTable(lut)
-    mapper.SetColorModeToMapScalars()
+    mapper.ScalarVisibilityOn()
+    mapper.SetScalarModeToUsePointFieldData()
     mapper.SelectColorArray("scalars")
-    mapper.SetScalarModeToUsePointData()
-    mapper.SetUseLookupTableScalarRange(True)
+
+    vmin, vmax = float(clim[0]), float(clim[1])
+    if vmin == vmax:
+        vmax = vmin + 1.0
+    lut = build_lut(kind=str(lut_kind), clim=(vmin, vmax), scalar_mode=str(scalar_mode))
+    mapper.SetLookupTable(lut)
+    mapper.SetScalarRange(vmin, vmax)
 
     actor = vtkActor()
     actor.SetMapper(mapper)
