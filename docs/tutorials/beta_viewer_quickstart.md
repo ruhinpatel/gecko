@@ -31,13 +31,20 @@ shg_df.to_csv(out / "shg_ijk.csv", index=False)
 ## 2) Launch the viewer from CSV
 
 ```bash
-python -m gecko.viz.apps.beta_viewer --csv data/csv_data/shg_ijk.csv
+python -m gecko.viz.apps.beta_viewer --shg-csv data/csv_data/shg_ijk.csv
 ```
 
 ## 3) Launch the viewer from a database directory
 
 ```bash
 python -m gecko.viz.apps.beta_viewer --db-dir /path/to/calcs
+```
+
+## Optional: build a reusable bundle
+
+```bash
+python -m gecko.viz.apps.beta_viewer --db-dir /path/to/calcs --write-bundle ./beta_bundle
+python -m gecko.viz.apps.beta_viewer --bundle-dir ./beta_bundle
 ```
 
 ## Omega indexing rule

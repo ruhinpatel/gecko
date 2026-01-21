@@ -11,13 +11,20 @@ python -m pip install -e .
 ```
 
 ```bash
-python -m gecko.viz.apps.beta_viewer --csv data/csv_data/shg_ijk.csv
+python -m gecko.viz.apps.beta_viewer --shg-csv data/csv_data/shg_ijk.csv
 ```
 
 ## Build from a database directory
 
 ```bash
 python -m gecko.viz.apps.beta_viewer --db-dir /path/to/calcs
+```
+
+## Build a reusable bundle
+
+```bash
+python -m gecko.viz.apps.beta_viewer --db-dir /path/to/calcs --write-bundle ./beta_bundle
+python -m gecko.viz.apps.beta_viewer --bundle-dir ./beta_bundle
 ```
 
 ## Notes

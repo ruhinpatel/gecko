@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import json
 import io
 import os
 import re
@@ -96,6 +97,10 @@ from gecko.viz.state import (
 
 
 _SHG_CSV_PATH: Path | None = None
+_SHG_DB_DIR: Path | None = None
+_GEOM_MAP_PATH: Path | None = None
+_BUNDLE_DIR: Path | None = None
+_WRITE_BUNDLE_DIR: Path | None = None
 
 
 @lru_cache(maxsize=1)
@@ -111,6 +116,51 @@ def _shg_long():
         import pandas as pd
 
         return pd.DataFrame(columns=["molecule", "basis", "omega", "ijk", "Beta"])
+
+
+def _normalize_label(label: str | None) -> str | None:
+    if label is None:
+        return None
+    cleaned = str(label).strip()
+    cleaned = re.sub(r"\s+", "", cleaned)
+    return cleaned or None
+
+
+def _load_geometry_map_from_json(path: Path) -> Dict[str, Dict[str, Any]]:
+    try:
+        raw = path.read_text(encoding="utf-8")
+        data = json.loads(raw)
+    except Exception as exc:
+        _dprint(f"[geom] failed to read geometry map: {path}: {exc}")
+        return {}
+    if not isinstance(data, dict):
+        _dprint(f"[geom] geometry map must be a JSON object: {path}")
+        return {}
+    mapped: Dict[str, Dict[str, Any]] = {}
+    for key, value in data.items():
+        norm = _normalize_label(str(key))
+        if norm is None:
+            continue
+        if isinstance(value, dict) and "symbols" in value and "geometry" in value:
+            mapped[norm] = value
+    return mapped
+
+
+@lru_cache(maxsize=1)
+def _geometry_map() -> Dict[str, Dict[str, Any]]:
+    if _GEOM_MAP_PATH is not None and _GEOM_MAP_PATH.exists():
+        return _load_geometry_map_from_json(_GEOM_MAP_PATH)
+    if _BUNDLE_DIR is not None:
+        geom_path = _BUNDLE_DIR / "geometries.json"
+        if geom_path.exists():
+            return _load_geometry_map_from_json(geom_path)
+
+    df = _data()
+    if "geometry" not in df.columns:
+        return {}
+    from gecko.viz.io import geometry_map_from_df
+
+    return geometry_map_from_df(df, key="molecule")
 
 
 def _beta_df_to_np(beta_df) -> np.ndarray:
@@ -135,12 +185,38 @@ def _tensor_from_long(shg_long, mol: str, basis: str, omega: float | int) -> np.
 @lru_cache(maxsize=1)
 def _data():
     # Intentionally only load the SHG tensor table here.
+    if _SHG_DB_DIR is not None:
+        from gecko.viz.io import build_shg_df_from_db, write_beta_viewer_bundle
+
+        df = build_shg_df_from_db(_SHG_DB_DIR, include_geometry=True)
+        if _WRITE_BUNDLE_DIR is not None:
+            try:
+                write_beta_viewer_bundle(df, _WRITE_BUNDLE_DIR)
+                _dprint(f"[bundle] wrote beta viewer bundle to {_WRITE_BUNDLE_DIR}")
+            except Exception as exc:
+                _dprint(f"[bundle] failed to write bundle: {exc}")
+        return df
+
     return _shg_long()
 
 
 @lru_cache(maxsize=256)
 def _load_molecule(mol_name: str):
     from gecko.mol.io import read_mol
+
+    norm_label = _normalize_label(mol_name)
+    geom_map = _geometry_map()
+    if norm_label is not None and norm_label in geom_map:
+        try:
+            import qcelemental as _qcel
+
+            payload = geom_map[norm_label]
+            symbols = payload.get("symbols")
+            geometry = payload.get("geometry")
+            if symbols is not None and geometry is not None:
+                return _qcel.models.Molecule(symbols=symbols, geometry=geometry)
+        except Exception as exc:
+            _dprint(f"[molecule] failed to build molecule from geometry map: {exc}")
 
     if _MOL_RESOLVER is not None:
         fake_calc = SimpleNamespace(meta={"molecule": mol_name}, data={}, root=Path(mol_name), molecule=None)
@@ -1320,9 +1396,9 @@ def _update_metric_plot() -> None:
 
 state.setdefault("mol", "H2O")
 state.setdefault("omega", 0.0)
-state.setdefault("ref_basis", "mra-high")
+state.setdefault("ref_basis", "MRA")
 state.setdefault("bas_basis_a", "aug-cc-pVDZ")
-state.setdefault("bas_basis_b", "d-aug-cc-pCVDZ")
+state.setdefault("bas_basis_b", "d-aug-cc-pVDZ")
 state.setdefault("lebedev_order", 29)
 state.setdefault("field_mode", "bas")
 state.setdefault("scalar_mode", "par_rel_signed")
@@ -2088,6 +2164,30 @@ def _parse_args(argv: list[str] | None = None):
         default=None,
         help="Path to shg_ijk.csv (default: data/csv_data/shg_ijk.csv)",
     )
+    parser.add_argument(
+        "--db-dir",
+        dest="db_dir",
+        default=None,
+        help="Path to a calculation database directory (builds SHG table on the fly)",
+    )
+    parser.add_argument(
+        "--bundle-dir",
+        dest="bundle_dir",
+        default=None,
+        help="Directory containing shg_ijk.csv and optional geometries.json",
+    )
+    parser.add_argument(
+        "--geom-json",
+        dest="geom_json",
+        default=None,
+        help="Path to a geometry map JSON (label -> {symbols, geometry})",
+    )
+    parser.add_argument(
+        "--write-bundle",
+        dest="write_bundle",
+        default=None,
+        help="If set with --db-dir, writes a bundle directory (CSV + geometries.json)",
+    )
     return parser.parse_args(argv)
 
 
@@ -2122,10 +2222,25 @@ def _select_free_port(host: str, preferred_port: int, *, max_tries: int = 50) ->
 def main(argv: list[str] | None = None) -> int:
     global _MOL_RESOLVER
     global _SHG_CSV_PATH
+    global _SHG_DB_DIR
+    global _GEOM_MAP_PATH
+    global _BUNDLE_DIR
+    global _WRITE_BUNDLE_DIR
 
     args = _parse_args(argv)
-    if args.shg_csv:
+    if args.bundle_dir:
+        _BUNDLE_DIR = Path(args.bundle_dir).expanduser().resolve()
+        _SHG_CSV_PATH = _BUNDLE_DIR / "shg_ijk.csv"
+    elif args.db_dir:
+        _SHG_DB_DIR = Path(args.db_dir).expanduser().resolve()
+    elif args.shg_csv:
         _SHG_CSV_PATH = Path(args.shg_csv).expanduser().resolve()
+
+    if args.geom_json:
+        _GEOM_MAP_PATH = Path(args.geom_json).expanduser().resolve()
+
+    if args.write_bundle:
+        _WRITE_BUNDLE_DIR = Path(args.write_bundle).expanduser().resolve()
     try:
         from gecko.mol.resolver import MoleculeResolver
 
