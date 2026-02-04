@@ -1,0 +1,201 @@
+{
+    "tasks": [
+        {
+            "convergence": {
+                "converged_for_dconv": 0.0001,
+                "converged_for_thresh": 5e-08
+            },
+            "molecule": {
+                "geometry": [
+                    [
+                        1.1115919044592524e-20,
+                        4.093860153231918e-09,
+                        0.21031607687343404
+                    ],
+                    [
+                        3.117383510588637e-20,
+                        -1.423046708859058,
+                        -0.8502012604103013
+                    ],
+                    [
+                        1.0490673800230074e-19,
+                        1.4230465995303707,
+                        -0.8502013584631312
+                    ]
+                ],
+                "parameters": {
+                    "core_type": "none",
+                    "eprec": 1e-06,
+                    "field": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "no_orient": false,
+                    "psp_calc": false,
+                    "pure_ae": true,
+                    "source_name": "mad.in",
+                    "source_type": "inputfile",
+                    "symtol": -0.01,
+                    "units": "atomic"
+                },
+                "symbols": [
+                    "O",
+                    "H",
+                    "H"
+                ]
+            },
+            "optimization_results": {
+                "final_energy": -76.0681752940795,
+                "final_geometry": {
+                    "geometry": [
+                        [
+                            1.1115919044592524e-20,
+                            4.093860153231918e-09,
+                            0.21031607687343404
+                        ],
+                        [
+                            3.117383510588637e-20,
+                            -1.423046708859058,
+                            -0.8502012604103013
+                        ],
+                        [
+                            1.0490673800230074e-19,
+                            1.4230465995303707,
+                            -0.8502013584631312
+                        ]
+                    ],
+                    "parameters": {
+                        "core_type": "none",
+                        "eprec": 1e-06,
+                        "field": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "no_orient": false,
+                        "psp_calc": false,
+                        "pure_ae": true,
+                        "source_name": "mad.in",
+                        "source_type": "inputfile",
+                        "symtol": -0.01,
+                        "units": "atomic"
+                    },
+                    "symbols": [
+                        "O",
+                        "H",
+                        "H"
+                    ]
+                },
+                "max_gradient": 0.0005506882881192166,
+                "max_step": 0.0,
+                "nsteps": 20
+            },
+            "properties": {
+                "dipole": {
+                    "dims": [
+                        3
+                    ],
+                    "ndim": 1,
+                    "size": 3,
+                    "vals": [
+                        -2.5745066141160157e-06,
+                        -6.636242806010706e-08,
+                        -0.3887784714018728
+                    ]
+                },
+                "energy": -76.06817529826044,
+                "gradient": {
+                    "ndim": -1,
+                    "size": 0
+                }
+            },
+            "scf": {
+                "is_opt": true,
+                "model": "scf",
+                "molecule": {
+                    "geometry": [
+                        [
+                            1.1115919044592524e-20,
+                            4.093860153231918e-09,
+                            0.21031607687343404
+                        ],
+                        [
+                            3.117383510588637e-20,
+                            -1.423046708859058,
+                            -0.8502012604103013
+                        ],
+                        [
+                            1.0490673800230074e-19,
+                            1.4230465995303707,
+                            -0.8502013584631312
+                        ]
+                    ],
+                    "parameters": {
+                        "core_type": "none",
+                        "eprec": 1e-06,
+                        "field": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "no_orient": false,
+                        "psp_calc": false,
+                        "pure_ae": true,
+                        "source_name": "mad.in",
+                        "source_type": "inputfile",
+                        "symtol": -0.01,
+                        "units": "atomic"
+                    },
+                    "symbols": [
+                        "O",
+                        "H",
+                        "H"
+                    ]
+                },
+                "properties": {
+                    "dipole": {
+                        "dims": [
+                            3
+                        ],
+                        "ndim": 1,
+                        "size": 3,
+                        "vals": [
+                            -2.5745066141160157e-06,
+                            -6.636242806010706e-08,
+                            -0.3887784714018728
+                        ]
+                    },
+                    "energy": -76.06817529826044,
+                    "gradient": {
+                        "ndim": -1,
+                        "size": 0
+                    }
+                },
+                "scf_eigenvalues_a": {
+                    "dims": [
+                        5
+                    ],
+                    "ndim": 1,
+                    "size": 5,
+                    "vals": [
+                        -20.554654579087895,
+                        -0.9902237821558995,
+                        -0.9902236139545808,
+                        -0.7013160202593909,
+                        -0.5118628925021156
+                    ]
+                },
+                "scf_eigenvalues_b": {
+                    "ndim": -1,
+                    "size": 0
+                },
+                "scf_fock_a": {
+                    "ndim": -1,
+                    "size": 0
+                },
+                "scf_total_energy": 0.0
+            }
+        }
+    ]
+}

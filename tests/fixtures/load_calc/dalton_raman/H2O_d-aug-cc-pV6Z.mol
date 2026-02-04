@@ -1,0 +1,10 @@
+BASIS
+d-aug-cc-pV6Z
+blah
+blah
+Atomtype=2 Atomic Charge=0 Nosymmmetry
+Charge=8 Atoms=1
+ O_a        -2.3557317e-36       7.3788506e-09         -0.21210803
+Charge=1 Atoms=2
+H_a         4.8477702e-28           1.4230352          0.84843215
+H_b       -4.8477699e-28          -1.4230353           0.8484321

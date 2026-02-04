@@ -1,7 +1,0 @@
-Content of the .mol file
-----------------------------
-BASIS
-aug-cc-pVDZ
-Atomtype=1 Angstrom Charge=0 Nosymmetry
-Charge=1 Atoms=1
-H_a 0.0 0.0 0.0

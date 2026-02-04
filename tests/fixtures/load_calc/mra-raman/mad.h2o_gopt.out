@@ -1,0 +1,2612 @@
+MADNESS runtime initialized with 4 threads in the pool and affinity OFF
+
+================================================================================
+   MADQC -- Multiresolution Quantum Chemistry Code 
+================================================================================ 
+
+
+--------------------------------------------
+   MADNESS 0.10.1 multiresolution suite
+--------------------------------------------
+
+   number of processors ... 32
+    processor frequency ... 2.099956e+09
+     hostname of rank 0 ... xm071
+            host system ... Linux
+          configured by ... ahurtado
+          configured on ... xeonmax
+          configured at ... 2025-12-03T15:04:48
+                    CXX ... /gpfs/software/gcc/13.2.0/bin/g++
+               CXXFLAGS ... -std=c++20
+             tuning for ... default
+                    MPI ... serialized
+ multi-threaded runtime ... Intel TBB
+                   BLAS ... Intel MKL 62825 73112 MFLOP/s
+               compiled ... 11:24:16  on  Dec  5 2025
+    git source description ...     last_svn-5924-gc8715cf95
+    built date/time ...     Dec  5 2025/11:24:14
+
+input file  : mad.h2o_gopt.in
+workflow    : response
+
+ignoring unknown parameter in input file:  nuclear.atom_indices
+could not read data group >>nemo<< in file mad.h2o_gopt.in
+could not read data group >>optimization<< in file mad.h2o_gopt.in
+could not read data group >>oep<< in file mad.h2o_gopt.in
+could not read data group >>tdhf<< in file mad.h2o_gopt.in
+could not read data group >>cc2<< in file mad.h2o_gopt.in
+Group:  dft  JSON:  {
+    "dipole": true,
+    "econv": 1e-07,
+    "gopt": true,
+    "maxiter": 20,
+    "protocol": [
+        0.0001,
+        1e-06,
+        1e-07
+    ]
+}
+Group:  response  JSON:  {
+    "dipole.directions": "xyz",
+    "dipole.frequencies": [
+        0.0,
+        0.02,
+        0.04,
+        0.06,
+        0.08,
+        0.1
+    ],
+    "nuclear": true,
+    "nuclear.directions": "xyz",
+    "nuclear.frequencies": [
+        0.0
+    ],
+    "property": true,
+    "quadratic": true,
+    "requested_properties": [
+        "polarizability",
+        "raman"
+    ]
+}
+Group:  nemo  JSON:  null
+Group:  optimization  JSON:  null
+Group:  oep  JSON:  null
+Group:  tdhf  JSON:  null
+Group:  cc2  JSON:  null
+Group:  molecule  JSON:  {
+    "geometry": [
+        [
+            0.0,
+            0.0,
+            0.21293835
+        ],
+        [
+            0.0,
+            1.42131521,
+            -0.8517534
+        ],
+        [
+            0.0,
+            -1.42131521,
+            -0.8517534
+        ]
+    ],
+    "parameters": {
+        "eprec": 1e-06,
+        "units": "atomic"
+    },
+    "symbols": [
+        "O",
+        "H",
+        "H"
+    ]
+}
+input filename:  mad.in
+Running SCF in "mad.h2o_gopt/task_0/moldft"
+Validating SCF results:
+ Required protocol threshold:  1.000000e-07
+ Required density convergence:  1.000000e-04
+ Archive needed:  true
+ Need energy:  true
+ Need dipole:  true
+ Need gradient:  false
+Restart file:  mad.restartdata.00000
+at_protocol:  true
+archive_needed:  true
+archive_exists:  true
+energy_ok:  true
+dipole_ok:  true
+gradient_ok:  true
+Molecule from params:
+molecule
+               eprec  1.0000e-06 # defined   smoothing for the nuclear potential
+               units  atomic     # defined   coordinate units                        [atomic, angstrom, bohr, au]
+    O                     0                   0          0.21293835
+    H                     0           1.4213152          -0.8517534
+    H                     0          -1.4213152          -0.8517534
+end
+SCF results are valid, no need to rerun
+Ensure we are running on the correct molecule geometry
+Molecule from scf results :
+molecule
+         source_type  inputfile  # defined   where to get the coordinates from       [inputfile, xyz, library]
+         source_name  mad.in     # defined   name of the geometry from the library or the input file
+               eprec  1.0000e-06 # defined   smoothing for the nuclear potential
+               units  atomic     # defined   coordinate units                        [atomic, angstrom, bohr, au]
+               field  [0.0000e+00, 0.0000e+00, 0.0000e+00] # defined   external electric field
+           no_orient  false      # defined   if true the coordinates will not be reoriented and/or symmetrized
+              symtol  -1.0000e-02 # defined   distance threshold
+           core_type  none       # defined   core potential type                     [none, mcp]
+            psp_calc  false      # defined   pseudopotential calculation for all atoms
+             pure_ae  true       # defined   pure all electron calculation with no pseudo-atoms
+    O         6.0731476e-36       7.3788507e-09          0.21210803
+    H         2.3653926e-35           1.4230352         -0.84843215
+    H        -7.2239107e-35          -1.4230353          -0.8484321
+end
+Next action is  0  (0=Ok,1=ReloadOnly,2=Restart,3=Redo)
+Written checkpoint file:  moldft.calc_info.json
+response_input_json:  {
+    "response": {
+        "dipole.directions": "xyz",
+        "dipole.frequencies": [
+            0.0,
+            0.02,
+            0.04,
+            0.06,
+            0.08,
+            0.1
+        ],
+        "nuclear": true,
+        "nuclear.directions": "xyz",
+        "nuclear.frequencies": [
+            0.0
+        ],
+        "property": true,
+        "quadratic": true,
+        "requested_properties": [
+            "polarizability",
+            "raman"
+        ]
+    }
+}
+input filename:  response.in
+Running MolresponseLib::run_response() in directory:  "mad.h2o_gopt/task_1/molresponse"
+Ground state archive:  "mad.h2o_gopt/task_0/moldft"
+Relative path:  "../../task_0/moldft"
+Proximate path:  "../../task_0/moldft"
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Constructing GroundStateData for molecule: 
+molecule
+         source_type  inputfile  # defined   where to get the coordinates from       [inputfile, xyz, library]
+         source_name  mad.in     # defined   name of the geometry from the library or the input file
+               eprec  1.0000e-06 # defined   smoothing for the nuclear potential
+               units  atomic     # defined   coordinate units                        [atomic, angstrom, bohr, au]
+               field  [0.0000e+00, 0.0000e+00, 0.0000e+00] # defined   external electric field
+           no_orient  false      # defined   if true the coordinates will not be reoriented and/or symmetrized
+              symtol  -1.0000e-02 # defined   distance threshold
+           core_type  none       # defined   core potential type                     [none, mcp]
+            psp_calc  false      # defined   pseudopotential calculation for all atoms
+             pure_ae  true       # defined   pure all electron calculation with no pseudo-atoms
+    O        -6.0731476e-36       7.3788507e-09         -0.21210803
+    H        -2.3653926e-35           1.4230352          0.84843215
+    H         7.2239107e-35          -1.4230353           0.8484321
+end
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+Read molecule with  3  atoms.
+dipole.frequencies:  [0.000000e+00, 2.000000e-02, 4.000000e-02, 6.000000e-02, 8.000000e-02, 1.000000e-01]
+dipole.directions:  xyz
+nuclear.frequencies:  [0.000000e+00]
+nuclear.directions:  xyz
+requested_properties:  ["polarizability", "raman"]
+📋 Generated Response States:
+    #  State Description                       Type                Num Freqs 
+------------------------------------------------------------------------------------------
+0      Dipole_x                                Dipole              6         
+1      Dipole_y                                Dipole              6         
+2      Dipole_z                                Dipole              6         
+3      Nuc_0x                                  Nuclear             1         
+4      Nuc_0y                                  Nuclear             1         
+5      Nuc_0z                                  Nuclear             1         
+6      Nuc_1x                                  Nuclear             1         
+7      Nuc_1y                                  Nuclear             1         
+8      Nuc_1z                                  Nuclear             1         
+9      Nuc_2x                                  Nuclear             1         
+10     Nuc_2y                                  Nuclear             1         
+11     Nuc_2z                                  Nuclear             1         
+📋 Response State Summary
+#      State                           Protocol    Freq      Saved  Converged 
+------------------------------------------------------------------------------
+0      Dipole_x                        1e-07       0.000     ✔    ✔       
+1      Dipole_x                        1e-07       0.020     ✔    ✔       
+2      Dipole_x                        1e-07       0.040     ✘    ✘       
+3      Dipole_x                        1e-07       0.060     ✘    ✘       
+4      Dipole_x                        1e-07       0.080     ✘    ✘       
+5      Dipole_x                        1e-07       0.100     ✘    ✘       
+6      Dipole_x                        1e-06       0.000     ✔    ✔       
+7      Dipole_x                        1e-06       0.020     ✔    ✔       
+8      Dipole_x                        1e-06       0.040     ✔    ✔       
+9      Dipole_x                        1e-06       0.060     ✔    ✔       
+10     Dipole_x                        1e-06       0.080     ✔    ✔       
+11     Dipole_x                        1e-06       0.100     ✔    ✔       
+12     Dipole_x                        1e-04       0.000     ✔    ✔       
+13     Dipole_x                        1e-04       0.020     ✔    ✔       
+14     Dipole_x                        1e-04       0.040     ✔    ✔       
+15     Dipole_x                        1e-04       0.060     ✔    ✔       
+16     Dipole_x                        1e-04       0.080     ✔    ✔       
+17     Dipole_x                        1e-04       0.100     ✔    ✔       
+18     Dipole_y                        1e-07       0.000     ✔    ✔       
+19     Dipole_y                        1e-07       0.020     ✘    ✘       
+20     Dipole_y                        1e-07       0.040     ✘    ✘       
+21     Dipole_y                        1e-07       0.060     ✘    ✘       
+22     Dipole_y                        1e-07       0.080     ✘    ✘       
+23     Dipole_y                        1e-07       0.100     ✘    ✘       
+24     Dipole_y                        1e-06       0.000     ✔    ✔       
+25     Dipole_y                        1e-06       0.020     ✔    ✔       
+26     Dipole_y                        1e-06       0.040     ✔    ✔       
+27     Dipole_y                        1e-06       0.060     ✔    ✔       
+28     Dipole_y                        1e-06       0.080     ✔    ✔       
+29     Dipole_y                        1e-06       0.100     ✔    ✔       
+30     Dipole_y                        1e-04       0.000     ✔    ✔       
+31     Dipole_y                        1e-04       0.020     ✔    ✔       
+32     Dipole_y                        1e-04       0.040     ✔    ✔       
+33     Dipole_y                        1e-04       0.060     ✔    ✔       
+34     Dipole_y                        1e-04       0.080     ✔    ✔       
+35     Dipole_y                        1e-04       0.100     ✔    ✔       
+36     Dipole_z                        1e-07       0.000     ✔    ✔       
+37     Dipole_z                        1e-07       0.020     ✘    ✘       
+38     Dipole_z                        1e-07       0.040     ✘    ✘       
+39     Dipole_z                        1e-07       0.060     ✘    ✘       
+40     Dipole_z                        1e-07       0.080     ✘    ✘       
+41     Dipole_z                        1e-07       0.100     ✘    ✘       
+42     Dipole_z                        1e-06       0.000     ✔    ✔       
+43     Dipole_z                        1e-06       0.020     ✔    ✔       
+44     Dipole_z                        1e-06       0.040     ✔    ✔       
+45     Dipole_z                        1e-06       0.060     ✔    ✔       
+46     Dipole_z                        1e-06       0.080     ✔    ✔       
+47     Dipole_z                        1e-06       0.100     ✔    ✔       
+48     Dipole_z                        1e-04       0.000     ✔    ✔       
+49     Dipole_z                        1e-04       0.020     ✔    ✔       
+50     Dipole_z                        1e-04       0.040     ✔    ✔       
+51     Dipole_z                        1e-04       0.060     ✔    ✔       
+52     Dipole_z                        1e-04       0.080     ✔    ✔       
+53     Dipole_z                        1e-04       0.100     ✔    ✔       
+54     Nuc_0x                          1e-07       0.000     ✔    ✔       
+55     Nuc_0x                          1e-06       0.000     ✔    ✔       
+56     Nuc_0x                          1e-04       0.000     ✔    ✘       
+57     Nuc_0y                          1e-07       0.000     ✔    ✔       
+58     Nuc_0y                          1e-06       0.000     ✔    ✔       
+59     Nuc_0y                          1e-04       0.000     ✔    ✘       
+60     Nuc_0z                          1e-07       0.000     ✔    ✔       
+61     Nuc_0z                          1e-06       0.000     ✔    ✔       
+62     Nuc_0z                          1e-04       0.000     ✔    ✔       
+63     Nuc_1x                          1e-07       0.000     ✔    ✔       
+64     Nuc_1x                          1e-06       0.000     ✔    ✔       
+65     Nuc_1x                          1e-04       0.000     ✔    ✔       
+66     Nuc_1y                          1e-07       0.000     ✔    ✔       
+67     Nuc_1y                          1e-06       0.000     ✔    ✔       
+68     Nuc_1y                          1e-04       0.000     ✔    ✔       
+69     Nuc_1z                          1e-07       0.000     ✔    ✔       
+70     Nuc_1z                          1e-06       0.000     ✔    ✔       
+71     Nuc_1z                          1e-04       0.000     ✔    ✔       
+72     Nuc_2x                          1e-07       0.000     ✔    ✔       
+73     Nuc_2x                          1e-06       0.000     ✔    ✔       
+74     Nuc_2x                          1e-04       0.000     ✔    ✔       
+75     Nuc_2y                          1e-07       0.000     ✔    ✔       
+76     Nuc_2y                          1e-06       0.000     ✔    ✔       
+77     Nuc_2y                          1e-04       0.000     ✔    ✔       
+78     Nuc_2z                          1e-07       0.000     ✔    ✔       
+79     Nuc_2z                          1e-06       0.000     ✔    ✔       
+80     Nuc_2z                          1e-04       0.000     ✔    ✔       
+Checking state  Dipole_x_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.020_p1.00e-04  at thresh  1.000000e-04  freq  2.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.040_p1.00e-04  at thresh  1.000000e-04  freq  4.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.060_p1.00e-04  at thresh  1.000000e-04  freq  6.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.080_p1.00e-04  at thresh  1.000000e-04  freq  8.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.100_p1.00e-04  at thresh  1.000000e-04  freq  1.000000e-01  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.020_p1.00e-04  at thresh  1.000000e-04  freq  2.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.040_p1.00e-04  at thresh  1.000000e-04  freq  4.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.060_p1.00e-04  at thresh  1.000000e-04  freq  6.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.080_p1.00e-04  at thresh  1.000000e-04  freq  8.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.100_p1.00e-04  at thresh  1.000000e-04  freq  1.000000e-01  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.020_p1.00e-04  at thresh  1.000000e-04  freq  2.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.040_p1.00e-04  at thresh  1.000000e-04  freq  4.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.060_p1.00e-04  at thresh  1.000000e-04  freq  6.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.080_p1.00e-04  at thresh  1.000000e-04  freq  8.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.100_p1.00e-04  at thresh  1.000000e-04  freq  1.000000e-01  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_0x_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_0y_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_0z_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_1x_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_1y_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_1z_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_2x_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_2y_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_2z_f0.000_p1.00e-04  at thresh  1.000000e-04  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+✓ All states converged at thresh 1.000000e-04 skipping to next protocol.
+Checking state  Dipole_x_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.020_p1.00e-06  at thresh  1.000000e-06  freq  2.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.040_p1.00e-06  at thresh  1.000000e-06  freq  4.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.060_p1.00e-06  at thresh  1.000000e-06  freq  6.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.080_p1.00e-06  at thresh  1.000000e-06  freq  8.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_x_f0.100_p1.00e-06  at thresh  1.000000e-06  freq  1.000000e-01  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.020_p1.00e-06  at thresh  1.000000e-06  freq  2.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.040_p1.00e-06  at thresh  1.000000e-06  freq  4.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.060_p1.00e-06  at thresh  1.000000e-06  freq  6.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.080_p1.00e-06  at thresh  1.000000e-06  freq  8.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_y_f0.100_p1.00e-06  at thresh  1.000000e-06  freq  1.000000e-01  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.020_p1.00e-06  at thresh  1.000000e-06  freq  2.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.040_p1.00e-06  at thresh  1.000000e-06  freq  4.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.060_p1.00e-06  at thresh  1.000000e-06  freq  6.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.080_p1.00e-06  at thresh  1.000000e-06  freq  8.000000e-02  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Dipole_z_f0.100_p1.00e-06  at thresh  1.000000e-06  freq  1.000000e-01  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_0x_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_0y_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_0z_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_1x_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_1y_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_1z_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_2x_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_2y_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+Checking state  Nuc_2z_f0.000_p1.00e-06  at thresh  1.000000e-06  freq  0.000000e+00  is_saved= true  at_final_protocol= false  should_solve= false
+✓ All states converged at thresh 1.000000e-06 skipping to next protocol.
+Checking state  Dipole_x_f0.000_p1.00e-07  at thresh  1.000000e-07  freq  0.000000e+00  is_saved= true  at_final_protocol= true  should_solve= false
+Checking state  Dipole_x_f0.020_p1.00e-07  at thresh  1.000000e-07  freq  2.000000e-02  is_saved= true  at_final_protocol= true  should_solve= false
+Checking state  Dipole_x_f0.040_p1.00e-07  at thresh  1.000000e-07  freq  4.000000e-02  is_saved= false  at_final_protocol= true  should_solve= true
+
+MRA Protocol Set: thresh = 1.000000e-07 , k = 10 
+
+
+Ground State Orbital Information:
+------------------------
+XC Functional: hf
+Localization Method: new
+Spin Restricted: true
+Number of Orbitals: 5
+Box Size L: 5.142100e+01
+Wavelet Order k: 10
+Converged for Threshold: 1.000000e-07
+Orbital Energies: [*] -20.55465566 -0.99021975  -0.99021963  -0.70132205  -0.51186311 
+
+Frequencies to process:
+[0.000000e+00, 2.000000e-02, 4.000000e-02, 6.000000e-02, 8.000000e-02, 1.000000e-01]
+▶️ Solving for state  Dipole_x_f0.000_p1.00e-07  at protocol  1.000000e-07  frequency  0.000000e+00  is_saved= true  at_final_protocol= true  converged  true
+▶️ Solving for state  Dipole_x_f0.020_p1.00e-07  at protocol  1.000000e-07  frequency  2.000000e-02  is_saved= true  at_final_protocol= true  converged  true
+▶️ Solving for state  Dipole_x_f0.040_p1.00e-07  at protocol  1.000000e-07  frequency  4.000000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_x_f0.040_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.940e-02s | CPU: 2.940e-02s | Value:  6.1088092 |
+⏱️ [g0_task]               | Wall:   5.086s | CPU:   5.086s |
+⏱️ [gx_task]               | Wall:  13.020s | CPU:  13.020s |
+⏱️ [compute_rsh]           | Wall:  22.163s | CPU:  22.164s |
+⏱️ [KAIN step]             | Wall:   0.060s | CPU:   0.060s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0003332 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0001078 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  7.8698119 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    3.332e-04 │    1.078e-04 │    7.870e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_x_f0.040_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0294    0.0604    0.0000   22.1634    0.0000    5.0856   13.0199    0.0000
+
+📋 Values for Dipole_x_f0.040_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     6.10881e+00     7.86981e+00     1.07830e-04     3.33218e-04
+✅ Saving response vector to: Dipole_x_f0.040_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_x_f0.060_p1.00e-07  at protocol  1.00000e-07  frequency  6.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_x_f0.060_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 3.000e-02s | CPU: 3.000e-02s | Value:  6.3087729 |
+⏱️ [g0_task]               | Wall:   4.902s | CPU:   4.902s |
+⏱️ [gx_task]               | Wall:  13.067s | CPU:  13.067s |
+⏱️ [compute_rsh]           | Wall:  22.141s | CPU:  22.141s |
+⏱️ [KAIN step]             | Wall:   0.061s | CPU:   0.061s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0002854 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000635 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  7.9240801 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    2.854e-04 │    6.351e-05 │    7.924e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_x_f0.060_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0300    0.0613    0.0000   22.1412    0.0000    4.9017   13.0669    0.0000
+
+📋 Values for Dipole_x_f0.060_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     6.30877e+00     7.92408e+00     6.35145e-05     2.85432e-04
+✅ Saving response vector to: Dipole_x_f0.060_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_x_f0.080_p1.00e-07  at protocol  1.00000e-07  frequency  8.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_x_f0.080_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.985e-02s | CPU: 2.985e-02s | Value:  6.6070953 |
+⏱️ [g0_task]               | Wall:   4.814s | CPU:   4.814s |
+⏱️ [gx_task]               | Wall:  12.896s | CPU:  12.896s |
+⏱️ [compute_rsh]           | Wall:  21.696s | CPU:  21.696s |
+⏱️ [KAIN step]             | Wall:   0.060s | CPU:   0.060s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0003207 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000787 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.0025551 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    3.207e-04 │    7.871e-05 │    8.003e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_x_f0.080_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0298    0.0604    0.0000   21.6956    0.0000    4.8140   12.8962    0.0000
+
+📋 Values for Dipole_x_f0.080_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     6.60710e+00     8.00256e+00     7.87079e-05     3.20729e-04
+✅ Saving response vector to: Dipole_x_f0.080_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_x_f0.100_p1.00e-07  at protocol  1.00000e-07  frequency  1.00000e-01  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_x_f0.100_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.959e-02s | CPU: 2.959e-02s | Value:  7.0238584 |
+⏱️ [g0_task]               | Wall:   4.853s | CPU:   4.853s |
+⏱️ [gx_task]               | Wall:  13.476s | CPU:  13.476s |
+⏱️ [compute_rsh]           | Wall:  22.355s | CPU:  22.355s |
+⏱️ [KAIN step]             | Wall:   0.064s | CPU:   0.064s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0004398 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0002613 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.1072452 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    4.398e-04 │    2.613e-04 │    8.107e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_x_f0.100_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0296    0.0636    0.0000   22.3548    0.0000    4.8530   13.4757    0.0000
+
+📋 Values for Dipole_x_f0.100_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     7.02386e+00     8.10725e+00     2.61326e-04     4.39767e-04
+✅ Saving response vector to: Dipole_x_f0.100_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00, 2.00000e-02, 4.00000e-02, 6.00000e-02, 8.00000e-02, 1.00000e-01]
+▶️ Solving for state  Dipole_y_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+▶️ Solving for state  Dipole_y_f0.020_p1.00e-07  at protocol  1.00000e-07  frequency  2.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_y_f0.020_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 3.015e-02s | CPU: 3.016e-02s | Value:  5.5893590 |
+⏱️ [g0_task]               | Wall:   4.743s | CPU:   4.743s |
+⏱️ [gx_task]               | Wall:  13.298s | CPU:  13.298s |
+⏱️ [compute_rsh]           | Wall:  22.553s | CPU:  22.553s |
+⏱️ [KAIN step]             | Wall:   0.065s | CPU:   0.065s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0006259 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000708 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.8748700 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    6.259e-04 │    7.077e-05 │    8.875e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_y_f0.020_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0302    0.0650    0.0000   22.5532    0.0000    4.7425   13.2976    0.0000
+
+📋 Values for Dipole_y_f0.020_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     5.58936e+00     8.87487e+00     7.07653e-05     6.25912e-04
+✅ Saving response vector to: Dipole_y_f0.020_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_y_f0.040_p1.00e-07  at protocol  1.00000e-07  frequency  4.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_y_f0.040_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.985e-02s | CPU: 2.985e-02s | Value:  5.6447404 |
+⏱️ [g0_task]               | Wall:   4.859s | CPU:   4.859s |
+⏱️ [gx_task]               | Wall:  13.557s | CPU:  13.557s |
+⏱️ [compute_rsh]           | Wall:  23.199s | CPU:  23.199s |
+⏱️ [KAIN step]             | Wall:   0.067s | CPU:   0.067s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0028720 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0004634 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.8975260 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    2.872e-03 │    4.634e-04 │    8.898e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_y_f0.040_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0299    0.0669    0.0000   23.1986    0.0000    4.8590   13.5565    0.0000
+
+📋 Values for Dipole_y_f0.040_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     5.64474e+00     8.89753e+00     4.63431e-04     2.87201e-03
+✅ Saving response vector to: Dipole_y_f0.040_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_y_f0.060_p1.00e-07  at protocol  1.00000e-07  frequency  6.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_y_f0.060_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 3.084e-02s | CPU: 3.084e-02s | Value:  5.7445006 |
+⏱️ [g0_task]               | Wall:   4.855s | CPU:   4.856s |
+⏱️ [gx_task]               | Wall:  13.323s | CPU:  13.323s |
+⏱️ [compute_rsh]           | Wall:  22.706s | CPU:  22.706s |
+⏱️ [KAIN step]             | Wall:   0.065s | CPU:   0.065s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0007456 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000551 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.9385470 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    7.456e-04 │    5.510e-05 │    8.939e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_y_f0.060_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0308    0.0654    0.0000   22.7057    0.0000    4.8555   13.3230    0.0000
+
+📋 Values for Dipole_y_f0.060_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     5.74450e+00     8.93855e+00     5.50969e-05     7.45595e-04
+✅ Saving response vector to: Dipole_y_f0.060_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_y_f0.080_p1.00e-07  at protocol  1.00000e-07  frequency  8.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_y_f0.080_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.978e-02s | CPU: 2.978e-02s | Value:  5.8828099 |
+⏱️ [g0_task]               | Wall:   4.814s | CPU:   4.814s |
+⏱️ [gx_task]               | Wall:  13.375s | CPU:  13.375s |
+⏱️ [compute_rsh]           | Wall:  22.456s | CPU:  22.456s |
+⏱️ [KAIN step]             | Wall:   0.066s | CPU:   0.066s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0004527 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000700 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.9936701 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    4.527e-04 │    7.000e-05 │    8.994e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_y_f0.080_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0298    0.0659    0.0000   22.4558    0.0000    4.8143   13.3746    0.0000
+
+📋 Values for Dipole_y_f0.080_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     5.88281e+00     8.99367e+00     6.99953e-05     4.52689e-04
+✅ Saving response vector to: Dipole_y_f0.080_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_y_f0.100_p1.00e-07  at protocol  1.00000e-07  frequency  1.00000e-01  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_y_f0.100_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 3.074e-02s | CPU: 3.074e-02s | Value:  6.0687810 |
+⏱️ [g0_task]               | Wall:   4.829s | CPU:   4.829s |
+⏱️ [gx_task]               | Wall:  13.378s | CPU:  13.378s |
+⏱️ [compute_rsh]           | Wall:  22.953s | CPU:  22.953s |
+⏱️ [KAIN step]             | Wall:   0.065s | CPU:   0.065s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0006601 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000533 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  9.0679304 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    6.601e-04 │    5.327e-05 │    9.068e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_y_f0.100_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0307    0.0653    0.0000   22.9531    0.0000    4.8286   13.3779    0.0000
+
+📋 Values for Dipole_y_f0.100_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     6.06878e+00     9.06793e+00     5.32671e-05     6.60066e-04
+✅ Saving response vector to: Dipole_y_f0.100_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00, 2.00000e-02, 4.00000e-02, 6.00000e-02, 8.00000e-02, 1.00000e-01]
+▶️ Solving for state  Dipole_z_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+▶️ Solving for state  Dipole_z_f0.020_p1.00e-07  at protocol  1.00000e-07  frequency  2.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_z_f0.020_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.986e-02s | CPU: 2.986e-02s | Value:  5.6674325 |
+⏱️ [g0_task]               | Wall:   4.846s | CPU:   4.846s |
+⏱️ [gx_task]               | Wall:  13.717s | CPU:  13.717s |
+⏱️ [compute_rsh]           | Wall:  22.872s | CPU:  22.872s |
+⏱️ [KAIN step]             | Wall:   0.066s | CPU:   0.066s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0005332 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000702 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.2903089 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    5.332e-04 │    7.018e-05 │    8.290e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_z_f0.020_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0299    0.0658    0.0000   22.8718    0.0000    4.8456   13.7173    0.0000
+
+📋 Values for Dipole_z_f0.020_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     5.66743e+00     8.29031e+00     7.01775e-05     5.33240e-04
+✅ Saving response vector to: Dipole_z_f0.020_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_z_f0.040_p1.00e-07  at protocol  1.00000e-07  frequency  4.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_z_f0.040_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.961e-02s | CPU: 2.961e-02s | Value:  5.7450032 |
+⏱️ [g0_task]               | Wall:   5.014s | CPU:   5.014s |
+⏱️ [gx_task]               | Wall:  13.257s | CPU:  13.257s |
+⏱️ [compute_rsh]           | Wall:  22.838s | CPU:  22.838s |
+⏱️ [KAIN step]             | Wall:   0.068s | CPU:   0.068s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0006670 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0001953 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.3164050 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    6.670e-04 │    1.953e-04 │    8.316e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_z_f0.040_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0296    0.0680    0.0000   22.8378    0.0000    5.0137   13.2572    0.0000
+
+📋 Values for Dipole_z_f0.040_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     5.74500e+00     8.31641e+00     1.95326e-04     6.67034e-04
+✅ Saving response vector to: Dipole_z_f0.040_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_z_f0.060_p1.00e-07  at protocol  1.00000e-07  frequency  6.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_z_f0.060_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 3.009e-02s | CPU: 3.009e-02s | Value:  5.8791215 |
+⏱️ [g0_task]               | Wall:   4.949s | CPU:   4.949s |
+⏱️ [gx_task]               | Wall:  13.364s | CPU:  13.364s |
+⏱️ [compute_rsh]           | Wall:  22.654s | CPU:  22.655s |
+⏱️ [KAIN step]             | Wall:   0.067s | CPU:   0.067s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0003958 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000798 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.3617455 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    3.958e-04 │    7.980e-05 │    8.362e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_z_f0.060_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0301    0.0673    0.0000   22.6545    0.0000    4.9485   13.3642    0.0000
+
+📋 Values for Dipole_z_f0.060_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     5.87912e+00     8.36175e+00     7.97980e-05     3.95832e-04
+✅ Saving response vector to: Dipole_z_f0.060_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_z_f0.080_p1.00e-07  at protocol  1.00000e-07  frequency  8.00000e-02  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_z_f0.080_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.947e-02s | CPU: 2.947e-02s | Value:  6.0737869 |
+⏱️ [g0_task]               | Wall:   4.973s | CPU:   4.973s |
+⏱️ [gx_task]               | Wall:  13.759s | CPU:  13.759s |
+⏱️ [compute_rsh]           | Wall:  23.177s | CPU:  23.177s |
+⏱️ [KAIN step]             | Wall:   0.066s | CPU:   0.066s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0002966 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0000950 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.4260743 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    2.966e-04 │    9.504e-05 │    8.426e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_z_f0.080_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0295    0.0661    0.0000   23.1771    0.0000    4.9727   13.7588    0.0000
+
+📋 Values for Dipole_z_f0.080_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     6.07379e+00     8.42607e+00     9.50413e-05     2.96573e-04
+✅ Saving response vector to: Dipole_z_f0.080_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+▶️ Solving for state  Dipole_z_f0.100_p1.00e-07  at protocol  1.00000e-07  frequency  1.00000e-01  is_saved= false  at_final_protocol= true  converged  false
+Reconstructing response vector with k= 10
+Starting state: Dipole_z_f0.100_p1.00e-07 
+
+⏱️ [<x|x>]                 | Wall: 2.930e-02s | CPU: 2.930e-02s | Value:  6.3383195 |
+⏱️ [g0_task]               | Wall:   5.067s | CPU:   5.067s |
+⏱️ [gx_task]               | Wall:  13.412s | CPU:  13.413s |
+⏱️ [compute_rsh]           | Wall:  22.959s | CPU:  22.959s |
+⏱️ [KAIN step]             | Wall:   0.068s | CPU:   0.068s |
+⏱️ [res_norm]              | Wall:   0.000s | CPU:   0.000s | Value:  0.0003439 |
+⏱️ [drho_change]           | Wall:   0.000s | CPU:   0.000s | Value:  0.0001211 |
+⏱️ [alpha]                 | Wall:   0.000s | CPU:   0.000s | Value:  8.5114162 |
+  Iter │     Residual │         Δρ │       <x|Vp> │ Targets
+------─┼─------------─┼─------------─┼─------------─┼─-------------------
+     0 │    3.439e-04 │    1.211e-04 │    8.511e+00 │ ||x||≤5.000e-03,||Δρ||≤5.000e-04
+
+⏱️ Timing for Dipole_z_f0.100_p1.00e-07 | proto=1e-07 | freq=true
+  Iter     <x|x>     KAIN      alpha     compu     drho_     g0_ta     gx_ta     res_n
+--------------------------------------------------------------------------------------
+     0    0.0293    0.0683    0.0000   22.9588    0.0000    5.0673   13.4124    0.0000
+
+📋 Values for Dipole_z_f0.100_p1.00e-07 | proto=1e-07 | freq=true
+  Iter           <x|x>           alpha     drho_change        res_norm
+----------------------------------------------------------------------
+     0     6.33832e+00     8.51142e+00     1.21099e-04     3.43864e-04
+✅ Saving response vector to: Dipole_z_f0.100_p1.00e-07
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_0x_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_0y_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_0z_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_1x_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_1y_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_1z_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_2x_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_2y_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+Frequencies to process:
+[0.00000e+00]
+▶️ Solving for state  Nuc_2z_f0.000_p1.00e-07  at protocol  1.00000e-07  frequency  0.00000e+00  is_saved= true  at_final_protocol= true  converged  true
+📂 Wrote response debug log to response_log.json
+
+MRA Protocol Set: thresh = 1.00000e-07 , k = 10 
+
+
+Ground State Orbital Information:
+------------------------
+XC Functional: hf
+Localization Method: new
+Spin Restricted: true
+Number of Orbitals: 5
+Box Size L: 5.14210e+01
+Wavelet Order k: 10
+Converged for Threshold: 1.00000e-07
+Orbital Energies: [*] -20.55465566  -0.99021975  -0.99021963  -0.70132205  -0.51186311
+
+▶️ Computing polarizability α...
+Direction keys: [Dipole_x, Dipole_y, Dipole_z]
+α tensor size: 9 x 9
+α=  [0,*]   7.82732463   0.00000001  -0.00005482
+[1,*]   0.00000001   8.86913589   0.00000010
+[2,*]  -0.00003826   0.00000010   8.28239770
+
+α tensor size: 9 x 9
+α=  [0,*]   7.83778215   0.00000001  -0.00000376
+[1,*]   0.00000001   8.87487002   0.00000010
+[2,*]  -0.00001096   0.00000010   8.29030886
+
+α tensor size: 9 x 9
+α=  [0,*]   7.86981185   0.00000001   0.00003919
+[1,*]   0.00000001   8.89752596   0.00000010
+[2,*]  -0.00003274   0.00000010   8.31640501
+
+α tensor size: 9 x 9
+α=  [0,*]   7.92408006   0.00000001  -0.00000322
+[1,*]   0.00000001   8.93854705   0.00000010
+[2,*]  -0.00003599   0.00000011   8.36174552
+
+α tensor size: 9 x 9
+α=  [0,*]   8.00255515   0.00000001   0.00003133
+[1,*]   0.00000001   8.99367011   0.00000011
+[2,*]  -0.00009139   0.00000011   8.42607430
+
+α tensor size: 9 x 9
+α=  [0,*]   8.10724523   0.00000001  -0.00023418
+[1,*]   0.00000001   9.06793039   0.00000011
+[2,*]  -0.00004842   0.00000011   8.51141617
+
+------------------------- Raman Computation -------------------------
+Loading response vector for  Nuc_0x
+Loading response vector for  Nuc_0y
+Loading response vector for  Nuc_0z
+Loading response vector for  Nuc_1x
+Loading response vector for  Nuc_1y
+Loading response vector for  Nuc_1z
+Loading response vector for  Nuc_2x
+Loading response vector for  Nuc_2y
+Loading response vector for  Nuc_2z
+
+ raw electronic Hessian (a.u.)
+
+[0,*]   0.00000000   0.00000001  -0.00021756  -1.43049477  -0.00000138   0.00000474  -1.43049470   0.00000138   0.00000474
+[1,*]  -0.00000071   0.00000000  -0.00001429   0.00000762   0.92155941  -1.75307677  -0.00000762   0.92155924   1.75307657
+[2,*]  -0.00387134   0.00000010   0.00000000   0.00002864  -1.81822352  -0.16103681   0.00002864   1.81822344  -0.16103682
+[3,*]  -1.43259571   0.00028879  -0.00044873   0.00000000  -0.00014400   0.00010495  -0.04362071   0.00014997   0.00009696
+[4,*]  -0.00003148   0.91718765  -1.81521465   0.00000082   0.00000000   1.78590860  -0.00000072   0.05400323   0.03224877
+[5,*]  -0.00127205  -1.76831935  -0.15961838   0.00000019   1.78588969   0.00000000  -0.00000604  -0.03245901  -0.02525647
+[6,*]  -1.43259565  -0.00028879  -0.00044875  -0.04362071  -0.00014997   0.00009696   0.00000000   0.00014400   0.00010495
+[7,*]   0.00003148   0.91718763   1.81521458   0.00000072   0.05400323  -0.03224877  -0.00000082   0.00000000  -1.78590851
+[8,*]  -0.00127205   1.76831926  -0.15961840  -0.00000604   0.03245901  -0.02525647   0.00000019  -1.78588961   0.00000000
+
+
+ electronic Hessian (a.u.)
+
+[0,*]   2.86098948  -0.00000035  -0.00204445  -1.43049477  -0.00000138   0.00000474  -1.43049470   0.00000138   0.00000474
+[1,*]  -0.00000035  -1.84311865  -0.00000710   0.00000762   0.92155941  -1.75307677  -0.00000762   0.92155924   1.75307657
+[2,*]  -0.00204445  -0.00000710   0.32207364   0.00002864  -1.81822352  -0.16103681   0.00002864   1.81822344  -0.16103682
+[3,*]  -1.43049477   0.00000762   0.00002864   1.47411548  -0.00007159   0.00005257  -0.04362071   0.00007534   0.00004546
+[4,*]  -0.00000138   0.92155941  -1.81822352  -0.00007159  -0.97556264   1.78589914  -0.00007534   0.05400323   0.03235389
+[5,*]   0.00000474  -1.75307677  -0.16103681   0.00005257   1.78589914   0.18629328   0.00004546  -0.03235389  -0.02525647
+[6,*]  -1.43049470  -0.00000762   0.00002864  -0.04362071  -0.00007534   0.00004546   1.47411541   0.00007159   0.00005257
+[7,*]   0.00000138   0.92155924   1.81822344   0.00007534   0.05400323  -0.03235389   0.00007159  -0.97556247  -1.78589906
+[8,*]   0.00000474   1.75307657  -0.16103682   0.00004546   0.03235389  -0.02525647   0.00005257  -1.78589906   0.18629329
+
+
+ Hessian (a.u.)
+
+[0,*]  -0.00121559  -0.00000035  -0.00204445   0.00060780  -0.00000138   0.00000474   0.00060779   0.00000138   0.00000474
+[1,*]  -0.00000035   0.81511786  -0.00000722   0.00000762  -0.40755887   0.30402273  -0.00000762  -0.40755899  -0.30402281
+[2,*]  -0.00204445  -0.00000722   0.52604220   0.00002864   0.23887598  -0.26302111   0.00002864  -0.23887593  -0.26302108
+[3,*]   0.00060780   0.00000762   0.00002864  -0.00036444  -0.00007159   0.00005257  -0.00024336   0.00007534   0.00004546
+[4,*]  -0.00000138  -0.40755887   0.23887598  -0.00007159   0.44031035  -0.27120035  -0.00007534  -0.03275148   0.03235389
+[5,*]   0.00000474   0.30402273  -0.26302111   0.00005257  -0.27120035   0.24490022   0.00004546  -0.03235389   0.01812089
+[6,*]   0.00060779  -0.00000762   0.00002864  -0.00024336  -0.00007534   0.00004546  -0.00036443   0.00007159   0.00005257
+[7,*]   0.00000138  -0.40755899  -0.23887593   0.00007534  -0.03275148  -0.03235389   0.00007159   0.44031047   0.27120031
+[8,*]   0.00000474  -0.30402281  -0.26302108   0.00004546   0.03235389   0.01812089   0.00005257   0.27120031   0.24490020
+
+mass-weighted unprojected hessian
+[0,*]  -0.00000004  -0.00000000  -0.00000007   0.00000008  -0.00000000   0.00000000   0.00000008   0.00000000   0.00000000
+[1,*]  -0.00000000   0.00002795  -0.00000000   0.00000000  -0.00005568   0.00004153  -0.00000000  -0.00005568  -0.00004153
+[2,*]  -0.00000007  -0.00000000   0.00001804   0.00000000   0.00003263  -0.00003593   0.00000000  -0.00003263  -0.00003593
+[3,*]   0.00000008   0.00000000   0.00000000  -0.00000020  -0.00000004   0.00000003  -0.00000013   0.00000004   0.00000002
+[4,*]  -0.00000000  -0.00005568   0.00003263  -0.00000004   0.00023964  -0.00014760  -0.00000004  -0.00001783   0.00001761
+[5,*]   0.00000000   0.00004153  -0.00003593   0.00000003  -0.00014760   0.00013329   0.00000002  -0.00001761   0.00000986
+[6,*]   0.00000008  -0.00000000   0.00000000  -0.00000013  -0.00000004   0.00000002  -0.00000020   0.00000004   0.00000003
+[7,*]   0.00000000  -0.00005568  -0.00003263   0.00000004  -0.00001783  -0.00001761   0.00000004   0.00023964   0.00014760
+[8,*]   0.00000000  -0.00004153  -0.00003593   0.00000002   0.00001761   0.00000986   0.00000003   0.00014760   0.00013329
+
+mass-weighted unprojected hessian; mass-weighing undone
+[0,*]  -0.00121559  -0.00000035  -0.00204445   0.00060780  -0.00000138   0.00000474   0.00060779   0.00000138   0.00000474
+[1,*]  -0.00000035   0.81511786  -0.00000722   0.00000762  -0.40755887   0.30402273  -0.00000762  -0.40755899  -0.30402281
+[2,*]  -0.00204445  -0.00000722   0.52604220   0.00002864   0.23887598  -0.26302111   0.00002864  -0.23887593  -0.26302108
+[3,*]   0.00060780   0.00000762   0.00002864  -0.00036444  -0.00007159   0.00005257  -0.00024336   0.00007534   0.00004546
+[4,*]  -0.00000138  -0.40755887   0.23887598  -0.00007159   0.44031035  -0.27120035  -0.00007534  -0.03275148   0.03235389
+[5,*]   0.00000474   0.30402273  -0.26302111   0.00005257  -0.27120035   0.24490022   0.00004546  -0.03235389   0.01812089
+[6,*]   0.00060779  -0.00000762   0.00002864  -0.00024336  -0.00007534   0.00004546  -0.00036443   0.00007159   0.00005257
+[7,*]   0.00000138  -0.40755899  -0.23887593   0.00007534  -0.03275148  -0.03235389   0.00007159   0.44031047   0.27120031
+[8,*]   0.00000474  -0.30402281  -0.26302108   0.00004546   0.03235389   0.01812089   0.00005257   0.27120031   0.24490020
+
+
+ vibrational frequencies (unprojected) (a.u.)
+
+[*]  -0.00061455  -0.00025687  -0.00022664  -0.00014164   0.00023775   0.00049271   0.00795152   0.01885284   0.01931242
+
+
+ vibrational frequencies (unprojected) (cm-1)
+
+[*] -134.87771858 -56.37558633 -49.74103376 -31.08576393  52.17943280 108.13630705 1745.15610878 4137.71983151 4238.58728345
+
+mass-weighted hessian with translation and rotation projected out
+[0,*]   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000  -0.00000000   0.00000000  -0.00000000  -0.00000000
+[1,*]   0.00000000   0.00002795  -0.00000000   0.00000000  -0.00005568   0.00004149   0.00000000  -0.00005568  -0.00004149
+[2,*]   0.00000000  -0.00000000   0.00001804  -0.00000000   0.00003263  -0.00003593  -0.00000000  -0.00003263  -0.00003593
+[3,*]   0.00000000   0.00000000  -0.00000000   0.00000000  -0.00000000   0.00000000   0.00000000  -0.00000000  -0.00000000
+[4,*]   0.00000000  -0.00005568   0.00003263  -0.00000000   0.00023964  -0.00014765  -0.00000000  -0.00001782   0.00001766
+[5,*]  -0.00000000   0.00004149  -0.00003593   0.00000000  -0.00014765   0.00013318   0.00000000  -0.00001766   0.00000997
+[6,*]   0.00000000   0.00000000  -0.00000000   0.00000000  -0.00000000   0.00000000   0.00000000  -0.00000000  -0.00000000
+[7,*]  -0.00000000  -0.00005568  -0.00003263  -0.00000000  -0.00001782  -0.00001766  -0.00000000   0.00023964   0.00014765
+[8,*]  -0.00000000  -0.00004149  -0.00003593  -0.00000000   0.00001766   0.00000997  -0.00000000   0.00014765   0.00013318
+
+mass-weighted unprojected hessian; mass-weighing undone
+[0,*]   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000  -0.00000000   0.00000000  -0.00000000  -0.00000000
+[1,*]   0.00000000   0.81512159  -0.00000009   0.00000000  -0.40756076   0.30374136   0.00000000  -0.40756083  -0.30374127
+[2,*]   0.00000000  -0.00000009   0.52604220  -0.00000000   0.23884979  -0.26302113  -0.00000000  -0.23884970  -0.26302106
+[3,*]   0.00000000   0.00000000  -0.00000000   0.00000000  -0.00000000   0.00000000   0.00000000  -0.00000000  -0.00000000
+[4,*]   0.00000000  -0.40756076   0.23884979  -0.00000000   0.44031131  -0.27129554  -0.00000000  -0.03275055   0.03244575
+[5,*]  -0.00000000   0.30374136  -0.26302113   0.00000000  -0.27129554   0.24469466   0.00000000  -0.03244582   0.01832647
+[6,*]   0.00000000   0.00000000  -0.00000000   0.00000000  -0.00000000   0.00000000   0.00000000  -0.00000000  -0.00000000
+[7,*]  -0.00000000  -0.40756083  -0.23884970  -0.00000000  -0.03275055  -0.03244582  -0.00000000   0.44031138   0.27129552
+[8,*]  -0.00000000  -0.30374127  -0.26302106  -0.00000000   0.03244575   0.01832647  -0.00000000   0.27129552   0.24469459
+
+
+projected vibrational frequencies (cm-1)
+
+frequency in cm-1       -0.000    -0.000    -0.000    -0.000    -0.000     0.000  1745.156  4137.720  4238.587
+ Mass-weighted
+
+[0,*]   0.00585556   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000
+[1,*]   0.00000000   0.00585556   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000
+[2,*]   0.00000000   0.00000000   0.00585556   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000
+[3,*]   0.00000000   0.00000000   0.00000000   0.02332935   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000
+[4,*]   0.00000000   0.00000000   0.00000000   0.00000000   0.02332935   0.00000000   0.00000000   0.00000000   0.00000000
+[5,*]   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.02332935   0.00000000   0.00000000   0.00000000
+[6,*]   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.02332935   0.00000000   0.00000000
+[7,*]   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.02332935   0.00000000
+[8,*]   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.00000000   0.02332935
+
+
+ Normal modes (a.u.)
+
+[0,*]   0.00000000  -0.00000000   0.00000000   0.00000360  -0.00585555  -0.00000000  -0.00000000   0.00000000   0.00000000
+[1,*]   0.00268202   0.00055986  -0.00348871  -0.00000000  -0.00000000  -0.00346994   0.00000000   0.00000000   0.00160292
+[2,*]   0.00289386  -0.00223039   0.00370132  -0.00000000   0.00000000  -0.00184445   0.00159701   0.00113414  -0.00000000
+[3,*]   0.00000000  -0.00000000  -0.00000000   0.02332934   0.00001435  -0.00000000  -0.00000000  -0.00000000   0.00000000
+[4,*]  -0.00522989  -0.00165584  -0.00132236   0.00000000  -0.00000000  -0.00885675  -0.00955154   0.01344981  -0.01272183
+[5,*]  -0.00772235  -0.00520342   0.00660813  -0.00000000   0.00000000  -0.00907250  -0.01267499  -0.00900128   0.00948115
+[6,*]  -0.00053623  -0.02066902  -0.00926313   0.00000000  -0.00000000   0.00556392   0.00000000  -0.00000000   0.00000000
+[7,*]  -0.00522989  -0.00165584  -0.00132236   0.00000000  -0.00000000  -0.00885675   0.00955153  -0.01344981  -0.01272183
+[8,*]   0.01351007   0.00074265   0.00079450  -0.00000000   0.00000000   0.00538359  -0.01267499  -0.00900129  -0.00948115
+
+
+ Mass-weighted normal modes atomic units (a.u.)
+
+[0,*]   0.00000000  -0.00000000   0.00000000   0.00000360  -0.00585555  -0.00000000  -0.00000000   0.00000000   0.00000000
+[1,*]   0.00268202   0.00055986  -0.00348871  -0.00000000  -0.00000000  -0.00346994   0.00000000   0.00000000   0.00160292
+[2,*]   0.00289386  -0.00223039   0.00370132  -0.00000000   0.00000000  -0.00184445   0.00159701   0.00113414  -0.00000000
+[3,*]   0.00000000  -0.00000000  -0.00000000   0.02332934   0.00001435  -0.00000000  -0.00000000  -0.00000000   0.00000000
+[4,*]  -0.00522989  -0.00165584  -0.00132236   0.00000000  -0.00000000  -0.00885675  -0.00955154   0.01344981  -0.01272183
+[5,*]  -0.00772235  -0.00520342   0.00660813  -0.00000000   0.00000000  -0.00907250  -0.01267499  -0.00900128   0.00948115
+[6,*]  -0.00053623  -0.02066902  -0.00926313   0.00000000  -0.00000000   0.00556392   0.00000000  -0.00000000   0.00000000
+[7,*]  -0.00522989  -0.00165584  -0.00132236   0.00000000  -0.00000000  -0.00885675   0.00955153  -0.01344981  -0.01272183
+[8,*]   0.01351007   0.00074265   0.00079450  -0.00000000   0.00000000   0.00538359  -0.01267499  -0.00900129  -0.00948115
+
+normal modes in atomic coordinates (au): 
+ [0,*]   0.00000000  -0.00000000   0.00000000   0.00000360  -0.00585555  -0.00000000  -0.00000000   0.00000000   0.00000000
+[1,*]   0.00268202   0.00055986  -0.00348871  -0.00000000  -0.00000000  -0.00346994   0.00000000   0.00000000   0.00160292
+[2,*]   0.00289386  -0.00223039   0.00370132  -0.00000000   0.00000000  -0.00184445   0.00159701   0.00113414  -0.00000000
+[3,*]   0.00000000  -0.00000000  -0.00000000   0.02332934   0.00001435  -0.00000000  -0.00000000  -0.00000000   0.00000000
+[4,*]  -0.00522989  -0.00165584  -0.00132236   0.00000000  -0.00000000  -0.00885675  -0.00955154   0.01344981  -0.01272183
+[5,*]  -0.00772235  -0.00520342   0.00660813  -0.00000000   0.00000000  -0.00907250  -0.01267499  -0.00900128   0.00948115
+[6,*]  -0.00053623  -0.02066902  -0.00926313   0.00000000  -0.00000000   0.00556392   0.00000000  -0.00000000   0.00000000
+[7,*]  -0.00522989  -0.00165584  -0.00132236   0.00000000  -0.00000000  -0.00885675   0.00955153  -0.01344981  -0.01272183
+[8,*]   0.01351007   0.00074265   0.00079450  -0.00000000   0.00000000   0.00538359  -0.01267499  -0.00900129  -0.00948115
+
+[6, 7, 8]
+6 8
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_0x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_0x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00002904
+[1,*]  -0.00000001
+[2,*]   0.02109617
+
+Dipole_x_Nuc_0x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00085933
+[1,*]   0.00000012
+[2,*]   0.42619263
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_1x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_1x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00056585
+[1,*]  -0.03943004
+[2,*]   0.03994095
+
+Dipole_x_Nuc_1x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00231860
+[1,*]   0.36353350
+[2,*]  -0.21293835
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_2x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_2x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00056585
+[1,*]   0.03943004
+[2,*]   0.03994095
+
+Dipole_x_Nuc_2x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00231861
+[1,*]  -0.36353356
+[2,*]  -0.21293839
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_0y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_0y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000035
+[1,*]   0.00002807
+[2,*]  -0.00000000
+
+Dipole_x_Nuc_0y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00000212
+[1,*]  -0.00044352
+[2,*]   0.00000002
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_1y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_1y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.10877134
+[1,*]   0.00000480
+[2,*]   0.00000687
+
+Dipole_x_Nuc_1y
+β tensor size: 3 x 3
+β= 
+ [0,*]   1.17529231
+[1,*]  -0.00002235
+[2,*]  -0.00010157
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_2y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_2y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.10877134
+[1,*]   0.00000480
+[2,*]  -0.00000687
+
+Dipole_x_Nuc_2y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -1.17529231
+[1,*]  -0.00002235
+[2,*]   0.00010156
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_0z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_0z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.09495239
+[1,*]  -0.00000000
+[2,*]  -0.00018533
+
+Dipole_x_Nuc_0z
+β tensor size: 3 x 3
+β= 
+ [0,*]   1.16472261
+[1,*]   0.00000000
+[2,*]   0.00106950
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_1z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_1z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.05985636
+[1,*]   0.00001338
+[2,*]  -0.00003915
+
+Dipole_x_Nuc_1z
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.58605021
+[1,*]  -0.00007091
+[2,*]   0.00026668
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_2z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_2z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.05985636
+[1,*]  -0.00001338
+[2,*]  -0.00003915
+
+Dipole_x_Nuc_2z
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.58605020
+[1,*]   0.00007090
+[2,*]   0.00026668
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_0x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_0x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000001
+[1,*]  -0.00000141
+[2,*]   0.00000000
+
+Dipole_y_Nuc_0x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00000011
+[1,*]  -0.00020614
+[2,*]  -0.00000001
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_1x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_1x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.06676784
+[1,*]  -0.00032404
+[2,*]   0.00000679
+
+Dipole_y_Nuc_1x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.36354076
+[1,*]   0.00082270
+[2,*]  -0.00003114
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_2x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_2x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.06676785
+[1,*]  -0.00032404
+[2,*]  -0.00000679
+
+Dipole_y_Nuc_2x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.36354082
+[1,*]   0.00082271
+[2,*]   0.00003114
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_0y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_0y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000395
+[1,*]   0.00000024
+[2,*]  -0.24671086
+
+Dipole_y_Nuc_0y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00040418
+[1,*]  -0.00000111
+[2,*]   4.02804575
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_1y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_1y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000495
+[1,*]  -0.40001086
+[2,*]   0.17509281
+
+Dipole_y_Nuc_1y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00002126
+[1,*]   4.48395531
+[2,*]  -2.01357214
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_2y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_2y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000495
+[1,*]   0.40001088
+[2,*]   0.17509282
+
+Dipole_y_Nuc_2y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00002127
+[1,*]  -4.48395557
+[2,*]  -2.01357225
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_0z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_0z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000000
+[1,*]  -0.36734513
+[2,*]  -0.00000002
+
+Dipole_y_Nuc_0z
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00000000
+[1,*]   5.12525366
+[2,*]   0.00000016
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_1z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_1z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000482
+[1,*]   0.22213967
+[2,*]  -0.17919792
+
+Dipole_y_Nuc_1z
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00007150
+[1,*]  -2.56429849
+[2,*]   1.70561999
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_2z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_2z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000482
+[1,*]   0.22213967
+[2,*]   0.17919793
+
+Dipole_y_Nuc_2z
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00007150
+[1,*]  -2.56429850
+[2,*]  -1.70562009
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_0x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_0x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.11150286
+[1,*]   0.00000000
+[2,*]  -0.00004431
+
+Dipole_z_Nuc_0x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.42628733
+[1,*]  -0.00000001
+[2,*]   0.00028300
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_1x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_1x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.04307881
+[1,*]   0.00000267
+[2,*]  -0.00031657
+
+Dipole_z_Nuc_1x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.21292898
+[1,*]  -0.00003065
+[2,*]   0.00052063
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_2x_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_2x_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.04307881
+[1,*]  -0.00000267
+[2,*]  -0.00031657
+
+Dipole_z_Nuc_2x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.21292903
+[1,*]   0.00003065
+[2,*]   0.00052064
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_0y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_0y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000000
+[1,*]  -0.36325332
+[2,*]   0.00000028
+
+Dipole_z_Nuc_0y
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00000001
+[1,*]   4.02802723
+[2,*]  -0.00000141
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_1y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_1y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000773
+[1,*]   0.18154955
+[2,*]  -0.21963547
+
+Dipole_z_Nuc_1y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00010149
+[1,*]  -2.01360884
+[2,*]   2.34893055
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_2y_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_2y_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000773
+[1,*]   0.18154956
+[2,*]   0.21963548
+
+Dipole_z_Nuc_2y
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00010149
+[1,*]  -2.01360895
+[2,*]  -2.34893058
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_0z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_0z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00012611
+[1,*]  -0.00000001
+[2,*]  -0.39283182
+
+Dipole_z_Nuc_0z
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00109378
+[1,*]   0.00000016
+[2,*]   4.25168457
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_1z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_1z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00002411
+[1,*]  -0.14601134
+[2,*]   0.24715191
+
+Dipole_z_Nuc_1z
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00026716
+[1,*]   1.70563045
+[2,*]  -2.12855981
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_2z_f0.020_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_2z_f0.020_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00002411
+[1,*]   0.14601135
+[2,*]   0.24715191
+
+Dipole_z_Nuc_2z
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00026716
+[1,*]  -1.70563055
+[2,*]  -2.12855990
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_0x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_0x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00008125
+[1,*]  -0.00000001
+[2,*]   0.02606524
+
+Dipole_x_Nuc_0x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00118492
+[1,*]   0.00000009
+[2,*]   0.42349041
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_1x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_1x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00053087
+[1,*]  -0.03706523
+[2,*]   0.03869355
+
+Dipole_x_Nuc_1x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00230203
+[1,*]   0.35992868
+[2,*]  -0.21036173
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_2x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_2x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00053087
+[1,*]   0.03706524
+[2,*]   0.03869356
+
+Dipole_x_Nuc_2x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00230205
+[1,*]  -0.35992874
+[2,*]  -0.21036178
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_0y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_0y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000033
+[1,*]   0.00003747
+[2,*]  -0.00000000
+
+Dipole_x_Nuc_0y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00000213
+[1,*]  -0.00025934
+[2,*]   0.00000001
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_1y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_1y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.10323057
+[1,*]   0.00002516
+[2,*]  -0.00000617
+
+Dipole_x_Nuc_1y
+β tensor size: 3 x 3
+β= 
+ [0,*]   1.18389896
+[1,*]  -0.00002219
+[2,*]  -0.00012736
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_2y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_2y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.10323057
+[1,*]   0.00002516
+[2,*]   0.00000617
+
+Dipole_x_Nuc_2y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -1.18389896
+[1,*]  -0.00002219
+[2,*]   0.00012736
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_0z_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_0z_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.08935834
+[1,*]  -0.00000000
+[2,*]  -0.00014283
+
+Dipole_x_Nuc_0z
+β tensor size: 3 x 3
+β= 
+ [0,*]   1.17610627
+[1,*]   0.00000002
+[2,*]   0.00054693
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_1z_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_1z_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.05739022
+[1,*]   0.00000041
+[2,*]  -0.00001586
+
+Dipole_x_Nuc_1z
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.59000159
+[1,*]  -0.00006998
+[2,*]   0.00028119
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_x_Nuc_2z_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_x_Nuc_2z_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.05739022
+[1,*]  -0.00000041
+[2,*]  -0.00001586
+
+Dipole_x_Nuc_2z
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.59000158
+[1,*]   0.00006997
+[2,*]   0.00028119
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_0x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_0x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000001
+[1,*]  -0.00001525
+[2,*]   0.00000000
+
+Dipole_y_Nuc_0x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00000009
+[1,*]  -0.00051341
+[2,*]  -0.00000001
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_1x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_1x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.06424419
+[1,*]  -0.00030791
+[2,*]   0.00000563
+
+Dipole_y_Nuc_1x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.35994483
+[1,*]   0.00082768
+[2,*]  -0.00003294
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_2x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_2x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.06424419
+[1,*]  -0.00030791
+[2,*]  -0.00000563
+
+Dipole_y_Nuc_2x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.35994490
+[1,*]   0.00082769
+[2,*]   0.00003294
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_0y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_0y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00002247
+[1,*]   0.00000023
+[2,*]  -0.23225206
+
+Dipole_y_Nuc_0y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00021616
+[1,*]  -0.00000120
+[2,*]   4.06040029
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_1y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_1y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00001082
+[1,*]  -0.37929118
+[2,*]   0.16549446
+
+Dipole_y_Nuc_1y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00001427
+[1,*]   4.50756620
+[2,*]  -2.02936188
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_2y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_2y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00001082
+[1,*]   0.37929120
+[2,*]   0.16549446
+
+Dipole_y_Nuc_2y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00001427
+[1,*]  -4.50756646
+[2,*]  -2.02936198
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_0z_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_0z_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000000
+[1,*]  -0.35691074
+[2,*]  -0.00000002
+
+Dipole_y_Nuc_0z
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00000002
+[1,*]   5.15451578
+[2,*]   0.00000017
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_1z_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_1z_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00000209
+[1,*]   0.21083369
+[2,*]  -0.17137752
+
+Dipole_y_Nuc_1z
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00007495
+[1,*]  -2.58017736
+[2,*]   1.71561785
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_y_Nuc_2z_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_y_Nuc_2z_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000209
+[1,*]   0.21083369
+[2,*]   0.17137753
+
+Dipole_y_Nuc_2z
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00007495
+[1,*]  -2.58017737
+[2,*]  -1.71561794
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_0x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_0x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.10624791
+[1,*]   0.00000000
+[2,*]  -0.00005029
+
+Dipole_z_Nuc_0x
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.42286135
+[1,*]  -0.00000001
+[2,*]   0.00048307
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_1x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_1x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.04142302
+[1,*]   0.00000332
+[2,*]  -0.00030305
+
+Dipole_z_Nuc_1x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.21037216
+[1,*]  -0.00002996
+[2,*]   0.00049364
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_2x_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_2x_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.04142303
+[1,*]  -0.00000332
+[2,*]  -0.00030306
+
+Dipole_z_Nuc_2x
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.21037221
+[1,*]   0.00002996
+[2,*]   0.00049365
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_0y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_0y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]  -0.00000000
+[1,*]  -0.35022836
+[2,*]   0.00000027
+
+Dipole_z_Nuc_0y
+β tensor size: 3 x 3
+β= 
+ [0,*]   0.00000001
+[1,*]   4.05780576
+[2,*]  -0.00000139
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+✅ Saving response vector to: VBCDipole_z_Nuc_1y_f0.040_0.000_p1.0e-07.response
+Saving response vector  0
+Saving response vector  1
+Saving response vector  2
+Saving response vector  3
+Saving response vector  4
+Saving response vector  5
+Saving response vector  6
+Saving response vector  7
+Saving response vector  8
+Saving response vector  9
+💾 Wrote VBC to VBCDipole_z_Nuc_1y_f0.040_0.000_p1.0e-07.response
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted
+beta_3 tensor size: 3 x 3
+beta_3= 
+  [0,*]   0.00001091
+[1,*]   0.17036571
+[2,*]  -0.20948471
+
+Dipole_z_Nuc_1y
+β tensor size: 3 x 3
+β= 
+ [0,*]  -0.00012783
+[1,*]  -2.02959740
+[2,*]   2.36880563
+
+📥 Copying dynamic restricted response
+🔁 Promoting static restricted → dynamic restricted

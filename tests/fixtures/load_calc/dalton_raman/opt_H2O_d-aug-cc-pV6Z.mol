@@ -1,0 +1,10 @@
+BASIS
+d-aug-cc-pV6Z
+optimized 6Z geometry
+optimize_h2o_g2.out
+Atomtype=2 Angstrom Charge=0 Nosymmmetry
+Charge=8 Atoms=1
+O_a     0.0000000000           -0.0000000129           -0.1135859196
+Charge=1 Atoms=2
+H_a     -0.0000000000            0.7521260304            0.4496425569
+H_b      0.0000000000           -0.7521260665            0.4496425179
