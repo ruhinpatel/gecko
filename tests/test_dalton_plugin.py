@@ -27,15 +27,13 @@ def test_split_label_basis_from_outname():
 
 
 def test_dalton_parses_molecule():
-    run = detect_dalton(FIXTURE_DIR)[0]
-    calc = gecko.load_calc(FIXTURE_DIR, run=run)
+    calc = gecko.load_calc(FIXTURE_DIR)
     assert calc.molecule is not None
     assert len(calc.molecule.symbols) == 3
 
 
 def test_dalton_infers_basis_and_molecule():
-    run = next(r for r in detect_dalton(FIXTURE_DIR) if r["meta"]["out_file"] == "H2O-aug-cc-pVDZ.out")
-    calc = gecko.load_calc(FIXTURE_DIR, run=run)
+    calc = gecko.load_calc(FIXTURE_DIR / "H2O-aug-cc-pVDZ.out")
     assert calc.meta.get("basis") == "aug-cc-pVDZ"
     inferred = calc.meta.get("inferred_from") or {}
     assert inferred.get("basis") == "filename"
@@ -44,7 +42,7 @@ def test_dalton_infers_basis_and_molecule():
 def test_dalton_parses_beta_if_present():
     runs = detect_dalton(QR_FIXTURE_DIR)
     assert runs
-    calc = gecko.load_calc(QR_FIXTURE_DIR, run=runs[0])
+    calc = gecko.load_calc(QR_FIXTURE_DIR)
     beta = calc.data.get("beta")
     assert beta is not None
     assert beta["omega"].shape[1] == 3

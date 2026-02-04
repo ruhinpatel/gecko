@@ -10,7 +10,6 @@ import json
 import gecko
 from gecko.core import iterators
 from gecko.ids import geom_id_from_molecule, mol_id_from_molecule
-from gecko.mol.resolver import MoleculeResolver
 from gecko.plugins.dalton.detect import can_load as dalton_can_load
 from gecko.plugins.madness.detect import can_load as madness_can_load
 
@@ -152,10 +151,6 @@ def build_beta_table(
     shg_start_at: int = 0,
     add_shg_omega: bool = False,
     app_compat: bool = False,
-    mol_file: str | Path | None = None,
-    mol_dir: str | Path | None = None,
-    mol_root: str | Path | None = None,
-    mol_map: str | Path | None = None,
 ) -> pd.DataFrame:
     """
     Build a long-form table for hyperpolarizability data.
@@ -192,18 +187,13 @@ def build_beta_table(
         add_shg_omega = True
 
     calc_paths = _expand_calc_paths(calc_dirs)
-    resolver = MoleculeResolver.from_sources(
-        mol_file=mol_file,
-        mol_dir=mol_dir or mol_root,
-        mol_map=mol_map,
-    )
 
     failures: list[tuple[str, str]] = []
     rows: list[dict[str, Any]] = []
 
     for path in calc_paths:
         try:
-            calcs = gecko.load_calcs(path, mol_resolver=resolver)
+            calcs = gecko.load_calcs(path)
         except Exception as exc:
             failures.append((str(path), f"{type(exc).__name__}: {exc}"))
             if fail_fast:

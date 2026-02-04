@@ -5,7 +5,11 @@ from typing import Any, Callable, Dict, Mapping, Tuple
 
 import math
 import numpy as np
-from scipy.integrate import lebedev_rule
+
+try:
+    from scipy.integrate import lebedev_rule as _scipy_lebedev_rule  # type: ignore
+except Exception:
+    _scipy_lebedev_rule = None
 
 Array = np.ndarray
 
@@ -19,8 +23,27 @@ class LebedevGrid:
 
 
 def load_lebedev_grid(order: int, *, weight_tol: float = 1e-8) -> LebedevGrid:
-    """Load a Lebedev grid (unit directions + weights)."""
-    points, weights = lebedev_rule(int(order))  # points: (3,N)
+    """Load a unit-sphere quadrature grid (Lebedev when available)."""
+    order = int(order)
+    if order <= 0:
+        raise ValueError(f"order must be positive; got {order}")
+
+    if _scipy_lebedev_rule is not None:
+        points, weights = _scipy_lebedev_rule(order)  # points: (3,N)
+    else:
+        # Fallback: quasi-uniform Fibonacci sphere with equal weights.
+        # This is not a true Lebedev rule, but provides a stable, SciPy-free grid for visualization.
+        n = order
+        i = np.arange(n, dtype=float)
+        golden_angle = math.pi * (3.0 - math.sqrt(5.0))
+        z = 1.0 - (2.0 * i + 1.0) / n
+        r = np.sqrt(np.maximum(0.0, 1.0 - z * z))
+        theta = golden_angle * i
+        x = r * np.cos(theta)
+        y = r * np.sin(theta)
+        points = np.vstack([x, y, z])  # (3,N)
+        weights = np.full(n, 4.0 * math.pi / n, dtype=float)
+
     n_hat = np.asarray(points, dtype=float).T
     w = np.asarray(weights, dtype=float)
 

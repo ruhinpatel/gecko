@@ -4,28 +4,41 @@ from pathlib import Path
 
 from gecko.core.model import Calculation
 from gecko.ids import calc_id, geom_id_from_molecule, mol_id_from_molecule
-from gecko.molecule_resolver import resolve_molecule
-from gecko.mol.resolver import mol_label_from_calc
+
+
+def _label_from_calc(calc: Calculation) -> str:
+    meta = calc.meta or {}
+    for key in ("label", "molecule", "molecule_key", "run_id"):
+        val = meta.get(key)
+        if isinstance(val, str) and val.strip():
+            return val.strip()
+    return calc.root.name
 
 
 def enrich(
     calc: Calculation,
-    *,
-    mol_root: str | Path | None = None,
-    mol_map: str | Path | None = None,
-    mol_file: str | Path | None = None,
-    mol_dir: str | Path | None = None,
 ) -> Calculation:
-    calc.meta.setdefault("label", mol_label_from_calc(calc))
+    calc.meta.setdefault("label", _label_from_calc(calc))
 
     if calc.molecule is None:
-        calc.molecule = resolve_molecule(
-            calc,
-            mol_root=mol_root,
-            mol_map=mol_map,
-            mol_file=mol_file,
-            mol_dir=mol_dir,
-        )
+        if calc.data.get("molecule") is not None:
+            calc.molecule = calc.data.get("molecule")
+        else:
+            from gecko.mol.io import read_mol
+
+            preferred = calc.root / "molecule.mol"
+            candidates = [preferred] if preferred.exists() else []
+            candidates.extend(sorted(p for p in calc.root.glob("*.mol") if p != preferred))
+            for path in candidates:
+                try:
+                    calc.molecule = read_mol(path)
+                    calc.meta.setdefault("molecule_source", "calc_dir")
+                    calc.meta.setdefault("molecule_path", str(path))
+                    break
+                except Exception as exc:
+                    calc.meta.setdefault("warnings", []).append(
+                        f"Failed to read molecule .mol file: {path} ({type(exc).__name__}: {exc})"
+                    )
 
     calc.meta["calc_id"] = calc_id(calc)
     calc.meta["mol_id"] = mol_id_from_molecule(calc.molecule)
@@ -34,7 +47,6 @@ def enrich(
         calc.meta["geom_id"] = geom_id_from_molecule(calc.molecule)
         calc.meta["molecule_id"] = calc.meta.get("geom_id")
         calc.meta.setdefault("mol_source", "embedded")
-        calc.meta.setdefault("molecule_source", "out")
     else:
         calc.meta.setdefault("mol_source", "missing")
 

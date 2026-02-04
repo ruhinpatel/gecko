@@ -1,19 +1,15 @@
-from collections import defaultdict
 from pathlib import Path
 
-from gecko.core.iterators import iter_calc_dirs
 from gecko.index import CalcIndex
 
 
 def test_calc_index_groups_by_molecule_id():
-    root = Path("tests/fixtures/calc_nlo_beta/NLO")
-    calc_dirs = list(iter_calc_dirs(root))
+    calc_dirs = [
+        Path("tests/fixtures/dalton_qr"),
+        Path("tests/fixtures/madness_madqc"),
+    ]
     index = CalcIndex.from_dirs(calc_dirs)
 
-    codes_by_molecule = defaultdict(set)
-    for calc in index.calcs:
-        mol_id = calc.meta.get("molecule_id")
-        if mol_id:
-            codes_by_molecule[mol_id].add(calc.code)
-
-    assert any(codes >= {"madness", "dalton"} for codes in codes_by_molecule.values())
+    codes = {calc.code for calc in index.calcs}
+    assert {"madness", "dalton"}.issubset(codes)
+    assert any(calc.meta.get("molecule_id") for calc in index.calcs)

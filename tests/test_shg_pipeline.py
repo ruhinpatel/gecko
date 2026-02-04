@@ -8,7 +8,7 @@ from gecko.recipes.shg_csv import build_beta_table
 
 
 def test_build_beta_table_shg_omega_mapping():
-    root = Path("tests/fixtures/calc_nlo_beta/NLO")
+    root = Path("tests/fixtures/dalton_qr")
     df = build_beta_table(
         root,
         shg_only=True,
@@ -28,7 +28,7 @@ def test_build_beta_table_shg_omega_mapping():
 
 
 def test_build_beta_table_uses_iterators(monkeypatch):
-    root = Path("tests/fixtures/calc_nlo_beta/NLO")
+    root = Path("tests/fixtures/dalton_qr")
     called = {"count": 0}
 
     original = iterators.iter_calc_dirs
@@ -45,8 +45,10 @@ def test_build_beta_table_uses_iterators(monkeypatch):
 
 
 def test_dalton_multi_out_counts():
-    root = Path("tests/fixtures/calc_nlo_beta/NLO/dalton/hf/n2/dipole")
+    root = Path("tests/fixtures/dalton_multi_outputs")
     out_files = list(root.glob("*.out"))
     calcs = gecko.load_calcs(root)
 
-    assert len(calcs) == len(out_files)
+    assert len(calcs) == 1
+    outputs = calcs[0].data.get("dalton_outputs") or {}
+    assert len(outputs) == len(out_files)

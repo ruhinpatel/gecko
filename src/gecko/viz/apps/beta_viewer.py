@@ -219,10 +219,7 @@ def _load_molecule(mol_name: str):
             _dprint(f"[molecule] failed to build molecule from geometry map: {exc}")
 
     if _MOL_RESOLVER is not None:
-        fake_calc = SimpleNamespace(meta={"molecule": mol_name}, data={}, root=Path(mol_name), molecule=None)
-        res = _MOL_RESOLVER.resolve(fake_calc)
-        if res.molecule is not None:
-            return res.molecule
+        _dprint("[molecule] MoleculeResolver support removed; ignoring _MOL_RESOLVER")
 
     mol_path = _repo_root() / "data" / "molecules" / f"{mol_name}.mol"
     if mol_path.exists():
@@ -2240,16 +2237,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.write_bundle:
         _WRITE_BUNDLE_DIR = Path(args.write_bundle).expanduser().resolve()
-    try:
-        from gecko.mol.resolver import MoleculeResolver
-
-        _MOL_RESOLVER = MoleculeResolver.from_sources(
-            mol_file=args.mol_file,
-            mol_dir=args.mol_dir,
-            mol_map=args.mol_map,
-        )
-    except Exception as exc:
-        _dprint(f"[molecule] failed to initialize MoleculeResolver: {exc}")
+    _MOL_RESOLVER = None
     kwargs: Dict[str, Any] = {}
     host = args.host
     port = _select_free_port(host, args.port)
