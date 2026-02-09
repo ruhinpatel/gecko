@@ -209,10 +209,14 @@ class TableBuilder:
         long_rows: list[dict[str, Any]] = []
         for _, row in pivot.iterrows():
             ref_val = float(row[ref_basis])
+            if not np.isfinite(ref_val):
+                continue
             for basis in basis_cols:
                 if basis == ref_basis:
                     continue
                 val = float(row[basis])
+                if not np.isfinite(val):
+                    continue
                 delta = val - ref_val
                 if abs(ref_val) < small_thresh:
                     rel = np.nan

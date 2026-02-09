@@ -50,6 +50,116 @@ def _beta_df_to_tensor(beta_df) -> dict[str, Any]:
 
     return {"omega": omega, "components": components, "values": values, "shape": ("freq", "component")}
 
+
+def _tensor_has_rows(tensor: Any) -> bool:
+    if not isinstance(tensor, dict):
+        return False
+    if not all(k in tensor for k in ("omega", "components", "values")):
+        return False
+    values = np.asarray(tensor.get("values"))
+    components = tensor.get("components") or []
+    return values.ndim == 2 and values.shape[0] > 0 and values.shape[1] > 0 and len(components) > 0
+
+
+def _legacy_alpha_to_tensor(raw_json: dict[str, Any]) -> dict[str, Any]:
+    response = raw_json.get("response")
+    if not isinstance(response, dict):
+        return {}
+    alpha = response.get("alpha")
+    if not isinstance(alpha, dict):
+        return {}
+
+    values = alpha.get("alpha")
+    components = alpha.get("ij")
+    omega = alpha.get("omega")
+    if not (isinstance(values, list) and isinstance(components, list) and isinstance(omega, list)):
+        return {}
+    if not values or len(values) != len(components) or len(values) != len(omega):
+        return {}
+
+    by_freq: dict[float, dict[str, float]] = {}
+    for freq_raw, comp_raw, value_raw in zip(omega, components, values, strict=False):
+        try:
+            freq = float(freq_raw)
+            comp = str(comp_raw).strip().lower()
+            value = float(value_raw)
+        except Exception:
+            continue
+        if not comp:
+            continue
+        by_freq.setdefault(freq, {})[comp] = value
+
+    if not by_freq:
+        return {}
+
+    freqs = sorted(by_freq.keys())
+    comps = sorted({comp for comp_map in by_freq.values() for comp in comp_map.keys()})
+    arr = np.full((len(freqs), len(comps)), np.nan, dtype=float)
+    for i, freq in enumerate(freqs):
+        for j, comp in enumerate(comps):
+            if comp in by_freq[freq]:
+                arr[i, j] = by_freq[freq][comp]
+
+    return {"omega": np.asarray(freqs, dtype=float), "components": comps, "values": arr, "shape": ("freq", "component")}
+
+
+def _legacy_beta_to_tensor(raw_json: dict[str, Any]) -> dict[str, Any]:
+    hyper = raw_json.get("hyper")
+    if not isinstance(hyper, dict):
+        return {}
+    beta = hyper.get("beta")
+    if not isinstance(beta, dict):
+        return {}
+
+    a = beta.get("A")
+    b = beta.get("B")
+    c = beta.get("C")
+    a_freq = beta.get("Afreq")
+    b_freq = beta.get("Bfreq")
+    c_freq = beta.get("Cfreq")
+    values = beta.get("Beta")
+
+    if not all(isinstance(x, list) for x in (a, b, c, a_freq, b_freq, c_freq, values)):
+        return {}
+    n = len(values)
+    if n == 0:
+        return {}
+    if not all(len(x) == n for x in (a, b, c, a_freq, b_freq, c_freq)):
+        return {}
+
+    by_freq: dict[tuple[float, float, float], dict[str, float]] = {}
+    for a_raw, b_raw, c_raw, af_raw, bf_raw, cf_raw, val_raw in zip(
+        a, b, c, a_freq, b_freq, c_freq, values, strict=False
+    ):
+        try:
+            comp = f"{str(a_raw).strip()}{str(b_raw).strip()}{str(c_raw).strip()}".lower()
+            freq = (float(af_raw), float(bf_raw), float(cf_raw))
+            val = float(val_raw)
+        except Exception:
+            continue
+        if len(comp) != 3:
+            continue
+        by_freq.setdefault(freq, {})[comp] = val
+
+    if not by_freq:
+        return {}
+
+    freqs = sorted(by_freq.keys())
+    comps = sorted({comp for comp_map in by_freq.values() for comp in comp_map.keys()})
+    arr = np.full((len(freqs), len(comps)), np.nan, dtype=float)
+    for i, freq in enumerate(freqs):
+        for j, comp in enumerate(comps):
+            if comp in by_freq[freq]:
+                arr[i, j] = by_freq[freq][comp]
+
+    return {
+        "omega": np.asarray(freqs, dtype=float),
+        "components": comps,
+        "values": arr,
+        "shape": ("freq", "component"),
+    }
+
+
 def _format_mra_threshold(prefix: str, value: float) -> str:
     try:
         import math
@@ -214,7 +324,12 @@ def parse_run(calc: Calculation) -> None:
 
     # Tensor-first hyperpolarizability
     calc.data["beta"] = _beta_df_to_tensor(obj.beta_pivot)
+    if not _tensor_has_rows(calc.data["beta"]):
+        calc.data["beta"] = _legacy_beta_to_tensor(calc.data["raw_json"])
+
     calc.data["alpha"] = _beta_df_to_tensor(obj.alpha_pivot)
+    if not _tensor_has_rows(calc.data["alpha"]):
+        calc.data["alpha"] = _legacy_alpha_to_tensor(calc.data["raw_json"])
 
     calc.data["raman"] = {"polarization_frequencies": obj.polarization_frequencies,
                           "vibrational_frequencies": obj.vibrational_frequencies,
