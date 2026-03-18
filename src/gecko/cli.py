@@ -182,6 +182,33 @@ def _calc_wizard_command(_args: argparse.Namespace) -> int:
         for p in file_list:
             print(f"  [{code}]  {p}")
 
+    # Print equivalent calc init command for easy re-run
+    cmd_parts = [
+        "gecko calc init",
+        f"--molecule {molecule}",
+        f"--property {property_}",
+        f"--code {' '.join(codes)}",
+        f"--basis {' '.join(basis_sets)}",
+        f"--frequencies {' '.join(str(f) for f in frequencies)}",
+        f"--xc {xc}",
+        f"--out {out_dir}",
+    ]
+    if geom_file:
+        cmd_parts.append(f"--geom-file {geom_file}")
+    if want_slurm == "yes":
+        cmd_parts += [
+            "--slurm",
+            f"--partition {partition}",
+            f"--nodes {nodes}",
+            f"--tasks-per-node {tasks_per_node}",
+            f"--walltime {walltime}",
+            f"--madqc-exec {madqc_exec}",
+        ]
+        if account:
+            cmd_parts.append(f"--account {account}")
+    print("\nEquivalent command:")
+    print("  " + " \\\n    ".join(cmd_parts))
+
     return 0
 
 
