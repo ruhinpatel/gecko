@@ -63,7 +63,8 @@ class MadnessInput:
         """Write the ``.in`` file and return its path."""
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
-        in_path = out_dir / f"{self.mol_name}.in"
+        stem = f"{self.property}_{self.mol_name}".lower()
+        in_path = out_dir / f"{stem}.in"
         in_path.write_text(self._render())
         return in_path
 

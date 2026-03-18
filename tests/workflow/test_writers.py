@@ -35,6 +35,7 @@ class TestMadnessInput:
         path = inp.write(tmp_path)
         assert path.exists()
         assert path.suffix == ".in"
+        assert path.name == "alpha_h2o.in"
 
     def test_dft_section_present(self, tmp_path, water):
         inp = MadnessInput(molecule=water, mol_name="H2O", xc="hf")
