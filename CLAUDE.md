@@ -49,3 +49,35 @@ Interactive web dashboards in `viz/apps/` use [Trame](https://trame.readthedocs.
 ### Testing
 
 Tests are contract-based in `tests/contracts/`. Fixtures are real calculation directories under `tests/fixtures/` — `01_mra-d04_n2/` for MADNESS and `02_aug-cc-pVDZ_n2/` for DALTON.
+
+## Current Work in Progress
+
+**Branch:** `claude/init-project-setup-PC09o`
+
+### Feature: `gecko calc` — calculation input file generator
+
+New subcommand for generating MADNESS and DALTON input files. Key files:
+
+- `src/gecko/cli.py` — `gecko calc init` and `gecko calc wizard` CLI commands
+- `src/gecko/workflow/writers.py` — `MadnessInput`, `DaltonInput`, `generate_calc_dir`
+- `src/gecko/workflow/geometry.py` — PubChem fetch + local .xyz/.mol loading
+- `src/gecko/workflow/hpc.py` — SLURM script generation
+- `src/gecko/plugins/dalton/legacy/dalton_write_inputs.py` — `.mol` file renderer
+
+### Status
+
+- `gecko calc init --code madness` works end-to-end
+- `gecko calc wizard` works for MADNESS; DALTON file generation is **not working** on the user's machine (no error, no files produced)
+- Diagnostic prints added to wizard (`codes`, `basis_sets`, `out_dir` printed before generation)
+- Wizard now prints the equivalent `gecko calc init` command at the end for easy re-runs
+- Fixed: removed invalid `_atoms_formatter` import in `dalton_write_inputs.py`
+
+### Next step
+
+User needs to pull branch, run the wizard selecting dalton, and share what the diagnostic lines print:
+```
+  codes      : [...]
+  basis_sets : [...]
+  out_dir    : ...
+```
+That output will reveal why dalton files are not being generated.
