@@ -1,10 +1,40 @@
-"""SLURM script generation for HPC job submission."""
+"""SLURM script generation and job submission for HPC clusters."""
 
 from __future__ import annotations
 
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gecko.workflow.remote import RemoteHost
+
+
+@dataclass
+class JobHandle:
+    """Identifies a submitted SLURM job.
+
+    Parameters
+    ----------
+    job_id : str
+        SLURM job ID returned by ``sbatch``.
+    hostname : str
+        Login-node hostname, or empty string for local submissions.
+    remote_dir : str
+        Remote working directory, or empty string for local submissions.
+    script_path : str
+        Local path of the SLURM ``.sh`` script.
+    """
+
+    job_id: str
+    hostname: str = ""
+    remote_dir: str = ""
+    script_path: str = ""
+
+    @property
+    def is_remote(self) -> bool:
+        return bool(self.hostname)
 
 
 @dataclass
@@ -189,28 +219,51 @@ def write_dalton_slurm(
     return script_path
 
 
-def submit_job(script_path: Path) -> str:
-    """Submit a SLURM script via ``sbatch`` and return the job ID.
+def submit_job(
+    script_path: Path,
+    host: RemoteHost | None = None,
+) -> JobHandle:
+    """Submit a SLURM script via ``sbatch`` and return a :class:`JobHandle`.
 
     Parameters
     ----------
     script_path : Path
-        Path to a ``.sh`` SLURM script.
+        Local path to the SLURM ``.sh`` script.
+    host : RemoteHost or None
+        If provided, upload the script's parent directory to the remote host
+        and run ``sbatch`` there via SSH.  Requires ``paramiko``.
+        If ``None``, run ``sbatch`` locally.
 
     Returns
     -------
-    str
-        SLURM job ID string.
-
-    Raises
-    ------
-    RuntimeError
-        If ``sbatch`` exits with a non-zero return code.
+    JobHandle
     """
+    script_path = Path(script_path)
+    if host is not None:
+        from gecko.workflow.remote import submit_remote_job
+        job_id = submit_remote_job(script_path, host)
+        # remote_dir is <host.remote_base_dir>/<script_parent.name>
+        import posixpath
+        from gecko.workflow.remote import open_ssh, _expand_remote_tilde, _ssh_run
+        ssh = open_ssh(host)
+        try:
+            base = _expand_remote_tilde(host.remote_base_dir, ssh)
+        finally:
+            ssh.close()
+        remote_dir = posixpath.join(base, script_path.parent.name)
+        return JobHandle(
+            job_id=job_id,
+            hostname=host.hostname,
+            remote_dir=remote_dir,
+            script_path=str(script_path),
+        )
+
+    # Local submission
     result = subprocess.run(
         ["sbatch", str(script_path)],
         capture_output=True,
         text=True,
+        cwd=str(script_path.parent),
     )
     if result.returncode != 0:
         raise RuntimeError(
@@ -218,15 +271,34 @@ def submit_job(script_path: Path) -> str:
         )
     # sbatch outputs: "Submitted batch job 12345"
     parts = result.stdout.strip().split()
-    return parts[-1]
+    job_id = parts[-1]
+    return JobHandle(job_id=job_id, script_path=str(script_path))
 
 
-def poll_job(job_id: str) -> str:
-    """Query SLURM job status via ``squeue``.
+def poll_job(handle: JobHandle | str) -> str:
+    """Query SLURM job status.
 
-    Returns one of: ``"queued"``, ``"running"``, ``"done"`` (not in queue),
+    Parameters
+    ----------
+    handle : JobHandle or str
+        A :class:`JobHandle` (supports remote polling) or a plain job ID
+        string (local only).
+
+    Returns one of: ``"queued"``, ``"running"``, ``"done"``, ``"failed"``,
     or ``"unknown"``.
     """
+    if isinstance(handle, str):
+        return _poll_local(handle)
+
+    if handle.is_remote:
+        from gecko.workflow.remote import RemoteHost, poll_remote_job
+        host = RemoteHost(hostname=handle.hostname, username="")  # username needed at connect
+        return poll_remote_job(handle.job_id, host)
+
+    return _poll_local(handle.job_id)
+
+
+def _poll_local(job_id: str) -> str:
     result = subprocess.run(
         ["squeue", "--job", job_id, "--format=%T", "--noheader"],
         capture_output=True,
@@ -239,6 +311,8 @@ def poll_job(job_id: str) -> str:
         return "done"
     if output in ("PENDING", "CF"):
         return "queued"
-    if output in ("RUNNING", "R"):
+    if output in ("RUNNING",):
         return "running"
+    if output in ("FAILED", "CANCELLED", "TIMEOUT", "NODE_FAIL", "OUT_OF_MEMORY"):
+        return "failed"
     return output.lower()

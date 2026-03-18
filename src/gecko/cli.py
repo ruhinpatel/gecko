@@ -183,6 +183,136 @@ def _calc_wizard_command(_args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
+# gecko calc submit
+# ---------------------------------------------------------------------------
+
+
+def _calc_submit_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.hpc import submit_job
+    from gecko.workflow.jobstore import JobRecord, load_store
+    from gecko.workflow.remote import RemoteHost
+
+    calc_root = Path(args.calc_dir)
+    store = load_store(calc_root)
+
+    # Collect all .sh scripts under calc_root
+    scripts = sorted(calc_root.rglob("run_*.sh"))
+    if not scripts:
+        print(f"No run_*.sh scripts found under {calc_root}")
+        return 1
+
+    host: RemoteHost | None = None
+    if args.host:
+        host = RemoteHost(
+            hostname=args.host,
+            username=args.user,
+            port=args.ssh_port,
+            key_file=args.key_file,
+            remote_base_dir=args.remote_dir,
+        )
+
+    submitted = 0
+    for script in scripts:
+        # Infer code and mol_name from directory structure
+        parts = script.parts
+        code = "madness" if "madness" in parts else "dalton"
+        mol_name = _guess_mol_name(script)
+
+        try:
+            handle = submit_job(script, host=host)
+            record = JobRecord(
+                job_id=handle.job_id,
+                mol_name=mol_name,
+                code=code,
+                script_path=str(script),
+                remote_dir=handle.remote_dir,
+                hostname=handle.hostname,
+            )
+            store.add(record)
+            location = f"@{handle.hostname}" if handle.is_remote else "local"
+            print(f"  Submitted [{handle.job_id}] {script.name} ({location})")
+            submitted += 1
+        except RuntimeError as exc:
+            print(f"  ERROR: {script.name}: {exc}")
+
+    print(f"\n{submitted} job(s) submitted.  Tracked in {store.path}")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# gecko calc status
+# ---------------------------------------------------------------------------
+
+
+def _calc_status_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.hpc import poll_job, JobHandle
+    from gecko.workflow.jobstore import load_store
+    from gecko.workflow.remote import RemoteHost
+
+    calc_root = Path(args.calc_dir)
+    store = load_store(calc_root)
+    records = store.all()
+
+    if not records:
+        print(f"No jobs tracked in {store.path}")
+        return 0
+
+    # Build host lookup keyed by hostname (for connection reuse)
+    _ssh_cache: dict[str, object] = {}
+
+    target = store.active() if not args.all else records
+
+    for record in target:
+        if record.is_remote if hasattr(record, "is_remote") else bool(record.hostname):
+            host = RemoteHost(
+                hostname=record.hostname,
+                username=args.user,
+                port=args.ssh_port,
+                key_file=args.key_file,
+            )
+            handle = JobHandle(
+                job_id=record.job_id,
+                hostname=record.hostname,
+                remote_dir=record.remote_dir,
+                script_path=record.script_path,
+            )
+        else:
+            handle = JobHandle(job_id=record.job_id, script_path=record.script_path)
+
+        try:
+            status = poll_job(handle)
+        except Exception as exc:
+            status = f"error: {exc}"
+
+        store.update(record.job_id, status)
+        _status_icon = {"done": "✓", "running": "►", "queued": "…", "failed": "✗"}.get(status, "?")
+        location = f"@{record.hostname}" if record.hostname else "local"
+        print(
+            f"  [{record.job_id:>8}] {_status_icon} {status:<10}  "
+            f"{record.mol_name}  {record.code}  {location}"
+        )
+
+    print(f"\nStore: {store.path}")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _guess_mol_name(script_path: Path) -> str:
+    """Infer molecule name from script or directory path."""
+    # script is typically  <root>/<mol>/<code>/run_<mol>.sh
+    # walk up until we find a part that doesn't look like a code/basis name
+    skip = {"madness", "dalton"}
+    for part in reversed(script_path.parts[:-1]):
+        if part not in skip and not part.startswith("aug-") and not part.startswith("d-aug"):
+            return part
+    return script_path.stem
+
+
+# ---------------------------------------------------------------------------
 # Prompt helpers
 # ---------------------------------------------------------------------------
 
@@ -259,6 +389,35 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Interactive guided setup for a new calculation",
     )
     wizard_parser.set_defaults(func=_calc_wizard_command)
+
+    # Shared SSH args used by submit + status
+    def _add_ssh_args(p: argparse.ArgumentParser) -> None:
+        p.add_argument("--host", default="", help="Remote HPC login node hostname (leave blank for local)")
+        p.add_argument("--user", default="", help="SSH username")
+        p.add_argument("--ssh-port", type=int, default=22)
+        p.add_argument("--key-file", default="", help="Path to SSH private key")
+        p.add_argument("--remote-dir", default="~/gecko_calcs",
+                       help="Base directory on remote host for uploads")
+
+    # gecko calc submit
+    submit_parser = calc_subparsers.add_parser(
+        "submit",
+        help="Submit generated SLURM scripts (local or remote via SSH)",
+    )
+    submit_parser.add_argument("calc_dir", help="Calculation root directory containing run_*.sh scripts")
+    _add_ssh_args(submit_parser)
+    submit_parser.set_defaults(func=_calc_submit_command)
+
+    # gecko calc status
+    status_parser = calc_subparsers.add_parser(
+        "status",
+        help="Poll status of tracked jobs",
+    )
+    status_parser.add_argument("calc_dir", help="Calculation root directory (contains jobs.json)")
+    status_parser.add_argument("--all", action="store_true", default=False,
+                               help="Show all jobs including completed ones")
+    _add_ssh_args(status_parser)
+    status_parser.set_defaults(func=_calc_status_command)
 
     return parser
 

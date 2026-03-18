@@ -55,6 +55,10 @@ apps = [
   "trame-vtk",
 ]
 
+hpc = [
+  "paramiko",
+]
+
 all = [
-  "gecko[dev,viz,apps]",
+  "gecko[dev,viz,apps,hpc]",
 ]
