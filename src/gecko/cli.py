@@ -136,6 +136,9 @@ def _calc_wizard_command(_args: argparse.Namespace) -> int:
     xc = _prompt("XC functional (hf, b3lyp, pbe0, …)", default="hf")
     out_dir = Path(_prompt("Output directory", default=f"./calcs/{molecule}"))
 
+    print(f"\n  codes      : {codes}")
+    print(f"  basis_sets : {basis_sets}")
+    print(f"  out_dir    : {out_dir.resolve()}")
     print(f"\nGenerating input files in {out_dir} …")
     paths = generate_calc_dir(
         molecule=mol,
