@@ -82,7 +82,9 @@ def _fetch_pubchem(name: str) -> qcel.models.Molecule:
     r.raise_for_status()
     cid = r.json()["IdentifierList"]["CID"][0]
 
-    # Fetch 3D conformer; fall back to 2D if unavailable
+    # Fetch 3D conformer; fall back to 2D only if no 3D is available.
+    # Note: PubChem sometimes returns a 2D record (no "z" key) even when
+    # record_type=3d is requested, so we must check for "z" explicitly.
     for record_type in ("3d", "2d"):
         url = f"{PUBCHEM_BASE}/compound/cid/{cid}/JSON?record_type={record_type}"
         r = requests.get(url, timeout=15)
@@ -96,7 +98,23 @@ def _fetch_pubchem(name: str) -> qcel.models.Molecule:
         conformer = compound["coords"][0]["conformers"][0]
         xs: list[float] = conformer["x"]
         ys: list[float] = conformer["y"]
-        zs: list[float] = conformer.get("z", [0.0] * len(xs))
+        zs: list[float] | None = conformer.get("z")
+
+        # If z is absent this is a flat 2D record — skip unless we're
+        # already in the 2D pass (in which case we warn the user).
+        if zs is None:
+            if record_type == "3d":
+                continue  # try the explicit 2D request next
+            # 2D fallback: all z=0, warn so the user knows
+            import warnings
+            warnings.warn(
+                f"No 3D conformer found for {name!r} (CID {cid}) in PubChem. "
+                "Using a 2D structure — all z-coordinates will be zero. "
+                "Provide a local geometry file (--geom-file) for accurate 3D geometry.",
+                UserWarning,
+                stacklevel=3,
+            )
+            zs = [0.0] * len(xs)
 
         symbols = [_atomic_number_to_symbol(z) for z in elements]
         geom_ang = np.array(list(zip(xs, ys, zs)), dtype=float)

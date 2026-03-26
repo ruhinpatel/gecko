@@ -418,6 +418,182 @@ def _prompt_choices(label: str, choices: list[str], default: str) -> str:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# gecko input  (show / get / set / validate / create / diff)
+# ---------------------------------------------------------------------------
+
+
+def _input_show_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.input_model import MadnessInputFile
+
+    inp = MadnessInputFile.from_file(args.file)
+    section_filter = getattr(args, "section", None)
+
+    if args.format == "json":
+        import json
+
+        if section_filter:
+            section = inp._get_section(section_filter)
+            data = section.model_dump(by_alias=True)
+            if section_filter == "molecule":
+                data["atoms"] = [a.model_dump() for a in inp.atoms]
+        else:
+            data = inp.model_dump(by_alias=True)
+        print(json.dumps(data, indent=2))
+    else:
+        if section_filter:
+            # Print just one section in MADNESS format
+            from gecko.workflow.input_serializer import _serialize_section, _serialize_atoms
+
+            section = inp._get_section(section_filter)
+            lines = _serialize_section(section, type(section).model_fields)
+            print(section_filter)
+            for line in lines:
+                print(f"    {line}")
+            if section_filter == "molecule":
+                for line in _serialize_atoms(inp.atoms):
+                    print(f"    {line}")
+            print("end")
+        else:
+            print(inp.to_madness_str(), end="")
+
+    return 0
+
+
+def _input_get_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.input_model import MadnessInputFile
+    from gecko.workflow.params import _render_value
+
+    inp = MadnessInputFile.from_file(args.file)
+    value = inp.get(args.key)
+    print(_render_value(value))
+    return 0
+
+
+def _input_set_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.input_model import MadnessInputFile
+
+    inp = MadnessInputFile.from_file(args.file)
+    inp.set(args.key, args.value)
+
+    if args.dry_run:
+        print(inp.to_madness_str(), end="")
+    else:
+        out_path = Path(args.output) if args.output else Path(args.file)
+        inp.to_file(out_path)
+        print(f"Written to {out_path}")
+
+    return 0
+
+
+def _input_validate_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.input_model import MadnessInputFile
+
+    try:
+        inp = MadnessInputFile.from_file(args.file)
+        n_atoms = len(inp.atoms)
+        n_dft = sum(1 for f in inp.dft.model_fields if getattr(inp.dft, f) != getattr(type(inp.dft)(), f))
+        n_resp = sum(1 for f in inp.response.model_fields if getattr(inp.response, f) != getattr(type(inp.response)(), f))
+        n_mol = sum(1 for f in inp.molecule.model_fields if getattr(inp.molecule, f) != getattr(type(inp.molecule)(), f))
+        print(f"Valid: {args.file}")
+        print(f"  dft: {n_dft} non-default params")
+        print(f"  response: {n_resp} non-default params")
+        print(f"  molecule: {n_mol} non-default params, {n_atoms} atoms")
+        return 0
+    except Exception as exc:
+        print(f"Invalid: {args.file}")
+        print(f"  Error: {exc}")
+        return 1
+
+
+def _input_create_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.input_model import MadnessInputFile, Atom
+
+    # Start from existing file or defaults
+    if args.from_file:
+        inp = MadnessInputFile.from_file(args.from_file)
+    else:
+        inp = MadnessInputFile()
+
+    # Load geometry from file or molecule library
+    if args.geom_file:
+        from gecko.workflow.geometry import load_geometry_from_file
+
+        mol = load_geometry_from_file(Path(args.geom_file))
+        inp.molecule.units = "angstrom"
+        inp.atoms = [
+            Atom(symbol=sym, x=float(xyz[0]), y=float(xyz[1]), z=float(xyz[2]))
+            for sym, xyz in zip(mol.symbols, mol.geometry * 0.529177249)  # Bohr → Å
+        ]
+    elif args.molecule:
+        from gecko.workflow.geometry import load_geometry_from_file
+
+        # Try molecule library first
+        mol_lib = Path("/gpfs/projects/rjh/adrian/development/madness-worktrees/molecules")
+        candidates = list(mol_lib.rglob(f"{args.molecule}.mol"))
+        if candidates:
+            mol = load_geometry_from_file(candidates[0])
+            inp.molecule.units = "angstrom"
+            inp.atoms = [
+                Atom(symbol=sym, x=float(xyz[0]), y=float(xyz[1]), z=float(xyz[2]))
+                for sym, xyz in zip(mol.symbols, mol.geometry * 0.529177249)
+            ]
+            print(f"Loaded geometry from {candidates[0]}")
+        else:
+            print(f"Molecule {args.molecule!r} not found in library. Use --geom-file instead.")
+            return 1
+
+    # Apply --set overrides
+    for kv in (args.set or []):
+        key, _, value = kv.partition("=")
+        if not value:
+            print(f"Invalid --set format: {kv!r} (expected KEY=VALUE)")
+            return 1
+        inp.set(key.strip(), value.strip())
+
+    out_path = Path(args.output)
+    inp.to_file(out_path)
+    print(f"Created {out_path}")
+    return 0
+
+
+def _input_diff_command(args: argparse.Namespace) -> int:
+    from gecko.workflow.input_model import MadnessInputFile
+    from gecko.workflow.params import _render_value
+
+    inp1 = MadnessInputFile.from_file(args.file1)
+    inp2 = MadnessInputFile.from_file(args.file2)
+
+    diffs: list[str] = []
+    for section_name in ("dft", "response", "molecule"):
+        s1 = inp1._get_section(section_name)
+        s2 = inp2._get_section(section_name)
+        for field_name, field_info in s1.model_fields.items():
+            v1 = getattr(s1, field_name)
+            v2 = getattr(s2, field_name)
+            if v1 != v2:
+                key = field_info.alias or field_name
+                diffs.append(
+                    f"  {section_name}.{key}: {_render_value(v1)} → {_render_value(v2)}"
+                )
+
+    # Compare atoms
+    if len(inp1.atoms) != len(inp2.atoms):
+        diffs.append(f"  atoms: {len(inp1.atoms)} → {len(inp2.atoms)}")
+    else:
+        for i, (a1, a2) in enumerate(zip(inp1.atoms, inp2.atoms)):
+            if a1 != a2:
+                diffs.append(f"  atom[{i}]: {a1.symbol} ({a1.x},{a1.y},{a1.z}) → {a2.symbol} ({a2.x},{a2.y},{a2.z})")
+
+    if diffs:
+        print(f"Differences between {args.file1} and {args.file2}:")
+        print("\n".join(diffs))
+    else:
+        print("Files are semantically identical.")
+
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gecko")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -434,6 +610,55 @@ def _build_parser() -> argparse.ArgumentParser:
     build_parser.add_argument("--fail-fast", action="store_true", default=False)
     build_parser.add_argument("--verbose", action=argparse.BooleanOptionalAction, default=True)
     build_parser.set_defaults(func=_build_shg_command)
+
+    # --- input subcommand ---
+    input_parser = subparsers.add_parser("input", help="Read, write, and edit MADNESS .in files")
+    input_subparsers = input_parser.add_subparsers(dest="input_command", required=True)
+
+    # gecko input show
+    show_parser = input_subparsers.add_parser("show", help="Display a parsed MADNESS input file")
+    show_parser.add_argument("file", help="Path to .in file")
+    show_parser.add_argument("--section", "-s", choices=["dft", "response", "molecule"],
+                             help="Show only this section")
+    show_parser.add_argument("--format", "-f", choices=["madness", "json"], default="madness",
+                             help="Output format (default: madness)")
+    show_parser.set_defaults(func=_input_show_command)
+
+    # gecko input get
+    get_parser = input_subparsers.add_parser("get", help="Get a single parameter value")
+    get_parser.add_argument("file", help="Path to .in file")
+    get_parser.add_argument("key", help="Dotted key (e.g. dft.xc, response.dipole.frequencies)")
+    get_parser.set_defaults(func=_input_get_command)
+
+    # gecko input set
+    set_parser = input_subparsers.add_parser("set", help="Set a parameter and write back")
+    set_parser.add_argument("file", help="Path to .in file")
+    set_parser.add_argument("key", help="Dotted key (e.g. dft.xc)")
+    set_parser.add_argument("value", help="New value")
+    set_parser.add_argument("--dry-run", action="store_true", help="Print result without writing")
+    set_parser.add_argument("--output", "-o", default="", help="Write to a different file")
+    set_parser.set_defaults(func=_input_set_command)
+
+    # gecko input validate
+    validate_parser = input_subparsers.add_parser("validate", help="Validate a MADNESS input file")
+    validate_parser.add_argument("file", help="Path to .in file")
+    validate_parser.set_defaults(func=_input_validate_command)
+
+    # gecko input create
+    create_parser = input_subparsers.add_parser("create", help="Create a new MADNESS input file")
+    create_parser.add_argument("--output", "-o", required=True, help="Output .in file path")
+    create_parser.add_argument("--set", action="append", metavar="KEY=VALUE",
+                               help="Set parameters (e.g. dft.xc=b3lyp)")
+    create_parser.add_argument("--from-file", default="", help="Start from an existing .in file")
+    create_parser.add_argument("--molecule", "-m", default="", help="Molecule name (search library)")
+    create_parser.add_argument("--geom-file", default="", help="Path to .xyz/.mol geometry file")
+    create_parser.set_defaults(func=_input_create_command)
+
+    # gecko input diff
+    diff_parser = input_subparsers.add_parser("diff", help="Semantic diff between two input files")
+    diff_parser.add_argument("file1", help="First .in file")
+    diff_parser.add_argument("file2", help="Second .in file")
+    diff_parser.set_defaults(func=_input_diff_command)
 
     # --- calc subcommand (new) ---
     calc_parser = subparsers.add_parser("calc", help="Calculation setup utilities")
