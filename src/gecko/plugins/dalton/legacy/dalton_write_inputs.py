@@ -5,7 +5,6 @@ from typing import Dict, Optional
 
 import qcelemental as qcel
 import numpy as np
-from qcelemental.molparse.to_string import _atoms_formatter
 
 
 def _has_no_orient(extras: Optional[dict], default: bool) -> bool:

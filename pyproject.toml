@@ -24,6 +24,9 @@ dependencies = [
   "trame",
   "trame-vuetify",
   "pint",
+  "requests",
+  "pydantic>=2.0",
+  "mcp>=1.0",
 ]
 
 [project.scripts]
@@ -54,6 +57,10 @@ apps = [
   "trame-vtk",
 ]
 
+hpc = [
+  "paramiko",
+]
+
 all = [
-  "gecko[dev,viz,apps]",
+  "gecko[dev,viz,apps,hpc]",
 ]
