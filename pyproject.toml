@@ -31,6 +31,8 @@ dependencies = [
 
 [project.scripts]
 gecko = "gecko.cli:main"
+gecko-mcp = "gecko.mcp_server:main"
+gecko-madness-mcp = "gecko.madness_mcp_server:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

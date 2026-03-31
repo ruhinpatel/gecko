@@ -373,5 +373,9 @@ def explore_parameter(param_name: str) -> str:
 # Entry point
 # ---------------------------------------------------------------------------
 
-if __name__ == "__main__":
+def main() -> None:
     server.run()
+
+
+if __name__ == "__main__":
+    main()
