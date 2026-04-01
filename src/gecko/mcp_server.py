@@ -468,6 +468,7 @@ def generate_calc_inputs(
     output_dir: str = "",
     geom_file: str = "",
     code: str = "madness",
+    basis_sets: str = "aug-cc-pVDZ",
 ) -> str:
     """Generate MADNESS (and optionally DALTON) input files for a molecule.
 
@@ -482,6 +483,7 @@ def generate_calc_inputs(
         output_dir: Output directory. Default: $GECKO_SCRATCH/<molecule>.
         geom_file: Optional path to .xyz/.mol file (overrides library/PubChem).
         code: "madness", "dalton", or "both".
+        basis_sets: Comma-separated basis sets for Dalton (e.g. "aug-cc-pVDZ,aug-cc-pVTZ").
     """
     from gecko.workflow.geometry import fetch_geometry, load_geometry_from_file
     from gecko.workflow.writers import generate_calc_dir
@@ -498,6 +500,7 @@ def generate_calc_inputs(
 
     codes = ["madness", "dalton"] if code == "both" else [code]
     freqs = [float(f.strip()) for f in frequencies.split(",")]
+    bases = [b.strip() for b in basis_sets.split(",")]
     out = Path(output_dir) if output_dir else _SCRATCH / molecule
 
     paths = generate_calc_dir(
@@ -505,7 +508,7 @@ def generate_calc_inputs(
         mol_name=molecule,
         property=property,
         codes=codes,
-        basis_sets=["aug-cc-pVDZ"],
+        basis_sets=bases,
         frequencies=freqs,
         xc=xc,
         out_dir=out,

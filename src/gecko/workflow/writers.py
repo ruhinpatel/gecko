@@ -372,7 +372,7 @@ class DaltonInput:
     def _response_lines(self) -> list[str]:
         lines = ["**RESPONSE"]
         if self.property == "alpha":
-            lines += ["*LINEAR", ".ALPHA"]
+            lines += ["*LINEAR", ".DIPLEN"]
         elif self.property == "beta":
             n = len(self.frequencies)
             freq_line = " ".join(str(f) for f in self.frequencies)
