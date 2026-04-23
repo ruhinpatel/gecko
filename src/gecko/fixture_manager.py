@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 # ---------------------------------------------------------------------------
 # Tier tolerances
 # ---------------------------------------------------------------------------
@@ -55,16 +57,14 @@ def _static_tensor(alpha: dict[str, Any]) -> dict[str, float] | None:
         return None
     omega = list(alpha.get("omega", []))
     comps = list(alpha.get("components", []))
-    import numpy as np
-
     vals = list(alpha.get("values", []))
     if not omega or not comps or not vals:
         return None
 
-    vals_arr = __import__("numpy").asarray(vals, dtype=float)
+    vals_arr = np.asarray(vals, dtype=float)
     # find omega=0 row
-    omegas = __import__("numpy").asarray(omega, dtype=float)
-    static_idx = int(__import__("numpy").argmin(__import__("numpy").abs(omegas)))
+    omegas = np.asarray(omega, dtype=float)
+    static_idx = int(np.argmin(np.abs(omegas)))
 
     result = {}
     for j, comp in enumerate(comps):
@@ -78,8 +78,6 @@ def _static_tensor(alpha: dict[str, Any]) -> dict[str, float] | None:
 
 
 def _validate_all(args: Any) -> int:
-    import numpy as np
-
     db_path = Path(args.db) if args.db else _DEFAULT_FIXTURES_DIR / "reference_db.json"
     tier: str = args.tier
     tol = _TIER_TOLERANCE.get(tier, 1e-4)
@@ -201,8 +199,6 @@ def _validate_all(args: Any) -> int:
 
 
 def _compare(args: Any) -> int:
-    import numpy as np
-
     build1 = Path(args.build1)
     build2 = Path(args.build2)
     prop: str = args.property
@@ -246,8 +242,6 @@ def _compare_tensor_property(
     label: str,
     tol: float,
 ) -> None:
-    import numpy as np
-
     if d1 is None or d2 is None:
         missing = "build1" if d1 is None else "build2"
         print(f"FAIL: {label} not found in {missing}")
