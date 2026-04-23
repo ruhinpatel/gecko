@@ -2,6 +2,7 @@ migration/*
 *.pyc
 __pycache__/
 *.pyc*
+dalton_probe_out/
 shg_ijk.csv
 *.egg-info
 project_data/*

@@ -29,7 +29,7 @@ can parse existing `.out` files produced by Dalton on Seawulf without re-running
 
 Test files used:
 - `tests/fixtures/load_calc/02_aug-cc-pVDZ_n2/quad_n2-aug-cc-pVDZ.out` (beta, works)
-- `/gpfs/projects/rjh/adrian/post_acs/dalton/hf/NH3O/dipole/freq_NH3O-d-aug-cc-pVDZ.out` (alpha, 5 frequencies, fails)
+- A multi-frequency alpha output for a non-linear molecule (H₂O or NH₃O) — not included in the repo; reproduce on Seawulf with any 5-frequency Dalton run on a C1-symmetry molecule
 
 ---
 
@@ -186,12 +186,3 @@ without waiting for upstream.
 
 This gives the cleanest long-term path without blocking the current sprint.
 
----
-
-## Questions for Adrian
-
-1. Do you have a preference between Options A, B, or C?
-2. Are there alpha calculation fixtures in the Gecko test suite I should be aware of beyond
-   the N₂ fixture in `tests/fixtures/load_calc/02_aug-cc-pVDZ_n2/`?
-3. Should we file the upstream bug report under the Gecko project or separately?
-4. Is there a known workaround in the DaltonProject docs for multi-symmetry outputs?

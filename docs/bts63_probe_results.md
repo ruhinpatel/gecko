@@ -2,7 +2,7 @@
 
 **Task:** Validate that `daltonproject.dalton` can reproduce polarizability for all 9 fixture molecules.
 **Script:** `gecko/scripts/daltonproject_probe.py`
-**Output:** `/gpfs/scratch/ruhipatel/dalton_probe/`
+**Output:** scratch directory on Seawulf (pass via `--scratch`)
 **API reference:** `gecko/docs/daltonproject_api_notes.md`
 
 ---
@@ -10,15 +10,14 @@
 ## How to Run
 
 ```bash
-cd /gpfs/projects/rjh/ruhin/gecko
-
-export PATH="/gpfs/projects/rjh/adrian/dalton/build:/cm/shared/apps/openmpi4/gcc/4.1.5/bin:$PATH"
-export LD_LIBRARY_PATH="/gpfs/software/intel/oneAPI/2024_2/mkl/2024.2/lib/intel64:$LD_LIBRARY_PATH"
+# Set up Seawulf environment (paths will differ per user/cluster setup)
+export PATH="<dalton_build_dir>:/cm/shared/apps/openmpi4/gcc/4.1.5/bin:$PATH"
+export LD_LIBRARY_PATH="<mkl_lib_dir>:$LD_LIBRARY_PATH"
 export DALTON_LAUNCHER="mpirun -np 1"
 
 .venv/bin/python scripts/daltonproject_probe.py \
     --basis both \
-    --scratch /gpfs/scratch/ruhipatel/dalton_probe
+    --scratch <scratch_dir>
 ```
 
 Re-run a subset:
@@ -73,7 +72,7 @@ Re-run a subset:
 ## Where to Find Output Files
 
 ```
-/gpfs/scratch/ruhipatel/dalton_probe/
+<scratch_dir>/
 └── <molecule>/
     └── <basis>/
         ├── <mol>_<basis>.dal   # Dalton input (wave function + response)
@@ -81,8 +80,6 @@ Re-run a subset:
         ├── <mol>_<basis>.out   # Full Dalton output log
         └── <mol>_<basis>.tar.gz
 ```
-
-Example: `/gpfs/scratch/ruhipatel/dalton_probe/H2O/d_aug_cc_pVDZ/H2O_d-aug-cc-pVDZ.out`
 
 ---
 

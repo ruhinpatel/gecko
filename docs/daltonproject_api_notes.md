@@ -192,7 +192,7 @@ Runs one shared `.dal` file with separate `.mol` files, parallelized across avai
 ## Environment Setup (Seawulf)
 
 ```bash
-export PATH="/gpfs/projects/rjh/adrian/dalton/build:/cm/shared/apps/openmpi4/gcc/4.1.5/bin:$PATH"
-export LD_LIBRARY_PATH="/gpfs/software/intel/oneAPI/2024_2/mkl/2024.2/lib/intel64:$LD_LIBRARY_PATH"
+export PATH="<dalton_build_dir>:/cm/shared/apps/openmpi4/gcc/4.1.5/bin:$PATH"
+export LD_LIBRARY_PATH="<mkl_lib_dir>:$LD_LIBRARY_PATH"
 export DALTON_LAUNCHER="mpirun -np 1"
 ```

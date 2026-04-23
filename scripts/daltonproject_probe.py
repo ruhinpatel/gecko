@@ -31,20 +31,15 @@ import numpy as np
 # Molecule definitions
 # ---------------------------------------------------------------------------
 
-MOL_LIB = Path(
-    os.environ.get(
-        "GECKO_MOL_LIB",
-        "/gpfs/projects/rjh/adrian/development/madness-worktrees/molecules",
-    )
-)
+_mol_lib = os.environ.get("GECKO_MOL_LIB")
+if not _mol_lib:
+    raise EnvironmentError("Set GECKO_MOL_LIB to the molecules directory before running this script.")
+MOL_LIB = Path(_mol_lib)
 
-FIXTURES_DIR = Path(
-    os.environ.get(
-        "GECKO_FIXTURES_DIR",
-        "/gpfs/projects/rjh/adrian/development/madness-worktrees"
-        "/molresponse-feature-next/src/apps/molresponse_v3/tests/fixtures",
-    )
-)
+_fixtures_dir = os.environ.get("GECKO_FIXTURES_DIR")
+if not _fixtures_dir:
+    raise EnvironmentError("Set GECKO_FIXTURES_DIR to the fixtures directory before running this script.")
+FIXTURES_DIR = Path(_fixtures_dir)
 
 REFERENCE_DB = FIXTURES_DIR / "reference_db.json"
 
