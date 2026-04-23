@@ -225,6 +225,10 @@ class DaltonInput:
     For Raman calculations, also generates an ``optimize.dal`` file
     (geometry optimisation must be run before the Raman step).
 
+    Input files are generated via ``daltonproject.dalton`` rather than
+    custom renderers.  The ``direct`` field is kept for API compatibility
+    but has no effect (DaltonProject controls integral handling).
+
     Parameters
     ----------
     molecule : qcel.models.Molecule
@@ -240,8 +244,15 @@ class DaltonInput:
     frequencies : list[float]
         Optical frequencies in atomic units (Hartree).
     direct : bool
-        Use direct integrals (``.DIRECT``).  Recommended for large systems.
-        Not used for Raman (the ``.WALK`` workflow handles this).
+        Kept for backward compatibility; has no effect.
+    multiplicity : int
+        Spin multiplicity (1 = singlet/closed-shell, 2 = doublet, etc.).
+    rohf_closed : int, optional
+        Number of closed-shell orbitals for ROHF open-shell calculations.
+        Required when ``multiplicity > 1``.
+    rohf_open : int, optional
+        Number of singly-occupied orbitals for ROHF open-shell calculations.
+        Required when ``multiplicity > 1``.
     """
 
     molecule: qcel.models.Molecule
@@ -251,6 +262,9 @@ class DaltonInput:
     property: Property = "alpha"
     frequencies: list[float] = field(default_factory=lambda: [0.0])
     direct: bool = True
+    multiplicity: int = 1
+    rohf_closed: Optional[int] = None
+    rohf_open: Optional[int] = None
 
     def write(self, out_dir: Path) -> dict[str, Path]:
         """Write input files and return a dict of ``{label: Path}``.
@@ -258,43 +272,65 @@ class DaltonInput:
         For alpha/beta: ``{"dal": ..., "mol": ...}``
         For raman:      ``{"optimize_dal": ..., "raman_dal": ..., "mol": ...}``
         """
+        import daltonproject as dp
+        from daltonproject.dalton.program import dalton_input, molecule_input
+
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
         stem = f"{self.mol_name}_{self.basis}"
-        mol_path = out_dir / f"{stem}.mol"
-        mol_path.write_text(self._render_mol())
 
+        # --- Build DaltonProject objects ---
+        bohr2ang = qcel.constants.conversion_factor("bohr", "angstrom")
+        geom = np.asarray(self.molecule.geometry).reshape(-1, 3) * bohr2ang
+        atoms_str = "; ".join(
+            f"{sym} {x:.10f} {y:.10f} {z:.10f}"
+            for sym, (x, y, z) in zip(self.molecule.symbols, geom)
+        )
+        charge = int(round(self.molecule.molecular_charge))
+        dp_mol = dp.Molecule(atoms=atoms_str, charge=charge, multiplicity=self.multiplicity)
+        dp_basis = dp.Basis(basis=self.basis)
+
+        method_name = "HF" if self.xc.lower() == "hf" else self.xc.upper()
+        dp_method = dp.QCMethod(method_name)
+        if self.multiplicity > 1 and self.rohf_closed is not None and self.rohf_open is not None:
+            dp_method.scf_occupation(
+                closed_shells=[self.rohf_closed],
+                open_shells=[self.rohf_open],
+            )
+
+        # --- Write .mol file ---
+        mol_path = out_dir / f"{stem}.mol"
+        mol_path.write_text(molecule_input(dp_mol, dp_basis))
+
+        # --- Write .dal file(s) ---
         if self.property == "raman":
+            # TODO(BTS-75): validate DaltonProject Raman (.WALK) workflow before replacing
             opt_path = out_dir / "optimize.dal"
             ram_path = out_dir / "raman.dal"
             opt_path.write_text(self._render_dal_optimize())
             ram_path.write_text(self._render_dal_raman())
             return {"optimize_dal": opt_path, "raman_dal": ram_path, "mol": mol_path}
-        else:
-            dal_path = out_dir / f"{stem}.dal"
-            dal_path.write_text(self._render_dal())
-            return {"dal": dal_path, "mol": mol_path}
+
+        freqs = [float(f) for f in self.frequencies]
+        if self.property == "alpha":
+            dp_prop = dp.Property(polarizabilities={"frequencies": freqs})
+        else:  # beta
+            dp_prop = dp.Property(first_hyperpolarizability=True)
+
+        dal_path = out_dir / f"{stem}.dal"
+        dal_path.write_text(dalton_input(dp_method, dp_prop, dp_mol))
+        return {"dal": dal_path, "mol": mol_path}
 
     # ------------------------------------------------------------------
+    # Raman legacy renderers — kept until DaltonProject .WALK workflow
+    # is validated (TODO BTS-75).
 
     def _wf_lines(self) -> list[str]:
-        """Wave function section lines, shared by all .dal variants."""
         if self.xc.lower() == "hf":
             return ["**WAVE FUNCTIONS", ".HF"]
         return ["**WAVE FUNCTIONS", ".DFT", self.xc.upper()]
 
-    def _render_dal(self) -> str:
-        """Alpha / beta .dal file."""
-        lines = ["**DALTON INPUT", ".RUN RESPONSE"]
-        if self.direct:
-            lines.append(".DIRECT")
-        lines.extend(self._wf_lines())
-        lines.extend(self._response_lines())
-        lines.append("**END OF DALTON INPUT")
-        return "\n".join(lines) + "\n"
-
     def _render_dal_optimize(self) -> str:
-        """Geometry optimisation .dal file (required before Raman)."""
         lines = [
             "**DALTON INPUT",
             ".OPTIMIZE",
@@ -317,15 +353,8 @@ class DaltonInput:
         return "\n".join(lines) + "\n"
 
     def _render_dal_raman(self) -> str:
-        """Raman .dal file using the .WALK numerical integration workflow.
-
-        Frequencies appear in three sections (**START, **EACH STEP,
-        **PROPERTIES) and must be identical in all three.
-        """
         n = len(self.frequencies)
         freq_line = " ".join(str(f) for f in self.frequencies)
-
-        # The ABALNR block (frequencies) is identical in all three sections.
         abalnr_block = [
             "*ABALNR",
             ".THRESH",
@@ -334,55 +363,19 @@ class DaltonInput:
             str(n),
             freq_line,
         ]
-
-        lines = [
-            "**DALTON INPUT",
-            ".WALK",
-            "*WALK",
-            ".NUMERI",
-        ]
+        lines = ["**DALTON INPUT", ".WALK", "*WALK", ".NUMERI"]
         lines.extend(self._wf_lines())
-        lines += [
-            "*SCF INPUT",
-            ".THRESH",
-            "1.0D-8",
-            "**START",
-            ".RAMAN",
-        ]
+        lines += ["*SCF INPUT", ".THRESH", "1.0D-8", "**START", ".RAMAN"]
         lines.extend(abalnr_block)
         lines += ["**EACH STEP", ".RAMAN"]
         lines.extend(abalnr_block)
         lines += [
-            "**PROPERTIES",
-            ".RAMAN",
-            ".VIBANA",
-            "*RESPONSE",
-            ".THRESH",
-            "1.0D-6",
+            "**PROPERTIES", ".RAMAN", ".VIBANA",
+            "*RESPONSE", ".THRESH", "1.0D-6",
         ]
         lines.extend(abalnr_block)
-        lines += [
-            "*VIBANA",
-            ".PRINT",
-            "100",
-            "**END OF DALTON INPUT",
-        ]
+        lines += ["*VIBANA", ".PRINT", "100", "**END OF DALTON INPUT"]
         return "\n".join(lines) + "\n"
-
-    def _response_lines(self) -> list[str]:
-        lines = ["**RESPONSE"]
-        if self.property == "alpha":
-            lines += ["*LINEAR", ".DIPLEN"]
-        elif self.property == "beta":
-            n = len(self.frequencies)
-            freq_line = " ".join(str(f) for f in self.frequencies)
-            lines += ["*QUADRA", ".DIPLEN", ".FREQUENCIES", str(n), freq_line]
-        return lines
-
-    def _render_mol(self) -> str:
-        from gecko.plugins.dalton.legacy.dalton_write_inputs import to_string
-
-        return to_string(self.molecule, self.basis, units="Angstrom") + "\n"
 
 
 # ---------------------------------------------------------------------------
@@ -442,7 +435,7 @@ def generate_calc_dir(
     result: dict[str, list[Path]] = {"madness": [], "dalton": []}
 
     if "madness" in codes:
-        mad_dir = out_dir / mol_name / "madness"
+        mad_dir = out_dir / mol_name / (f"mad-{tier}" if tier else "madness")
         inp = MadnessInput(
             molecule=molecule,
             mol_name=mol_name,
