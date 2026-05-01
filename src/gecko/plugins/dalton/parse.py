@@ -11,6 +11,12 @@ from gecko.core.model import Calculation
 from gecko.molecule.canonical import canonicalize_atom_order
 from gecko.plugins.dalton.legacy.dalton import DaltonParser as LegacyDaltonParser
 
+try:
+    from daltonproject.dalton.output_parser import OutputParser as _DaltonProjectOutputParser
+    _DALTONPROJECT_AVAILABLE = True
+except ImportError:
+    _DALTONPROJECT_AVAILABLE = False
+
 
 _BETA_LINE_PREFIX = "@ B-freq"
 
@@ -656,11 +662,23 @@ def _parse_one_out(path: Path) -> dict[str, Any]:
     except Exception:
         pass
 
-    try:
-        tensors, freqs, _ = parse_polarizability_section(lines, start_index=0)
-        out["alpha"] = _alpha_tensor_to_data(tensors, freqs)
-    except Exception:
-        pass
+    if _DALTONPROJECT_AVAILABLE:
+        try:
+            dp_parser = _DaltonProjectOutputParser(str(path.with_suffix('')))
+            pol = dp_parser.polarizabilities
+            out["alpha"] = _alpha_tensor_to_data(pol.values, pol.frequencies.tolist())
+        except Exception:
+            try:
+                tensors, freqs, _ = parse_polarizability_section(lines, start_index=0)
+                out["alpha"] = _alpha_tensor_to_data(tensors, freqs)
+            except Exception:
+                pass
+    else:
+        try:
+            tensors, freqs, _ = parse_polarizability_section(lines, start_index=0)
+            out["alpha"] = _alpha_tensor_to_data(tensors, freqs)
+        except Exception:
+            pass
 
     try:
         beta = _parse_beta_from_quad_lines(lines)

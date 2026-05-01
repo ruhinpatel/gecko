@@ -17,6 +17,7 @@ authors = [
 dependencies = [
   "scipy",
   "qcelemental @ git+https://github.com/ahurta92/QCElemental.git@928af03",
+  "daltonproject @ git+https://github.com/ruhinpatel/daltonproject.git@fix/alpha-parser-nonlinear",
   "sphinx",
   "nglview",
   "matplotlib",
