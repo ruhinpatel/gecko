@@ -815,6 +815,44 @@ def _build_parser() -> argparse.ArgumentParser:
     _add_ssh_args(status_parser)
     status_parser.set_defaults(func=_calc_status_command)
 
+    # --- fixture subcommand ---
+    from gecko.fixture_manager import _validate_all, _compare
+
+    fixture_parser = subparsers.add_parser("fixture", help="Developer validation utilities")
+    fixture_subparsers = fixture_parser.add_subparsers(dest="fixture_command", required=True)
+
+    # gecko fixture validate-all
+    va_parser = fixture_subparsers.add_parser(
+        "validate-all",
+        help="Compare completed fixture calcs against reference_db.json",
+    )
+    va_parser.add_argument(
+        "--tier", default="medium", choices=["low", "medium", "high"],
+        help="Numerical accuracy tier — sets comparison tolerance (default: medium)",
+    )
+    va_parser.add_argument(
+        "--db", default="",
+        help="Path to reference_db.json (default: $GECKO_FIXTURES_DIR/reference_db.json)",
+    )
+    va_parser.set_defaults(func=_validate_all)
+
+    # gecko fixture compare
+    cmp_parser = fixture_subparsers.add_parser(
+        "compare",
+        help="Diff same fixture run under two builds and report regressions",
+    )
+    cmp_parser.add_argument("--build1", required=True, help="Path to first calc directory")
+    cmp_parser.add_argument("--build2", required=True, help="Path to second calc directory")
+    cmp_parser.add_argument(
+        "--property", "-p", default="alpha", choices=["alpha", "beta", "energy"],
+        help="Property to compare (default: alpha)",
+    )
+    cmp_parser.add_argument(
+        "--tier", default="medium", choices=["low", "medium", "high"],
+        help="Tier tolerance for regression detection (default: medium)",
+    )
+    cmp_parser.set_defaults(func=_compare)
+
     return parser
 
 

@@ -11,3 +11,4 @@ tmp_raman_scaffold/data/raman_paper/slurm_scripts/gecko.code-workspace
 *latex*
 .venv/
 test.py
+calcs/
