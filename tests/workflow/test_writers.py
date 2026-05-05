@@ -187,6 +187,31 @@ class TestGenerateCalcDir:
         assert len(result["madness"]) == 1
         assert len(result["dalton"]) > 0
 
+    def test_madness_tier_directory(self, tmp_path, water):
+        result = generate_calc_dir(
+            molecule=water,
+            mol_name="H2O",
+            property="alpha",
+            codes=["madness"],
+            basis_sets=[],
+            out_dir=tmp_path,
+            tier="medium",
+        )
+        in_file = result["madness"][0]
+        assert in_file.parent.name == "mad-medium"
+        assert in_file.parent.parent.name == "H2O"
+
+    def test_madness_no_tier_uses_madness_dir(self, tmp_path, water):
+        result = generate_calc_dir(
+            molecule=water,
+            mol_name="H2O",
+            property="alpha",
+            codes=["madness"],
+            basis_sets=[],
+            out_dir=tmp_path,
+        )
+        assert result["madness"][0].parent.name == "madness"
+
 
 # ---------------------------------------------------------------------------
 # MadnessInput — params overrides
