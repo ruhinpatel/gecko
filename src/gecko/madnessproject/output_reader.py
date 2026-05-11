@@ -100,6 +100,8 @@ def load_output(path: str | Path) -> CalculationResult:
 
     if "tasks" in data:
         _parse_calc_info(data, result)
+    elif "return_energy" in data:
+        _parse_moldft_output(data, result)
     else:
         _parse_legacy_output(data, result)
 
@@ -161,6 +163,33 @@ def _parse_calc_info(data: dict, result: CalculationResult) -> None:
         props = t.get("properties", {})
         if "raman_spectra" in props:
             result.raman = props["raman_spectra"]
+
+
+# ---------------------------------------------------------------------------
+# Direct moldft calc_info.json format (return_energy at top level)
+# ---------------------------------------------------------------------------
+
+
+def _parse_moldft_output(data: dict, result: CalculationResult) -> None:
+    """Parse direct moldft ``*.calc_info.json`` format.
+
+    This format is produced by running ``moldft`` directly (not via MADQC).
+    Energy is stored at ``data["return_energy"]`` and molecule geometry is
+    nested under ``data["molecule"]``.
+    """
+    result.energy = data.get("return_energy")
+
+    mol_data = data.get("molecule")
+    if mol_data:
+        result.molecule = _build_molecule_from_json(mol_data)
+
+    calc_data = data.get("parameters", {})
+    params: dict[str, Any] = {}
+    for key in ("xc", "k", "maxiter", "localize", "econv", "dconv"):
+        if key in calc_data:
+            params[key] = calc_data[key]
+    if params:
+        result.calc_params = CalculationParameters(**params)
 
 
 # ---------------------------------------------------------------------------
